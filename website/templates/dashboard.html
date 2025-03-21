@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture Notes - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+<div class="d-flex" style="height: 100vh;">
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column justify-content-between p-3 border-end">
+        <div>
+            <a class="nav-link text-dark" href="/"><h4 class="text-center fw-bold">Lecture Notes</h4></a>
+            <ul class="nav flex-column mt-4">
+                <li class="nav-item mb-3"><a class="nav-link text-dark" href="#">🏠 Dashboard</a></li>
+                <li class="nav-item mb-3"><a class="nav-link text-dark" href="#">📝 All my notes</a></li>
+                <li class="nav-item mb-3"><a class="nav-link text-dark" href="#">📤 Shared with me</a></li>
+                <li class="nav-item mb-5"><a class="nav-link text-dark" href="#">🗑️ Trash</a></li>
+            </ul>
+        </div>
+        <div>
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2"><a class="nav-link text-dark" href="#">💬 Support</a></li>
+                <li class="nav-item"><a class="nav-link text-dark" href="#">⚙️ Setting</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main area -->
+    <div class="main-area d-flex flex-column flex-grow-1">
+        <!-- Topbar -->
+        <div class="topbar d-flex justify-content-between align-items-center px-4 py-3 border-bottom">
+            <div style="width: 35px;"></div>
+            <form class="d-flex w-50 justify-content-center">
+                <input class="form-control w-75" type="search" placeholder="Search" aria-label="Search">
+            </form>
+            <div class="dropdown">
+                <img src="#" alt="User" class="rounded-circle me-2">
+                <a href="#" class="dropdown-toggle text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">☰</a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#">Cập nhật thông tin</a></li>
+                    <li><a class="dropdown-item" href="#">Đăng xuất</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content p-4 flex-grow-1">
+            <h4 class="fw-bold">My Notes</h4>
+            <div class="d-flex flex-wrap gap-3">
+                <div class="position-relative">
+                    <a href="#" class="note-card note-yellow text-decoration-none d-block">
+                        <strong><em>Tiêu đề</em></strong>
+                        <p>Mô tả ngắn gọn</p>
+                    </a>
+                    <div class="dropdown position-absolute top-0 end-0 m-2">
+                        <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">Edit</a></li>
+                            <li><a class="dropdown-item" href="#">Share</a></li>
+                            <li><a class="dropdown-item text-danger" href="#">Remove</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Thêm các thẻ note tương tự -->
+            </div>
+
+            <h4 class="fw-bold mt-5">Shared</h4>
+            <div class="d-flex flex-wrap gap-3">
+                <div class="position-relative">
+                    <a href="#" class="note-card note-purple text-decoration-none d-block">
+                        <strong><em>Tiêu đề</em></strong>
+                        <p>Mô tả ngắn gọn</p>
+                    </a>
+                    <div class="dropdown position-absolute top-0 end-0 m-2">
+                        <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">Edit</a></li>
+                            <li><a class="dropdown-item" href="#">Share</a></li>
+                            <li><a class="dropdown-item text-danger" href="#">Remove</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-dark rounded-circle position-fixed end-0 bottom-0 m-4" style="width: 50px; height: 50px; font-size: 24px;">+</button>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

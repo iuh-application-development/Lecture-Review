@@ -1,5 +1,6 @@
 Flask
 Flask-SQLAlchemy
-flask-login
-flask-admin
+FLask-Login
+Flask-Admin
+Flask-WTF
 python-dotenv

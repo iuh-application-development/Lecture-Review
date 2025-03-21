@@ -1,0 +1,70 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+}
+
+h4 {
+    font-weight: bold;
+}
+
+.sidebar {
+    width: 220px;
+    min-width: 220px;
+    background-color: #fff;
+}
+
+/* Sidebar menu link style */
+.nav-link {
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: #007bff;
+}
+
+/* Topbar styling */
+.topbar {
+    background-color: #fff;
+}
+
+/* Note card styles (tăng kích thước lớn hơn) */
+.note-card {
+    border-radius: 15px;
+    color: #fff;
+    padding: 20px;
+    width: 250px;          /* tăng từ 200px lên 250px */
+    min-height: 180px;     /* tăng từ 150px lên 180px */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.1s;
+    cursor: pointer;
+}
+
+.note-card:hover {
+    transform: scale(1.03);
+}
+
+.note-yellow {
+    background-color: #f7d774;
+    color: #000;
+}
+
+.note-green {
+    background-color: #1fb67d;
+    color: #fff;
+}
+
+.note-purple {
+    background-color: #b86ccf;
+    color: #fff;
+}
+
+.bi-three-dots-vertical {
+    color: #000;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.dropdown-toggle::after {
+    display: none;
+}
