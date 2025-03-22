@@ -13,31 +13,51 @@ h4 {
     background-color: #fff;
 }
 
-/* Sidebar menu link style */
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
 .nav-link {
     text-decoration: none;
     font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.nav-link i {
+    margin-right: 8px;
+    font-size: 18px;
 }
 
 .nav-link:hover {
     color: #007bff;
 }
 
-/* Topbar styling */
 .topbar {
     background-color: #fff;
 }
 
-/* Note card styles (tăng kích thước lớn hơn) */
+.topbar .dropdown-toggle {
+    color: black;
+    font-size: 24px;
+}
+
 .note-card {
     border-radius: 15px;
     color: #fff;
     padding: 20px;
-    width: 250px;          /* tăng từ 200px lên 250px */
-    min-height: 180px;     /* tăng từ 150px lên 180px */
+    width: 300px;
+    min-height: 180px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     transition: transform 0.1s;
     cursor: pointer;
+}
+
+.note-header strong em {
+    font-weight: bold;
 }
 
 .note-card:hover {
@@ -65,6 +85,35 @@ h4 {
     cursor: pointer;
 }
 
+.note-dropdown .dropdown-item {
+    display: flex;
+    align-items: center;
+}
+
+.note-dropdown .dropdown-item i {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.title-block {
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    display: inline-block;
+    width: auto;
+    padding: 5px 15px;
+    margin-bottom: 10px;
+}
+
 .dropdown-toggle::after {
     display: none;
+}
+
+.card-separator {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
+.main-area {
+    overflow-y: auto;
 }
