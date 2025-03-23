@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Lecture-Review
 Lecture-Review
 =======
@@ -93,4 +92,3 @@ MAIL_PASSWORD=your_email_password
 ## Ghi chú
 - Đảm bảo đã cài đặt **Python 3.8+**
 - Nếu sử dụng **PostgreSQL**, cần cập nhật `DATABASE_URL` trong file `.env`
->>>>>>> master
