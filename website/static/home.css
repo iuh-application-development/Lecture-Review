@@ -1,0 +1,73 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.note-card {
+    border-radius: 15px;
+    color: #fff;
+    padding: 15px;
+    margin-right: 10px;
+    width: 200px;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.note-card:hover {
+    transform: scale(1.03);
+}
+
+.note-yellow {
+    background-color: #f7d774;
+    color: #000;
+}
+
+.note-black {
+    background-color: #000;
+    color: #fff;
+}
+
+.note-green {
+    background-color: #1fb67d;
+}
+
+.note-purple {
+    background-color: #b86ccf;
+}
+
+.header-section,
+.intro-section,
+.notes-section {
+    margin-bottom: 60px;
+}
+
+.header-section h4 {
+    font-weight: bold;
+}
+
+.notes-section {
+    position: relative;
+}
+
+.next-arrow {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #000;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    line-height: 38px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 20px;
+    color: #000;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.next-arrow:hover {
+    background-color: #000;
+    color: #fff;
+}
