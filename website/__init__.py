@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 from .config import Config
 import os
 
@@ -11,10 +12,24 @@ def create_app():
     db.init_app(app)
     
     from .views import views
+    from .auth import auth
     from .api import api
-    
+    from .admin.admin_views import admin
+
     app.register_blueprint(views, url_prefix='/')
+    app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(api, url_prefix='/api')
+    app.register_blueprint(admin, url_prefix='/admin')
+
+    from .models import User
+    
+    login_manager = LoginManager()
+    login_manager.login_view = 'auth.login'
+    login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
 
     create_database(app)
 

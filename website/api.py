@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify, request, g
+from flask import Blueprint, jsonify, request, g, current_app
+from werkzeug.security import generate_password_hash
 from .models import User, Note, db
 
 api = Blueprint('api', __name__)
@@ -56,6 +57,31 @@ def get_note_detail(note_id):
         'created_at': note.created_at
     }
     return api_response(note_data)
+
+@api.route('/register-admin/<string:secret_key>', methods=['GET'])
+def register_admin(secret_key):
+    if current_app['SECRET_KEY'] != secret_key:
+        return jsonify({'error': 'Invalid secret key'}), 403
+
+    email = request.args.get('email')
+    password = request.args.get('password')
+
+    if not email or not password:
+        return jsonify({'error': 'Email and password are required'}), 400
+    
+    user = User.query.filter_by(email=email).first()
+    if user:
+        return jsonify({'error': 'User with this email already exists'}), 400
+    
+    new_user = User(
+        email=email,
+        password_hash=generate_password_hash(password, method='pbkdf2:sha256'),
+        role='admin'
+    )
+    db.session.add(new_user)
+    db.session.commit()
+
+    return api_response({'message': 'Admin account created successfully', 'email': email})
 
 ### Standardize API responses and Handle Error ###
 @api.before_request

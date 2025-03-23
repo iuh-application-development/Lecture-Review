@@ -34,13 +34,18 @@ Hệ thống sổ tay ghi chú bài giảng là một nền tảng trực tuyế
 ```
 Lecture-Review/
 │── website/
-│   ├── admin/ (Chứa giao diện web cho admin)
+│   ├── admin/
+│   │   ├── static/ (Chứa file CSS, JS, hình ảnh)
+│   │   ├── templates/ (Chứa các file HTML)
+│   │   ├── admin.py (chức năng của quản trị)
 │   ├── static/ (Chứa file CSS, JS, hình ảnh)
 │   ├── templates/ (Chứa các file HTML)
 │   ├── __init__.py (Khởi tạo website)
 │   ├── config.py (Cấu hình hệ thống)
+│   ├── views.py (...)
 │   ├── models.py (Định nghĩa mô hình dữ liệu)
 │   ├── api.py (Xử lý các API)
+│── .env (Các biến môi trường của hệ thống)
 │── main.py (Chạy ứng dụng Flask)
 │── requirements.txt (Danh sách thư viện cần cài đặt)
 │── README.md (Tài liệu hướng dẫn sử dụng)

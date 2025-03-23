@@ -10,3 +10,7 @@ def home():
 @views.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html', user=current_user)
+
+@views.route('/all-my-notes')
+def all_my_notes():
+    return render_template('all_my_notes.html', user=current_user)
