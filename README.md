@@ -1,5 +1,4 @@
 # Lecture-Review
-Lecture-Review
 =======
 # Hệ Thống Sổ Tay Ghi Chú Bài Giảng
 
