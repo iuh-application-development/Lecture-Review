@@ -1,0 +1,296 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+}
+
+h4 {
+    font-weight: bold;
+}
+
+.sidebar {
+    width: 220px;
+    min-width: 220px;
+    background-color: #fff;
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.nav-link {
+    text-decoration: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.nav-link i {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.nav-link:hover {
+    color: #007bff;
+}
+
+.topbar {
+    background-color: #fff;
+}
+
+.topbar .dropdown-toggle {
+    color: black;
+    font-size: 24px;
+}
+
+.note-card {
+    border-radius: 15px;
+    color: #fff;
+    padding: 20px;
+    width: 300px;
+    min-height: 180px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.1s;
+    cursor: pointer;
+}
+
+.note-header strong em {
+    font-weight: bold;
+}
+
+.note-card:hover {
+    transform: scale(1.03);
+}
+
+.note-yellow {
+    background-color: #f7d774;
+    color: #000;
+}
+
+.note-green {
+    background-color: #1fb67d;
+    color: #fff;
+}
+
+.note-purple {
+    background-color: #b86ccf;
+    color: #fff;
+}
+
+.bi-three-dots-vertical {
+    color: #000;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.note-dropdown .dropdown-item {
+    display: flex;
+    align-items: center;
+}
+
+.note-dropdown .dropdown-item i {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.title-block {
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    display: inline-block;
+    width: auto;
+    padding: 5px 15px;
+    margin-bottom: 10px;
+}
+
+.dropdown-toggle::after {
+    display: none;
+}
+
+.card-separator {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
+.main-area {
+    overflow-y: auto;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+}
+
+h4 {
+    font-weight: bold;
+}
+
+.sidebar {
+    width: 220px;
+    min-width: 220px;
+    background-color: #fff;
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.nav-link {
+    text-decoration: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.nav-link i {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.nav-link:hover {
+    color: #007bff;
+}
+
+.topbar {
+    background-color: #fff;
+}
+
+.topbar .dropdown-toggle {
+    color: black;
+    font-size: 24px;
+}
+
+.note-card {
+    border-radius: 15px;
+    color: #fff;
+    padding: 20px;
+    width: 300px;
+    min-height: 180px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.1s;
+    cursor: pointer;
+}
+
+.note-header strong em {
+    font-weight: bold;
+}
+
+.note-card:hover {
+    transform: scale(1.03);
+}
+
+.note-yellow {
+    background-color: #f7d774;
+    color: #000;
+}
+
+.note-green {
+    background-color: #1fb67d;
+    color: #fff;
+}
+
+.note-purple {
+    background-color: #b86ccf;
+    color: #fff;
+}
+
+.bi-three-dots-vertical {
+    color: #000;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.note-dropdown .dropdown-item {
+    display: flex;
+    align-items: center;
+}
+
+.note-dropdown .dropdown-item i {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.title-block {
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    display: inline-block;
+    width: auto;
+    padding: 5px 15px;
+    margin-bottom: 10px;
+}
+
+.dropdown-toggle::after {
+    display: none;
+}
+
+.card-separator {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
+.main-area {
+    overflow-y: auto;
+}
+
+.dropdown-item {
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+.dropdown-item i {
+    margin-right: 8px;
+}
+
+.btn-link:hover {
+    opacity: 0.7;
+}
+.create-note-btn {
+    color: #007bff;
+    font-weight: bold;
+}
+/*Định dạng bộ chọn màu*/
+.color-pick {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #efe6e6;
+}
+/*Định dạng ô nhập liệu*/
+.form-control {
+    border:  1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: none;
+}
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: none;
+}
+/*Định dạng nhãn*/
+.form-label {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+}
+/*Định dạng nút*/
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 20px;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.btn-secondary:hover {
+    background-color: #b3b3b3;
+    border-color: #b3b3b3;
+}
