@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 views = Blueprint('views', __name__)
 
@@ -10,6 +10,11 @@ def home():
 @views.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html', user=current_user)
+
+@views.route('/all-my-notes')
+@login_required
+def all_my_notes():
+    return render_template('all_my_notes.html', user=current_user)
 
 @views.route('/share-with-me')
 def share_with_me():
