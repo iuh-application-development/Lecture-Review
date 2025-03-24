@@ -60,7 +60,7 @@ def get_note_detail(note_id):
 
 @api.route('/register-admin/<string:secret_key>', methods=['GET'])
 def register_admin(secret_key):
-    if current_app['SECRET_KEY'] != secret_key:
+    if current_app.secret_key != secret_key:
         return jsonify({'error': 'Invalid secret key'}), 403
 
     email = request.args.get('email')
@@ -76,6 +76,9 @@ def register_admin(secret_key):
     new_user = User(
         email=email,
         password_hash=generate_password_hash(password, method='pbkdf2:sha256'),
+        first_name='admin',
+        last_name=email,
+        gender='Male',
         role='admin'
     )
     db.session.add(new_user)

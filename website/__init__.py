@@ -14,7 +14,7 @@ def create_app():
     from .views import views
     from .auth import auth
     from .api import api
-    from .admin.admin_views import admin
+    from .admin import admin
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
@@ -32,7 +32,6 @@ def create_app():
         return User.query.get(int(user_id))
 
     create_database(app)
-
     return app
 
 def create_database(app):

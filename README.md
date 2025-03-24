@@ -34,17 +34,16 @@ Hệ thống sổ tay ghi chú bài giảng là một nền tảng trực tuyế
 ```
 Lecture-Review/
 │── website/
-│   ├── admin/
-│   │   ├── static/ (Chứa file CSS, JS, hình ảnh)
-│   │   ├── templates/ (Chứa các file HTML)
-│   │   ├── admin.py (chức năng của quản trị)
 │   ├── static/ (Chứa file CSS, JS, hình ảnh)
 │   ├── templates/ (Chứa các file HTML)
+│   │   ├── admin/ (Chứa các file HTML của giao diện admin)
 │   ├── __init__.py (Khởi tạo website)
 │   ├── config.py (Cấu hình hệ thống)
-│   ├── views.py (...)
-│   ├── models.py (Định nghĩa mô hình dữ liệu)
+│   ├── views.py (Xử lý giao diện người dùng)
+│   ├── auth.py (Xử lý các xác thực)
+│   ├── admin.py (Xử lý giao diện admin)
 │   ├── api.py (Xử lý các API)
+│   ├── models.py (Định nghĩa mô hình dữ liệu)
 │── .env (Các biến môi trường của hệ thống)
 │── main.py (Chạy ứng dụng Flask)
 │── requirements.txt (Danh sách thư viện cần cài đặt)
@@ -67,6 +66,7 @@ venv\Scripts\activate  # Trên Windows
 
 ### 3. Cài đặt các thư viện cần thiết
 ```bash
+python -m pip install --upgrade pip  # Nâng cấp phiên bản mới nhất của pip
 pip install -r requirements.txt
 ```
 

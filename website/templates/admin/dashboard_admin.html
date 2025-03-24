@@ -1,0 +1,60 @@
+{% extends 'admin/base_admin.html' %} {% block content %}
+<div class="content p-4 flex-grow-1">
+    <!-- Hàng hiển thị 3 box thống kê -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3 mb-md-0">
+            <div class="border rounded p-3 text-center">
+                <div class="fw-bold">Total User</div>
+                <div>100</div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3 mb-md-0">
+            <div class="border rounded p-3 text-center">
+                <div class="fw-bold">Total Content</div>
+                <div>1000</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="border rounded p-3 text-center">
+                <div class="fw-bold">Active session</div>
+                <div>50</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hàng hiển thị Recent Activities và System Status -->
+    <div class="row">
+        <!-- Recent Activities -->
+        <div class="col-md-6 mb-4 text-center">
+            <!-- Tiêu đề bên ngoài khối, căn giữa -->
+            <h5 class="fw-bold mb-3">Recent Activities</h5>
+            <!-- Khối nội dung full-width cột -->
+            <div class="border rounded p-3">
+                <ul class="list-unstyled text-start">
+                    <li class="mb-2 d-flex align-items-center">
+                        <i class="bi bi-person-plus-fill me-2"></i>
+                        New user registered
+                    </li>
+                    <li class="mb-2 d-flex align-items-center">
+                        <i class="bi bi-pencil-fill me-2"></i>
+                        Content update
+                    </li>
+                    <li class="d-flex align-items-center">
+                        <i class="bi bi-gear-fill me-2"></i>
+                        Setting change
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- System Status -->
+        <div class="col-md-6 mb-4 text-center">
+            <!-- Tiêu đề bên ngoài khối, căn giữa -->
+            <h5 class="fw-bold mb-3">System Status</h5>
+            <!-- Khối nội dung full-width cột -->
+            <div class="border rounded p-3 text-start">
+                <p class="mb-0">All systems running normally.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
