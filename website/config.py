@@ -10,9 +10,4 @@ class Config:
 
     # Cấu hình Email
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
-<<<<<<< HEAD
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
-=======
-    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
-    
->>>>>>> HamHuong

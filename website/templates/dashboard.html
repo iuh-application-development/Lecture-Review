@@ -8,11 +8,21 @@
             <div class="note-header d-flex justify-content-between align-items-start pb-1">
                 <strong><em>Tiêu đề</em></strong>
                 <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
+                    <button class="btn p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-share"></i> Share</a></li>
+                        <li><a class="dropdown-item edit-note" href="#" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#editNoteModal"
+                            data-note-color="yellow"
+                            data-note-title="Tiêu đề"
+                            data-note-content="Nội dung">
+                            <i class="bi bi-pencil"></i> Edit</a></li>
+                        <li><a class="dropdown-item text-danger" href="#">
+                            <i class="bi bi-trash"></i> Delete</a></li>
                     </ul>
                 </div>
             </div>
@@ -23,11 +33,19 @@
             <div class="note-header d-flex justify-content-between align-items-start pb-1">
                 <strong><em>Tiêu đề</em></strong>
                 <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
+                    <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editNoteModal">
+                            <i class="bi bi-pencil-fill"></i> Edit</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-share-fill"></i> Share</a>
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#">
+                            <i class="bi bi-trash3-fill"></i> Delete</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -38,11 +56,19 @@
             <div class="note-header d-flex justify-content-between align-items-start pb-1">
                 <strong><em>Tiêu đề</em></strong>
                 <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
+                    <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editNoteModal">
+                            <i class="bi bi-pencil-fill"></i> Edit</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-share-fill"></i> Share</a>
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#">
+                            <i class="bi bi-trash3-fill"></i> Delete</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -53,11 +79,19 @@
             <div class="note-header d-flex justify-content-between align-items-start pb-1">
                 <strong><em>Tiêu đề</em></strong>
                 <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
+                    <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editNoteModal">
+                            <i class="bi bi-pencil-fill"></i> Edit</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-share-fill"></i> Share</a>
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#">
+                            <i class="bi bi-trash3-fill"></i> Delete</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -68,11 +102,19 @@
             <div class="note-header d-flex justify-content-between align-items-start pb-1">
                 <strong><em>Tiêu đề</em></strong>
                 <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
+                    <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editNoteModal">
+                            <i class="bi bi-pencil-fill"></i> Edit</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-share-fill"></i> Share</a>
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#">
+                            <i class="bi bi-trash3-fill"></i> Delete</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -83,11 +125,19 @@
             <div class="note-header d-flex justify-content-between align-items-start pb-1">
                 <strong><em>Tiêu đề</em></strong>
                 <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
+                    <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editNoteModal">
+                            <i class="bi bi-pencil-fill"></i> Edit</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-share-fill"></i> Share</a>
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#">
+                            <i class="bi bi-trash3-fill"></i> Delete</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -98,11 +148,19 @@
             <div class="note-header d-flex justify-content-between align-items-start pb-1">
                 <strong><em>Tiêu đề</em></strong>
                 <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
+                    <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editNoteModal">
+                            <i class="bi bi-pencil-fill"></i> Edit</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-share-fill"></i> Share</a>
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#">
+                            <i class="bi bi-trash3-fill"></i> Delete</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -120,11 +178,19 @@
             <div class="note-header d-flex justify-content-between align-items-start pb-1">
                 <strong><em>Tiêu đề</em></strong>
                 <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
+                    <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editNoteModal">
+                            <i class="bi bi-pencil-fill"></i> Edit</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-share-fill"></i> Share</a>
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#">
+                            <i class="bi bi-trash3-fill"></i> Delete</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -135,11 +201,19 @@
             <div class="note-header d-flex justify-content-between align-items-start pb-1">
                 <strong><em>Tiêu đề</em></strong>
                 <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
+                    <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editNoteModal">
+                            <i class="bi bi-pencil-fill"></i> Edit</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-share-fill"></i> Share</a>
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#">
+                            <i class="bi bi-trash3-fill"></i> Delete</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -150,11 +224,19 @@
             <div class="note-header d-flex justify-content-between align-items-start pb-1">
                 <strong><em>Tiêu đề</em></strong>
                 <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
+                    <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editNoteModal">
+                            <i class="bi bi-pencil-fill"></i> Edit</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-share-fill"></i> Share</a>
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#">
+                            <i class="bi bi-trash3-fill"></i> Delete</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -165,11 +247,19 @@
             <div class="note-header d-flex justify-content-between align-items-start pb-1">
                 <strong><em>Tiêu đề</em></strong>
                 <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
+                    <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editNoteModal">
+                            <i class="bi bi-pencil-fill"></i> Edit</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-share-fill"></i> Share</a>
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#">
+                            <i class="bi bi-trash3-fill"></i> Delete</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -180,11 +270,19 @@
             <div class="note-header d-flex justify-content-between align-items-start pb-1">
                 <strong><em>Tiêu đề</em></strong>
                 <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
+                    <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editNoteModal">
+                            <i class="bi bi-pencil-fill"></i> Edit</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-share-fill"></i> Share</a>
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#">
+                            <i class="bi bi-trash3-fill"></i> Delete</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -195,11 +293,19 @@
             <div class="note-header d-flex justify-content-between align-items-start pb-1">
                 <strong><em>Tiêu đề</em></strong>
                 <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
+                    <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editNoteModal">
+                            <i class="bi bi-pencil-fill"></i> Edit</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-share-fill"></i> Share</a>
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#">
+                            <i class="bi bi-trash3-fill"></i> Delete</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -210,11 +316,19 @@
             <div class="note-header d-flex justify-content-between align-items-start pb-1">
                 <strong><em>Tiêu đề</em></strong>
                 <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
+                    <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editNoteModal">
+                            <i class="bi bi-pencil-fill"></i> Edit</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-share-fill"></i> Share</a>
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#">
+                            <i class="bi bi-trash3-fill"></i> Delete</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -224,9 +338,15 @@
         <!-- Các card khác tương tự -->
     </div>
 
-    <button class="btn btn-dark rounded-circle position-fixed end-0 bottom-0 m-4" style="width: 50px; height: 50px; font-size: 24px;">+</button>
+    <!-- Nút create - đặt ở cuối content area -->
+    <button type="button" 
+            class="btn btn-dark rounded-circle position-fixed" 
+            style="bottom: 30px; right: 30px; width: 50px; height: 50px;"
+            data-bs-toggle="modal" 
+            data-bs-target="#createNoteModal">
+        +
+    </button>
 </div>
-{% endblock %}
 
 <!-- Edit Modal -->
 <div class="modal fade" id="editNoteModal" tabindex="-1">
@@ -296,6 +416,4 @@
     </div>
 </div>
 
-
-</body>
-</html>
+{% endblock %}
