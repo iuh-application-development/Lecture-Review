@@ -227,3 +227,75 @@
     <button class="btn btn-dark rounded-circle position-fixed end-0 bottom-0 m-4" style="width: 50px; height: 50px; font-size: 24px;">+</button>
 </div>
 {% endblock %}
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editNoteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-4">
+            <h4 class="text-center mb-4 edit-note-title">Edit Note</h4>
+            
+            <!-- Color Picker -->
+            <div class="d-flex justify-content-center gap-2 mb-4">
+                <div class="color-pick" style="background-color: #ffd700;"></div>
+                <div class="color-pick" style="background-color: #f8c1cc;"></div>
+                <div class="color-pick" style="background-color: #90EE90;"></div>
+                <div class="color-pick" style="background-color: #b3e5fc;"></div>
+            </div>
+
+            <!-- Form -->
+            <div class="mb-3">
+                <label for="editNoteTitle" class="form-label">Title</label>
+                <input type="text" class="form-control" id="editNoteTitle">
+            </div>
+
+            <div class="mb-4">
+                <label for="editNoteContent" class="form-label">Content</label>
+                <textarea class="form-control" id="editNoteContent" rows="4"></textarea>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Create Note -->
+<div class="modal" id="createNoteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-4">
+            <h4 class="text-center mb-3">Create new notes</h4>
+            
+            <!-- Color Picker - 3 nút nhỏ ở giữa -->
+            <div class="d-flex justify-content-center gap-2 mb-4">
+                <div class="color-pick" style="background-color: #ffd700;"></div>
+                <div class="color-pick" style="background-color: #90EE90;"></div>
+                <div class="color-pick" style="background-color: #DDA0DD;"></div>
+                <div class="color-pick" style="background-color: #b3e5fc;"></div>
+            </div>
+
+            <!-- Form -->
+            <div class="mb-3">
+                <label for = 'editNoteTitle' class="form-label">Title</label>
+                <input type="text" class="form-control" id="editNoteTitle">
+            </div>
+
+            <div class="mb-4">
+                <label for = 'editNoteContent' class="form-label">Content</label>
+                <textarea class="form-control" rows="6" id="editNoteContent"></textarea>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex justify-content-center gap-2">
+                <button type="button" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>

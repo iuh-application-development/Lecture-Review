@@ -179,6 +179,47 @@ h4 {
     gap: 5px;
 }
 
-.tag i {
-    font-size: 1rem;
+.create-note-btn {
+    color: #007bff;
+    font-weight: bold;
+}
+/*Định dạng bộ chọn màu*/
+.color-pick {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #efe6e6;
+}
+/*Định dạng ô nhập liệu*/
+.form-control {
+    border:  1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: none;
+}
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: none;
+}
+/*Định dạng nhãn*/
+.form-label {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+}
+/*Định dạng nút*/
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 20px;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.btn-secondary:hover {
+    background-color: #b3b3b3;
+    border-color: #b3b3b3;
 }
