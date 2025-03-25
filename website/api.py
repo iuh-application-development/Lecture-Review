@@ -1,6 +1,8 @@
-from flask import Blueprint, jsonify, request, g, current_app
+from flask import Blueprint, jsonify, request, g, current_app, url_for
 from werkzeug.security import generate_password_hash
+from flask_login import current_user
 from .models import User, Note, db
+from datetime import datetime
 
 api = Blueprint('api', __name__)
 API_VERSION = 'api-v1'
@@ -33,18 +35,63 @@ def get_user_detail(user_id):
 
 @api.route('/notes', methods=['GET'])
 def get_notes():
-    notes = Note.query.all()
+    limit = request.args.get('limit', type=int)
+    
+    if current_user.role == 'admin':
+        all_param = request.args.get('all', 'false').lower()
+        if all_param == 'true':
+            query = Note.query.order_by(Note.updated_at.desc())
+        else:
+            query = Note.query.filter_by(user_id=current_user.id).order_by(Note.updated_at.desc())
+    else:
+        query = Note.query.filter_by(user_id=current_user.id).order_by(Note.updated_at.desc())
+
+    if limit is not None and limit > 0:
+        notes = query.limit(limit).all()
+    else:
+        notes = query.all()
+
     notes_data = [
         {
             'id': note.id,
             'title': note.title,
             'content': note.content,
+            'color': note.color,
             'user_id': note.user_id,
-            'created_at': note.created_at
+            'updated_at': note.updated_at
         }
         for note in notes
     ]
     return api_response(notes_data)
+
+@api.route('/notes/create', methods=['POST'])
+def create_note():
+    data = request.get_json()
+    title = data.get('title')
+    content = data.get('content')
+    color = data.get('color')
+    user_id = data.get('user_id')
+
+    new_note = Note(
+        title=title,
+        content=content,
+        color=color,
+        user_id=user_id,
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    )
+
+    db.session.add(new_note)
+    db.session.commit()
+
+    return jsonify({
+        'success': True,
+        'redirect': url_for('views.dashboard')
+    })
+
+@api.route('/notes/edit/<int:note_id>', methods=['POST'])
+def edit_note(note_id):
+    return ''
 
 @api.route('/notes/<int:note_id>', methods=['GET'])
 def get_note_detail(note_id):
@@ -58,6 +105,7 @@ def get_note_detail(note_id):
     }
     return api_response(note_data)
 
+# /api/register-admin/your_secret_key?email=admin@gmail.com&password=admin123
 @api.route('/register-admin/<string:secret_key>', methods=['GET'])
 def register_admin(secret_key):
     if current_app.secret_key != secret_key:

@@ -64,19 +64,19 @@ h4 {
     transform: scale(1.03);
 }
 
-.note-yellow {
-    background-color: #f7d774;
+.note-blue {
+    background-color: rgba(13, 202, 240, 0.2);
     color: #000;
 }
 
 .note-green {
-    background-color: #1fb67d;
-    color: #fff;
+    background-color: rgba(25, 135, 84, 0.2);
+    color: #000;
 }
 
 .note-purple {
-    background-color: #b86ccf;
-    color: #fff;
+    background-color: #E5BEF1;
+    color: #000;
 }
 
 .bi-three-dots-vertical {
@@ -183,6 +183,7 @@ h4 {
     color: #007bff;
     font-weight: bold;
 }
+
 /*Định dạng bộ chọn màu*/
 .color-pick {
     width: 20px;

@@ -27,67 +27,7 @@
 
     <!-- Note cards (ví dụ) -->
     <div class="d-flex flex-wrap gap-3 mb-4">
-        <div class="note-card note-yellow p-3">
-            <div class="note-header d-flex justify-content-between align-items-start pb-1">
-                <strong><em>Tiêu đề</em></strong>
-                <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="card-separator"></div>
-            <p class="mt-2">Nội dung</p>
-        </div>
-        <div class="note-card note-green p-3">
-            <div class="note-header d-flex justify-content-between align-items-start pb-1">
-                <strong><em>Tiêu đề</em></strong>
-                <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="card-separator"></div>
-            <p class="mt-2">Nội dung</p>
-        </div>
-        <div class="note-card note-yellow p-3">
-            <div class="note-header d-flex justify-content-between align-items-start pb-1">
-                <strong><em>Tiêu đề</em></strong>
-                <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="card-separator"></div>
-            <p class="mt-2">Nội dung</p>
-        </div>
-        <div class="note-card note-purple p-3">
-            <div class="note-header d-flex justify-content-between align-items-start pb-1">
-                <strong><em>Tiêu đề</em></strong>
-                <div class="dropdown">
-                    <a href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-share-fill"></i> Share</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil-fill"></i> Edit</a></li>
-                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3-fill"></i> Delete</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="card-separator"></div>
-            <p class="mt-2">Nội dung</p>
-        </div>
-        <div class="note-card note-yellow p-3">
+        <div class="note-card note-blue p-3">
             <div class="note-header d-flex justify-content-between align-items-start pb-1">
                 <strong><em>Tiêu đề</em></strong>
                 <div class="dropdown">
@@ -155,6 +95,10 @@
         </ul>
     </nav>
 
-    <button class="btn btn-dark rounded-circle position-fixed end-0 bottom-0 m-4" style="width: 50px; height: 50px; font-size: 24px;">+</button>
+    <button type="button" class="btn btn-dark rounded-circle position-fixed"
+        style="bottom: 30px; right: 30px; width: 50px; height: 50px;" data-bs-toggle="modal"
+        data-bs-target="#createNoteModal">
+        +
+    </button>
 </div>
 {% endblock %}
