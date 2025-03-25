@@ -1,68 +1,65 @@
 {% extends 'base.html' %} {% block content %}
 <div class="content p-4 flex-grow-1">
-    <div id="shared-with-me">
-        <!-- Tabs -->
-        <div class="d-flex mb-3 border-bottom">
-          <button class="tab-button active" id="tab1" >Shared with me</button>
-          <button class="tab-button" id="tab2">Shared by me</button>
-        </div>
-      
-        <!-- Title -->
-        <h4 class="mb-4 fw-bold">Shared with me</h4>
-      
-        <!-- Cards -->
-        <div class="d-flex flex-wrap gap-3">
-          <div class="card-shared bg-success-subtle" style="background-color: #BEF1C4; ">
-            <p class="fst-italic" >Shared by User1</p>
-            <div class="fw-bold ms-4" >Tiêu đề</div>
-            <div class="text-muted ms-4 fst-italic" style="font-size: 14px;">Nội dung</div>
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <span class="fst-italic" style="font-size: 14px;">
-                    <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image" style="width: 22px;">
-                        Shared 2 days ago
-                </span>
-                <span class="tag ms-4" style="font-size: 12px; background: #D9D9D9; border: 1px solid #000000">
-                    <img src="{{ url_for('static', filename='images/profile.png') }}" alt="Image" style="width: 22px;"> 
-                    Manage access
-                </span>
-            </div>
-          </div>
-      
-          <div class="card-shared" style="background-color: #E5BEF1; ">
-            <p class="fst-italic">Shared by User2</p>
-            <div class="fw-bold ms-4">Tiêu đề</div>
-            <div class="text-muted ms-4 fst-italic" style="font-size: 14px;">Nội dung</div>
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <span class="fst-italic" style="font-size: 14px;">
-                    <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image" style="width: 22px;">
-                        Shared 1 week ago
-                </span>
-                <span class="tag ms-4" style="font-size: 12px; background: #D9D9D9; border: 1px solid #000000">
-                    <img src="{{ url_for('static', filename='images/profile.png') }}" alt="Image" style="width: 22px;"> 
-                    Manage access
-                </span>
-            </div>
-          </div>
-      
-          <div class="card-shared bg-info-subtle" style="background-color: #BEF1E9; ">
-            <p class="fst-italic">Shared by User1</p>
-            <div class="fw-bold ms-4">Tiêu đề</div>
-            <div class="text-muted ms-4 fst-italic" style="font-size: 14px;">Nội dung</div>
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <span class="fst-italic" style="font-size: 14px;">
-                    <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image" style="width: 22px;">
-                        Shared 2 days ago
-                </span>
-                <span class="tag ms-4" style="font-size: 12px; background: #D9D9D9; border: 1px solid #000000">
-                    <img src="{{ url_for('static', filename='images/profile.png') }}" alt="Image" style="width: 22px;"> 
-                    Manage access
-                </span>
-            </div>
-          </div>
+  <div id="shared-with-me">
+    <!-- Tabs -->
+    <div class="d-flex mb-3 border-bottom">
+      <button class="tab-button active" id="tab1">Shared with me</button>
+      <button class="tab-button" id="tab2">Shared by me</button>
+    </div>
+
+    <!-- Title -->
+    <h4 class="mb-4 fw-bold">Shared with me</h4>
+
+    <!-- Cards -->
+    <div class="d-flex flex-wrap gap-3">
+      <div class="card-shared bg-success-subtle" style="background-color: #BEF1C4; ">
+        <p class="fst-italic">Shared by User1</p>
+        <div class="fw-bold ms-4">Tiêu đề</div>
+        <div class="text-muted ms-4 fst-italic" style="font-size: 14px;">Nội dung</div>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <span class="fst-italic" style="font-size: 14px;">
+            <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image" style="width: 22px;">
+            Shared 2 days ago
+          </span>
+          <span class="tag ms-4" style="font-size: 12px; background: #D9D9D9; border: 1px solid #000000">
+            <img src="{{ url_for('static', filename='images/profile.png') }}" alt="Image" style="width: 22px;">
+            Manage access
+          </span>
         </div>
       </div>
-      
 
-    <button class="btn btn-dark rounded-circle position-fixed end-0 bottom-0 m-4" style="width: 50px; height: 50px; font-size: 24px;">+</button>
+      <div class="card-shared" style="background-color: #E5BEF1; ">
+        <p class="fst-italic">Shared by User2</p>
+        <div class="fw-bold ms-4">Tiêu đề</div>
+        <div class="text-muted ms-4 fst-italic" style="font-size: 14px;">Nội dung</div>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <span class="fst-italic" style="font-size: 14px;">
+            <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image" style="width: 22px;">
+            Shared 1 week ago
+          </span>
+          <span class="tag ms-4" style="font-size: 12px; background: #D9D9D9; border: 1px solid #000000">
+            <img src="{{ url_for('static', filename='images/profile.png') }}" alt="Image" style="width: 22px;">
+            Manage access
+          </span>
+        </div>
+      </div>
+
+      <div class="card-shared bg-info-subtle" style="background-color: #BEF1E9; ">
+        <p class="fst-italic">Shared by User1</p>
+        <div class="fw-bold ms-4">Tiêu đề</div>
+        <div class="text-muted ms-4 fst-italic" style="font-size: 14px;">Nội dung</div>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <span class="fst-italic" style="font-size: 14px;">
+            <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image" style="width: 22px;">
+            Shared 2 days ago
+          </span>
+          <span class="tag ms-4" style="font-size: 12px; background: #D9D9D9; border: 1px solid #000000">
+            <img src="{{ url_for('static', filename='images/profile.png') }}" alt="Image" style="width: 22px;">
+            Manage access
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

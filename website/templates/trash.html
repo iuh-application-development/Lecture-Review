@@ -2,91 +2,106 @@
 <div class="content p-4 flex-grow-1">
     <div id="shared-with-me">
         <!-- Tabs -->
-        <div class="d-flex mb-3 border-bottom" >
+        <div class="d-flex mb-3 border-bottom">
             <h4 class=" fw-bold" style="font-size: 30px;">Trash</h4>
         </div>
-      
-        <!-- Title -->              
+
+        <!-- Title -->
         <!-- Cards -->
         <div class="d-flex flex-wrap gap-3">
-          <div class="card-shared bg-success-subtle" style="background-color: #BEF1C4; position: relative;">
-            <div class="fw-bold " style="color: #3300FF;">Tiêu đề</div>
-            <div class="text-muted  fst-italic" style="font-size: 14px;">Nội dung</div>
-            <div class="d-flex flex-column align-items-start mt-5">
-                <span class="fst-italic" style="font-size: 14px;">
-                    <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image" style="width: 22px;">
+            <div class="card-shared bg-success-subtle" style="background-color: #BEF1C4; position: relative;">
+                <div class="fw-bold " style="color: #3300FF;">Tiêu đề</div>
+                <div class="text-muted  fst-italic" style="font-size: 14px;">Nội dung</div>
+                <div class="d-flex flex-column align-items-start mt-5">
+                    <span class="fst-italic" style="font-size: 14px;">
+                        <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image"
+                            style="width: 22px;">
                         Deleted 2 days ago
-                </span>
-                <span class="fst-italic mt-2" style="font-size: 14px;">
-                    <img src="{{ url_for('static', filename='images/error.png') }}" alt="Image" style="width: 22px;">
-                    Will be permanently deleted in 28 days
-                </span>
-            </div>
-            <div class="d-flex " style="position: absolute; top: 12px; right: 12px;">
-                <span class="fst-italic p-1" style="font-size: 12px; border-radius: 20px; background: #007BFF; color: white;">
-                    <img src="{{ url_for('static', filename='images/rotate.png') }}" alt="Image" style="width: 18px;">
+                    </span>
+                    <span class="fst-italic mt-2" style="font-size: 14px;">
+                        <img src="{{ url_for('static', filename='images/error.png') }}" alt="Image"
+                            style="width: 22px;">
+                        Will be permanently deleted in 28 days
+                    </span>
+                </div>
+                <div class="d-flex " style="position: absolute; top: 12px; right: 12px;">
+                    <span class="fst-italic p-1"
+                        style="font-size: 12px; border-radius: 20px; background: #007BFF; color: white;">
+                        <img src="{{ url_for('static', filename='images/rotate.png') }}" alt="Image"
+                            style="width: 18px;">
                         Restore
-                </span>
-                <span class="fst-italic p-1 ms-2" style="font-size: 12px; border-radius: 20px; background: #FC0004CF; color: white;">
-                    <img src="{{ url_for('static', filename='images/delete.png') }}" alt="Image" style="width: 18px;">
-                    Delete
-                </span>
+                    </span>
+                    <span class="fst-italic p-1 ms-2"
+                        style="font-size: 12px; border-radius: 20px; background: #FC0004CF; color: white;">
+                        <img src="{{ url_for('static', filename='images/delete.png') }}" alt="Image"
+                            style="width: 18px;">
+                        Delete
+                    </span>
+                </div>
             </div>
-          </div>
-      
-          <div class="card-shared" style="background-color: #E5BEF1; position: relative;">
-            <div class="fw-bold " style="color: #3300FF;">Tiêu đề</div>
-            <div class="text-muted  fst-italic" style="font-size: 14px;">Nội dung</div>
-            <div class="d-flex flex-column align-items-start mt-5">
-                <span class="fst-italic" style="font-size: 14px;">
-                    <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image" style="width: 22px;">
-                        Deleted 2 days ago
-                </span>
-                <span class="fst-italic mt-2" style="font-size: 14px;">
-                    <img src="{{ url_for('static', filename='images/error.png') }}" alt="Image" style="width: 22px;">
-                    Will be permanently deleted in 28 days
-                </span>
-            </div>
-            <div class="d-flex " style="position: absolute; top: 12px; right: 12px;">
-                <span class="fst-italic p-1" style="font-size: 12px; border-radius: 20px; background: #007BFF; color: white;">
-                    <img src="{{ url_for('static', filename='images/rotate.png') }}" alt="Image" style="width: 18px;">
-                        Restore
-                </span>
-                <span class="fst-italic p-1 ms-2" style="font-size: 12px; border-radius: 20px; background: #FC0004CF; color: white;">
-                    <img src="{{ url_for('static', filename='images/delete.png') }}" alt="Image" style="width: 18px;">
-                    Delete
-                </span>
-            </div>
-          </div>
-      
-          <div class="card-shared bg-info-subtle" style="background-color: #BEF1E9; position: relative;">
-            <div class="fw-bold " style="color: #3300FF;">Tiêu đề</div>
-            <div class="text-muted  fst-italic" style="font-size: 14px;">Nội dung</div>
-            <div class="d-flex flex-column align-items-start mt-5">
-                <span class="fst-italic" style="font-size: 14px;">
-                    <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image" style="width: 22px;">
-                        Deleted 2 days ago
-                </span>
-                <span class="fst-italic mt-2" style="font-size: 14px;">
-                    <img src="{{ url_for('static', filename='images/error.png') }}" alt="Image" style="width: 22px;">
-                    Will be permanently deleted in 28 days
-                </span>
-            </div>
-            <div class="d-flex " style="position: absolute; top: 12px; right: 12px;">
-                <span class="fst-italic p-1" style="font-size: 12px; border-radius: 20px; background: #007BFF; color: white;">
-                    <img src="{{ url_for('static', filename='images/rotate.png') }}" alt="Image" style="width: 18px;">
-                        Restore
-                </span>
-                <span class="fst-italic p-1 ms-2" style="font-size: 12px; border-radius: 20px; background: #FC0004CF; color: white;">
-                    <img src="{{ url_for('static', filename='images/delete.png') }}" alt="Image" style="width: 18px;">
-                    Delete
-                </span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
 
-    <button class="btn btn-dark rounded-circle position-fixed end-0 bottom-0 m-4" style="width: 50px; height: 50px; font-size: 24px;">+</button>
+            <div class="card-shared" style="background-color: #E5BEF1; position: relative;">
+                <div class="fw-bold " style="color: #3300FF;">Tiêu đề</div>
+                <div class="text-muted  fst-italic" style="font-size: 14px;">Nội dung</div>
+                <div class="d-flex flex-column align-items-start mt-5">
+                    <span class="fst-italic" style="font-size: 14px;">
+                        <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image"
+                            style="width: 22px;">
+                        Deleted 2 days ago
+                    </span>
+                    <span class="fst-italic mt-2" style="font-size: 14px;">
+                        <img src="{{ url_for('static', filename='images/error.png') }}" alt="Image"
+                            style="width: 22px;">
+                        Will be permanently deleted in 28 days
+                    </span>
+                </div>
+                <div class="d-flex " style="position: absolute; top: 12px; right: 12px;">
+                    <span class="fst-italic p-1"
+                        style="font-size: 12px; border-radius: 20px; background: #007BFF; color: white;">
+                        <img src="{{ url_for('static', filename='images/rotate.png') }}" alt="Image"
+                            style="width: 18px;">
+                        Restore
+                    </span>
+                    <span class="fst-italic p-1 ms-2"
+                        style="font-size: 12px; border-radius: 20px; background: #FC0004CF; color: white;">
+                        <img src="{{ url_for('static', filename='images/delete.png') }}" alt="Image"
+                            style="width: 18px;">
+                        Delete
+                    </span>
+                </div>
+            </div>
+
+            <div class="card-shared bg-info-subtle" style="background-color: #BEF1E9; position: relative;">
+                <div class="fw-bold " style="color: #3300FF;">Tiêu đề</div>
+                <div class="text-muted  fst-italic" style="font-size: 14px;">Nội dung</div>
+                <div class="d-flex flex-column align-items-start mt-5">
+                    <span class="fst-italic" style="font-size: 14px;">
+                        <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image"
+                            style="width: 22px;">
+                        Deleted 2 days ago
+                    </span>
+                    <span class="fst-italic mt-2" style="font-size: 14px;">
+                        <img src="{{ url_for('static', filename='images/error.png') }}" alt="Image"
+                            style="width: 22px;">
+                        Will be permanently deleted in 28 days
+                    </span>
+                </div>
+                <div class="d-flex " style="position: absolute; top: 12px; right: 12px;">
+                    <span class="fst-italic p-1"
+                        style="font-size: 12px; border-radius: 20px; background: #007BFF; color: white;">
+                        <img src="{{ url_for('static', filename='images/rotate.png') }}" alt="Image"
+                            style="width: 18px;">
+                        Restore
+                    </span>
+                    <span class="fst-italic p-1 ms-2"
+                        style="font-size: 12px; border-radius: 20px; background: #FC0004CF; color: white;">
+                        <img src="{{ url_for('static', filename='images/delete.png') }}" alt="Image"
+                            style="width: 18px;">
+                        Delete
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

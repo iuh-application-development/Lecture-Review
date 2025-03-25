@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,63 +9,238 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
 </head>
-<body>
-<div class="d-flex" style="height: 100vh;">
-    <!-- Sidebar -->
-    <div class="sidebar d-flex flex-column justify-content-between p-3 border-end">
-        {% set current_path = request.path %}
-        <div>
-            <div class="sidebar-logo text-center mb-4">
-                <i class="bi bi-journal-bookmark-fill fs-4"></i>
-                <a href="/" class="nav-link text-dark"><span class="fw-bold fs-5">Lecture Notes</span></a>
-            </div>
-            <ul class="nav flex-column mt-4">
-                <li class="nav-item mb-3">
-                    <a class="nav-link text-dark {% if current_path == '/dashboard' %}active{% endif %}" href="/dashboard"><i class="bi bi-house-door-fill"></i> Dashboard</a>
-                </li>
-                <li class="nav-item mb-3">
-                    <a class="nav-link text-dark {% if current_path == '/all-my-notes' %}active{% endif %}" href="/all-my-notes"><i class="bi bi-journal-text"></i> All my notes</a>
-                </li>
-                <li class="nav-item mb-3">
-                    <a class="nav-link text-dark {% if current_path == '/share-with-me' %}active{% endif %}" href="/share-with-me"><i class="bi bi-share-fill"></i> Shared with me</a>
-                </li>
-                <li class="nav-item mb-5">
-                    <a class="nav-link text-dark {% if current_path == '/trash' %}active{% endif %}" href="/trash"><i class="bi bi-trash3-fill"></i> Trash</a>
-                </li>
-            </ul>
-        </div>
-        <div>
-            <ul class="nav flex-column">
-                <li class="nav-item mb-2"><a class="nav-link text-dark" href="#"><i class="bi bi-chat-left-text"></i> Support</a></li>
-                <li class="nav-item"><a class="nav-link text-dark" href="#"><i class="bi bi-gear-fill"></i> Setting</a></li>
-            </ul>
-        </div>
-    </div>
 
-    <!-- Main area -->
-    <div class="main-area d-flex flex-column flex-grow-1">
-        <!-- Topbar -->
-        <div class="topbar d-flex justify-content-between align-items-center px-4 py-3 border-bottom">
-            <div style="width: 35px;"></div>
-            <form class="d-flex w-50 justify-content-center">
-                <input class="form-control w-75" type="search" placeholder="Search" aria-label="Search">
-            </form>
-            <div class="dropdown">
-                <img src="#" alt="User" class="rounded-circle me-2">
-                <a href="#" class="dropdown-toggle text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">☰</a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    {% if user.role == 'admin' %}
-                    <li><a class="dropdown-item" href="/admin">Quản trị</a></li>
-                    {% endif %}
-                    <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+<body>
+    <div class="d-flex" style="height: 100vh;">
+        <!-- Sidebar -->
+        <div class="sidebar d-flex flex-column justify-content-between p-3 border-end">
+            {% set current_path = request.path %}
+            <div>
+                <div class="sidebar-logo text-center mb-4">
+                    <i class="bi bi-journal-bookmark-fill fs-4"></i>
+                    <a href="/" class="nav-link text-dark"><span class="fw-bold fs-5">Lecture Notes</span></a>
+                </div>
+                <ul class="nav flex-column mt-4">
+                    <li class="nav-item mb-3">
+                        <a class="nav-link text-dark {% if current_path == '/dashboard' %}active{% endif %}"
+                            href="/dashboard"><i class="bi bi-house-door-fill"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item mb-3">
+                        <a class="nav-link text-dark {% if current_path == '/all-my-notes' %}active{% endif %}"
+                            href="/all-my-notes"><i class="bi bi-journal-text"></i> All my notes</a>
+                    </li>
+                    <li class="nav-item mb-3">
+                        <a class="nav-link text-dark {% if current_path == '/share-with-me' %}active{% endif %}"
+                            href="/share-with-me"><i class="bi bi-share-fill"></i> Shared with me</a>
+                    </li>
+                    <li class="nav-item mb-5">
+                        <a class="nav-link text-dark {% if current_path == '/trash' %}active{% endif %}"
+                            href="/trash"><i class="bi bi-trash3-fill"></i> Trash</a>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <ul class="nav flex-column">
+                    <li class="nav-item mb-2"><a class="nav-link text-dark" href="#"><i
+                                class="bi bi-chat-left-text"></i> Support</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark" href="#"><i class="bi bi-gear-fill"></i>
+                            Setting</a></li>
                 </ul>
             </div>
         </div>
 
-        <!-- Content -->
-        {% block content %}{% endblock %}
+        <!-- Main area -->
+        <div class="main-area d-flex flex-column flex-grow-1">
+            <!-- Topbar -->
+            <div class="topbar d-flex justify-content-between align-items-center px-4 py-3 border-bottom">
+                <div style="width: 35px;"></div>
+                <form class="d-flex w-50 justify-content-center">
+                    <input class="form-control w-75" type="search" placeholder="Search" aria-label="Search">
+                </form>
+                <div class="dropdown">
+                    <img src="#" alt="User" class="rounded-circle me-2">
+                    <a href="#" class="dropdown-toggle text-decoration-none" data-bs-toggle="dropdown"
+                        aria-expanded="false" style="color: black;">☰</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        {% if user.role == 'admin' %}
+                        <li><a class="dropdown-item" href="/admin">Quản trị</a></li>
+                        {% endif %}
+                        <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Content -->
+            {% block content %}{% endblock %}
+        </div>
+        <!-- Edit Modal -->
+        <div class="modal fade" id="editNoteModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content p-4">
+                    <form action="/api/notes/edit/{{1}}" method="POST" id="editNoteForm">
+                        <h4 class="text-center mb-4 edit-note-title">Edit Note</h4>
+                        <!-- Color Picker với các lựa chọn: note-green, note-blue, note-purple -->
+                        <div class="d-flex justify-content-center gap-2 mb-4">
+                            <div class="color-pick note-green" data-color="note-green"></div>
+                            <div class="color-pick note-blue" data-color="note-blue"></div>
+                            <div class="color-pick note-purple" data-color="note-purple"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editNoteTitle" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="editNoteTitle" name="title">
+                        </div>
+                        <div class="mb-4">
+                            <label for="editNoteContent" class="form-label">Content</label>
+                            <textarea class="form-control" id="editNoteContent" rows="4" name="content"></textarea>
+                        </div>
+                        <input type="hidden" name="color" id="editNoteColor" value="">
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Create Note -->
+        <div class="modal" id="createNoteModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content p-4">
+                    <form action="/api/notes/create" method="POST" id="createNoteForm">
+                        <h4 class="text-center mb-3">Create new note</h4>
+                        <!-- Color Picker với các lựa chọn: note-green, note-blue, note-purple -->
+                        <div class="d-flex justify-content-center gap-2 mb-4">
+                            <div class="color-pick note-green" data-color="note-green"></div>
+                            <div class="color-pick note-blue" data-color="note-blue"></div>
+                            <div class="color-pick note-purple" data-color="note-purple"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="createNoteTitle" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="createNoteTitle" name="title">
+                        </div>
+                        <div class="mb-4">
+                            <label for="createNoteContent" class="form-label">Content</label>
+                            <textarea class="form-control" rows="6" id="createNoteContent" name="content"></textarea>
+                        </div>
+                        <!-- Hidden field cho color, mặc định là note-green -->
+                        <input type="hidden" name="color" id="createNoteColor" value="note-green">
+                        <!-- Nếu cần, thêm hidden field cho user_id -->
+                        <input type="hidden" name="user_id" id="createNoteUserId" value="{{ user.id }}">
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Xử lý chọn màu trong modal Create Note
+            const createColorPicks = document.querySelectorAll('#createNoteModal .color-pick');
+            createColorPicks.forEach(colorPick => {
+                colorPick.addEventListener('click', function () {
+                    // Xóa class 'selected' khỏi tất cả các phần tử chọn màu
+                    createColorPicks.forEach(item => item.classList.remove('selected'));
+                    // Thêm class 'selected' cho phần tử được chọn
+                    this.classList.add('selected');
+                    // Cập nhật giá trị của trường hidden
+                    document.getElementById('createNoteColor').value = this.getAttribute('data-color');
+                });
+            });
+
+            // Xử lý submit form Create Note bằng fetch API
+            const createNoteForm = document.getElementById('createNoteForm');
+            createNoteForm.addEventListener('submit', function (event) {
+                event.preventDefault(); // Ngăn submit mặc định
+
+                const title = document.getElementById('createNoteTitle').value;
+                const content = document.getElementById('createNoteContent').value;
+                const color = document.getElementById('createNoteColor').value;
+                const userIdField = document.getElementById('createNoteUserId');
+                const user_id = userIdField ? userIdField.value : null;
+
+                const payload = { title, content, color, user_id };
+
+                fetch('/api/notes/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.redirect) {
+                            window.location.href = data.redirect;
+                        } else {
+                            console.error('Lỗi khi tạo note:', data);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+
+            // Xử lý hiển thị note: lấy limit từ data-limit của container
+            const container = document.getElementById('myNotesContainer');
+            // Nếu có thuộc tính data-limit thì sử dụng, ngược lại mặc định là 9
+            const limit = container && container.getAttribute('data-limit') ? parseInt(container.getAttribute('data-limit')) : 9;
+
+            // Gọi API để lấy note theo limit đã định nghĩa
+            fetch(`/api/notes?limit=${limit}`)
+                .then(response => response.json())
+                .then(data => {
+                    const notes = data.data || data;
+                    container.innerHTML = '';
+
+                    notes.forEach(note => {
+                        const noteCard = document.createElement('div');
+                        noteCard.innerHTML = `
+                        <div class="note-card ${note.color} position-relative p-3">
+                            <div class="note-header d-flex justify-content-between align-items-start pb-1">
+                                <strong><em>${note.title}</em></strong>
+                                <div class="dropdown">
+                                    <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a class="dropdown-item edit-note" href="#" data-bs-toggle="modal"
+                                                data-bs-target="#editNoteModal" data-note-id="${note.id}"
+                                                data-note-color="${note.color}" data-note-title="${note.title}"
+                                                data-note-content="${note.content}">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-share-fill"></i> Share
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="#">
+                                                <i class="bi bi-trash3-fill"></i> Delete
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-separator"></div>
+                            <p class="mt-2">${note.content}</p>
+                        </div>
+                        `;
+                        container.appendChild(noteCard);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching notes:', error);
+                });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
