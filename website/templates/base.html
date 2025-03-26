@@ -23,28 +23,37 @@
                 <ul class="nav flex-column mt-4">
                     <li class="nav-item mb-3">
                         <a class="nav-link text-dark {% if current_path == '/dashboard' %}active{% endif %}"
-                            href="/dashboard"><i class="bi bi-house-door-fill"></i> Dashboard</a>
+                            href="/dashboard">
+                            <i class="bi bi-house-door-fill"></i> Dashboard
+                        </a>
                     </li>
                     <li class="nav-item mb-3">
                         <a class="nav-link text-dark {% if current_path == '/all-my-notes' %}active{% endif %}"
-                            href="/all-my-notes"><i class="bi bi-journal-text"></i> All my notes</a>
+                            href="/all-my-notes">
+                            <i class="bi bi-journal-text"></i> All my notes
+                        </a>
                     </li>
                     <li class="nav-item mb-3">
                         <a class="nav-link text-dark {% if current_path == '/share-with-me' %}active{% endif %}"
-                            href="/share-with-me"><i class="bi bi-share-fill"></i> Shared with me</a>
+                            href="/share-with-me">
+                            <i class="bi bi-share-fill"></i> Shared with me
+                        </a>
                     </li>
                     <li class="nav-item mb-5">
-                        <a class="nav-link text-dark {% if current_path == '/trash' %}active{% endif %}"
-                            href="/trash"><i class="bi bi-trash3-fill"></i> Trash</a>
+                        <a class="nav-link text-dark {% if current_path == '/trash' %}active{% endif %}" href="/trash">
+                            <i class="bi bi-trash3-fill"></i> Trash
+                        </a>
                     </li>
                 </ul>
             </div>
             <div>
                 <ul class="nav flex-column">
-                    <li class="nav-item mb-2"><a class="nav-link text-dark" href="#"><i
-                                class="bi bi-chat-left-text"></i> Support</a></li>
-                    <li class="nav-item"><a class="nav-link text-dark" href="#"><i class="bi bi-gear-fill"></i>
-                            Setting</a></li>
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-dark" href="#"><i class="bi bi-chat-left-text"></i> Support</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="#"><i class="bi bi-gear-fill"></i> Setting</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -73,13 +82,14 @@
             <!-- Content -->
             {% block content %}{% endblock %}
         </div>
-        <!-- Edit Modal -->
+
+        <!-- Modal Edit Note -->
         <div class="modal fade" id="editNoteModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content p-4">
-                    <form action="/api/notes/edit/{{1}}" method="POST" id="editNoteForm">
+                    <form id="editNoteForm">
                         <h4 class="text-center mb-4 edit-note-title">Edit Note</h4>
-                        <!-- Color Picker với các lựa chọn: note-green, note-blue, note-purple -->
+                        <!-- Color Picker -->
                         <div class="d-flex justify-content-center gap-2 mb-4">
                             <div class="color-pick note-green" data-color="note-green"></div>
                             <div class="color-pick note-blue" data-color="note-blue"></div>
@@ -94,6 +104,7 @@
                             <textarea class="form-control" id="editNoteContent" rows="4" name="content"></textarea>
                         </div>
                         <input type="hidden" name="color" id="editNoteColor" value="">
+                        <input type="hidden" id="editNoteId" value="">
                         <div class="d-flex justify-content-end gap-2">
                             <button type="submit" class="btn btn-primary">Save Changes</button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -107,9 +118,9 @@
         <div class="modal" id="createNoteModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content p-4">
-                    <form action="/api/notes/create" method="POST" id="createNoteForm">
+                    <form id="createNoteForm">
                         <h4 class="text-center mb-3">Create new note</h4>
-                        <!-- Color Picker với các lựa chọn: note-green, note-blue, note-purple -->
+                        <!-- Color Picker -->
                         <div class="d-flex justify-content-center gap-2 mb-4">
                             <div class="color-pick note-green" data-color="note-green"></div>
                             <div class="color-pick note-blue" data-color="note-blue"></div>
@@ -123,9 +134,7 @@
                             <label for="createNoteContent" class="form-label">Content</label>
                             <textarea class="form-control" rows="6" id="createNoteContent" name="content"></textarea>
                         </div>
-                        <!-- Hidden field cho color, mặc định là note-green -->
                         <input type="hidden" name="color" id="createNoteColor" value="note-green">
-                        <!-- Nếu cần, thêm hidden field cho user_id -->
                         <input type="hidden" name="user_id" id="createNoteUserId" value="{{ user.id }}">
                         <div class="d-flex justify-content-center gap-2">
                             <button type="submit" class="btn btn-primary">Save</button>
@@ -139,104 +148,170 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Xử lý chọn màu trong modal Create Note
-            const createColorPicks = document.querySelectorAll('#createNoteModal .color-pick');
-            createColorPicks.forEach(colorPick => {
-                colorPick.addEventListener('click', function () {
-                    // Xóa class 'selected' khỏi tất cả các phần tử chọn màu
-                    createColorPicks.forEach(item => item.classList.remove('selected'));
-                    // Thêm class 'selected' cho phần tử được chọn
+            // --- Xử lý Edit Note ---
+            document.addEventListener('click', function (e) {
+                const target = e.target.closest('.edit-note');
+                if (target) {
+                    e.preventDefault();
+                    const noteId = target.getAttribute('data-note-id');
+                    const noteTitle = target.getAttribute('data-note-title');
+                    const noteContent = target.getAttribute('data-note-content');
+                    const noteColor = target.getAttribute('data-note-color');
+    
+                    // Gán giá trị vào modal
+                    document.getElementById('editNoteId').value = noteId;
+                    document.getElementById('editNoteTitle').value = noteTitle;
+                    document.getElementById('editNoteContent').value = noteContent;
+                    document.getElementById('editNoteColor').value = noteColor;
+    
+                    // Highlight màu hiện có
+                    const colorPicks = document.querySelectorAll('#editNoteModal .color-pick');
+                    colorPicks.forEach(pick => {
+                        pick.classList.remove('selected');
+                        if (pick.getAttribute('data-color') === noteColor) {
+                            pick.classList.add('selected');
+                        }
+                    });
+                }
+            });
+    
+            // Xử lý chọn màu trong modal Edit Note
+            document.querySelectorAll('#editNoteModal .color-pick').forEach(pick => {
+                pick.addEventListener('click', function () {
+                    document.querySelectorAll('#editNoteModal .color-pick').forEach(p => p.classList.remove('selected'));
                     this.classList.add('selected');
-                    // Cập nhật giá trị của trường hidden
+                    document.getElementById('editNoteColor').value = this.getAttribute('data-color');
+                });
+            });
+    
+            // Xử lý submit form Edit Note bằng fetch API
+            const editForm = document.getElementById('editNoteForm');
+            if (editForm) {
+                editForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const noteId = document.getElementById('editNoteId').value;
+                    const title = document.getElementById('editNoteTitle').value;
+                    const content = document.getElementById('editNoteContent').value;
+                    const color = document.getElementById('editNoteColor').value;
+    
+                    const payload = { title, content, color };
+    
+                    fetch(`/api/notes/edit/${noteId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                console.log('Cập nhật note thành công!', data);
+                                const editModal = document.getElementById('editNoteModal');
+                                const modalInstance = bootstrap.Modal.getOrCreateInstance(editModal);
+                                modalInstance.hide();
+                                location.reload(); // Reload trang để cập nhật danh sách
+                            } else {
+                                console.error('Lỗi khi cập nhật note:', data);
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
+            }
+    
+            // --- Xử lý Create Note ---
+            document.querySelectorAll('#createNoteModal .color-pick').forEach(colorPick => {
+                colorPick.addEventListener('click', function () {
+                    document.querySelectorAll('#createNoteModal .color-pick').forEach(item => item.classList.remove('selected'));
+                    this.classList.add('selected');
                     document.getElementById('createNoteColor').value = this.getAttribute('data-color');
                 });
             });
-
-            // Xử lý submit form Create Note bằng fetch API
+    
             const createNoteForm = document.getElementById('createNoteForm');
-            createNoteForm.addEventListener('submit', function (event) {
-                event.preventDefault(); // Ngăn submit mặc định
-
-                const title = document.getElementById('createNoteTitle').value;
-                const content = document.getElementById('createNoteContent').value;
-                const color = document.getElementById('createNoteColor').value;
-                const userIdField = document.getElementById('createNoteUserId');
-                const user_id = userIdField ? userIdField.value : null;
-
-                const payload = { title, content, color, user_id };
-
-                fetch('/api/notes/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                })
+            if (createNoteForm) {
+                createNoteForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    const title = document.getElementById('createNoteTitle').value;
+                    const content = document.getElementById('createNoteContent').value;
+                    const color = document.getElementById('createNoteColor').value;
+                    const userIdField = document.getElementById('createNoteUserId');
+                    const user_id = userIdField ? userIdField.value : null;
+    
+                    const payload = { title, content, color, user_id };
+    
+                    fetch('/api/notes/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success && data.redirect) {
+                                location.reload(); // Reload trang để cập nhật danh sách
+                            } else {
+                                console.error('Lỗi khi tạo note:', data);
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
+            }
+    
+            // --- Xử lý hiển thị note ---
+            const container = document.getElementById('myNotesContainer');
+            if (container) {
+                const limit = container.getAttribute('data-limit') ? parseInt(container.getAttribute('data-limit')) : 9;
+    
+                fetch(`/api/notes?limit=${limit}`)
                     .then(response => response.json())
                     .then(data => {
-                        if (data.success && data.redirect) {
-                            window.location.href = data.redirect;
-                        } else {
-                            console.error('Lỗi khi tạo note:', data);
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-            });
-
-            // Xử lý hiển thị note: lấy limit từ data-limit của container
-            const container = document.getElementById('myNotesContainer');
-            // Nếu có thuộc tính data-limit thì sử dụng, ngược lại mặc định là 9
-            const limit = container && container.getAttribute('data-limit') ? parseInt(container.getAttribute('data-limit')) : 9;
-
-            // Gọi API để lấy note theo limit đã định nghĩa
-            fetch(`/api/notes?limit=${limit}`)
-                .then(response => response.json())
-                .then(data => {
-                    const notes = data.data || data;
-                    container.innerHTML = '';
-
-                    notes.forEach(note => {
-                        const noteCard = document.createElement('div');
-                        noteCard.innerHTML = `
-                        <div class="note-card ${note.color} position-relative p-3">
-                            <div class="note-header d-flex justify-content-between align-items-start pb-1">
-                                <strong><em>${note.title}</em></strong>
-                                <div class="dropdown">
-                                    <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li>
-                                            <a class="dropdown-item edit-note" href="#" data-bs-toggle="modal"
-                                                data-bs-target="#editNoteModal" data-note-id="${note.id}"
-                                                data-note-color="${note.color}" data-note-title="${note.title}"
-                                                data-note-content="${note.content}">
-                                                <i class="bi bi-pencil"></i> Edit
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="#">
-                                                <i class="bi bi-share-fill"></i> Share
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item text-danger" href="#">
-                                                <i class="bi bi-trash3-fill"></i> Delete
-                                            </a>
-                                        </li>
-                                    </ul>
+                        const notes = data.data || data;
+                        container.innerHTML = '';
+                        notes.forEach(note => {
+                            const noteCard = document.createElement('div');
+                            noteCard.innerHTML = `
+                            <div class="note-card ${note.color} position-relative p-3">
+                                <div class="note-header d-flex justify-content-between align-items-start pb-1">
+                                    <strong><em>${note.title}</em></strong>
+                                    <div class="dropdown">
+                                        <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li>
+                                                <a class="dropdown-item edit-note" href="#" data-bs-toggle="modal"
+                                                    data-bs-target="#editNoteModal" data-note-id="${note.id}"
+                                                    data-note-color="${note.color}" data-note-title="${note.title}"
+                                                    data-note-content="${note.content}">
+                                                    <i class="bi bi-pencil"></i> Edit
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="#">
+                                                    <i class="bi bi-share-fill"></i> Share
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-danger" href="#">
+                                                    <i class="bi bi-trash3-fill"></i> Delete
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
+                                <div class="card-separator"></div>
+                                <p class="mt-2">${note.content}</p>
                             </div>
-                            <div class="card-separator"></div>
-                            <p class="mt-2">${note.content}</p>
-                        </div>
-                        `;
-                        container.appendChild(noteCard);
+                            `;
+                            container.appendChild(noteCard);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching notes:', error);
                     });
-                })
-                .catch(error => {
-                    console.error('Error fetching notes:', error);
-                });
+            }
         });
     </script>
 

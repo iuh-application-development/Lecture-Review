@@ -112,12 +112,32 @@ def create_note():
 
     return jsonify({
         'success': True,
-        'redirect': url_for('views.dashboard')
+        'message': 'Note created successfully'
     })
 
 @api.route('/notes/edit/<int:note_id>', methods=['POST'])
 def edit_note(note_id):
-    return ''
+    note = Note.query.get_or_404(note_id)
+
+    if note.user_id != current_user.id:
+        return jsonify({
+            'status': 'error',
+            'message': "You don't have permission to edit this note."
+        }), 403
+
+    data = request.get_json() or {}
+
+    note.title = data.get('title', note.title)
+    note.content = data.get('content', note.content)
+    note.color = data.get('color', note.color)
+    note.updated_at = datetime.utcnow()
+
+    db.session.commit()
+
+    return jsonify({
+        'status': 'success',
+        'message': 'Note updated successfully!'
+    })
 
 @api.route('/notes/<int:note_id>', methods=['GET'])
 def get_note_detail(note_id):
