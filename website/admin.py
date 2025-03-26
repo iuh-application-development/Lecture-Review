@@ -12,6 +12,13 @@ def dashboard():
     
     return render_template('admin/dashboard_admin.html')
 
+@admin.route('/manage-users')
+def manage_users():
+    if not (current_user.is_authenticated and current_user.role == 'admin'):
+        return redirect(url_for('views.home'))
+    
+    return render_template('admin/manage_users.html')
+
 # /admin/register-admin/your_secret_key?email=admin@gmail.com&password=admin123
 @admin.route('/register-admin/<string:secret_key>', methods=['GET'])
 def register_admin(secret_key):
@@ -43,17 +50,44 @@ def register_admin(secret_key):
 
 @admin.route('/users', methods=['GET'])
 def get_users():
-    users = User.query.all()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 10, type=int)
+    status = request.args.get('status', 'all', type=int)
+    search = request.args.get('search', '')
+
+    query = User.query
+    if status != 'all':
+        query = query.filter_by(status=status)
+    if search:
+        query = query.filter(User.email.ilike(f'%{search}%'))
+    
+    pagination = query.paginate(page=page, per_page=limit, error_out=False)
+    users = pagination.items
+
     users_data = [
         {
             'id': user.id,
-            'username': user.username,
             'email': user.email,
-            'role': user.role
+            'status': user.status,
+            'last_login': user.created_at.strftime('%Y-%m-%d %H:%M:%S') if user.created_at else None
         }
         for user in users
     ]
-    return jsonify(users_data)
+    return jsonify({
+        'users': users_data,
+        'total': pagination.total
+    })
+
+@admin.route('/users/<int:user_id>/toggle-lock', methods=['POST'])
+def toggle_user_lock(user_id):
+    user = User.query.get_or_404(user_id)
+    data = request.get_json()
+    new_status = data.get('status')
+
+    user.status = new_status
+    db.session.commit()
+
+    return jsonify({'success': True, 'message': 'User status updated successfully'})
 
 @admin.route('/users/<int:user_id>', methods=['GET'])
 def get_user_detail(user_id):
