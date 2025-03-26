@@ -249,7 +249,7 @@
                     })
                         .then(response => response.json())
                         .then(data => {
-                            if (data.success && data.redirect) {
+                            if (data.success) {
                                 location.reload(); // Reload trang để cập nhật danh sách
                             } else {
                                 console.error('Lỗi khi tạo note:', data);

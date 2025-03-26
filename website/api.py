@@ -1,5 +1,4 @@
-from flask import Blueprint, jsonify, request, g, current_app, url_for
-from werkzeug.security import generate_password_hash
+from flask import Blueprint, jsonify, request, g
 from flask_login import current_user
 from .models import User, Note, db
 from datetime import datetime
@@ -7,44 +6,11 @@ from datetime import datetime
 api = Blueprint('api', __name__)
 API_VERSION = 'api-v1'
 
-@api.route('/users', methods=['GET'])
-def get_users():
-    users = User.query.all()
-    users_data = [
-        {
-            'id': user.id,
-            'username': user.username,
-            'email': user.email,
-            'role': user.role
-        }
-        for user in users
-    ]
-    return api_response(users_data)
-
-@api.route('/users/<int:user_id>', methods=['GET'])
-def get_user_detail(user_id):
-    user = User.query.get_or_404(user_id)
-    user_data = {
-        'id': user.id,
-        'username': user.username,
-        'email': user.email,
-        'role': user.role,
-        'created_at': user.created_at
-    }
-    return api_response(user_data)
-
 @api.route('/notes', methods=['GET'])
 def get_notes():
     limit = request.args.get('limit', type=int)
     
-    if current_user.role == 'admin':
-        all_param = request.args.get('all', 'false').lower()
-        if all_param == 'true':
-            query = Note.query.order_by(Note.updated_at.desc())
-        else:
-            query = Note.query.filter_by(user_id=current_user.id).order_by(Note.updated_at.desc())
-    else:
-        query = Note.query.filter_by(user_id=current_user.id).order_by(Note.updated_at.desc())
+    query = Note.query.filter_by(user_id=current_user.id).order_by(Note.updated_at.desc())
 
     if limit is not None and limit > 0:
         notes = query.limit(limit).all()
@@ -69,18 +35,19 @@ def get_notes_paginate():
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 15, type=int)
     
-    # Truy vấn và phân trang theo updated_at giảm dần
     query = Note.query.filter_by(user_id=current_user.id).order_by(Note.updated_at.desc())
     pagination = query.paginate(page=page, per_page=limit, error_out=False)
     notes = pagination.items
 
-    notes_data = [{
-        'id': note.id,
-        'title': note.title,
-        'content': note.content,
-        'color': note.color,
-        'updated_at': note.updated_at.isoformat() if note.updated_at else None
-    } for note in notes]
+    notes_data = [
+        {
+            'id': note.id,
+            'title': note.title,
+            'content': note.content,
+            'color': note.color,
+            'updated_at': note.updated_at.isoformat() if note.updated_at else None
+        } for note in notes
+    ]
 
     return api_response({
         'notes': notes_data,
@@ -150,35 +117,6 @@ def get_note_detail(note_id):
         'created_at': note.created_at
     }
     return api_response(note_data)
-
-# /api/register-admin/your_secret_key?email=admin@gmail.com&password=admin123
-@api.route('/register-admin/<string:secret_key>', methods=['GET'])
-def register_admin(secret_key):
-    if current_app.secret_key != secret_key:
-        return jsonify({'error': 'Invalid secret key'}), 403
-
-    email = request.args.get('email')
-    password = request.args.get('password')
-
-    if not email or not password:
-        return jsonify({'error': 'Email and password are required'}), 400
-    
-    user = User.query.filter_by(email=email).first()
-    if user:
-        return jsonify({'error': 'User with this email already exists'}), 400
-    
-    new_user = User(
-        email=email,
-        password_hash=generate_password_hash(password, method='pbkdf2:sha256'),
-        first_name='admin',
-        last_name=email,
-        gender='Male',
-        role='admin'
-    )
-    db.session.add(new_user)
-    db.session.commit()
-
-    return api_response({'message': 'Admin account created successfully', 'email': email})
 
 ### Standardize API responses and Handle Error ###
 @api.before_request
