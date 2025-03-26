@@ -64,6 +64,32 @@ def get_notes():
     ]
     return api_response(notes_data)
 
+@api.route('/notes-paginate', methods=['GET'])
+def get_notes_paginate():
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 15, type=int)
+    
+    # Truy vấn và phân trang theo updated_at giảm dần
+    query = Note.query.filter_by(user_id=current_user.id).order_by(Note.updated_at.desc())
+    pagination = query.paginate(page=page, per_page=limit, error_out=False)
+    notes = pagination.items
+
+    notes_data = [{
+        'id': note.id,
+        'title': note.title,
+        'content': note.content,
+        'color': note.color,
+        'updated_at': note.updated_at.isoformat() if note.updated_at else None
+    } for note in notes]
+
+    return api_response({
+        'notes': notes_data,
+        'page': pagination.page,
+        'limit': limit,
+        'total': pagination.total,
+        'total_pages': pagination.pages
+    })
+
 @api.route('/notes/create', methods=['POST'])
 def create_note():
     data = request.get_json()
