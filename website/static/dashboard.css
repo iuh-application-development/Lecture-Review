@@ -124,6 +124,7 @@ h4 {
     border-radius: 8px;
 }
 
+/* Phân trang - Custom Pagination */
 .custom-pagination .page-link {
     color: #000 !important;
     border: 1px solid #000 !important;

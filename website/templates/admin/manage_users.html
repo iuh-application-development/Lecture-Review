@@ -49,7 +49,7 @@
   <div class="mt-2 d-flex justify-content-between align-items-center">
     <small id="paginationInfo">Showing 0 to 0 of 0 entries</small>
     <nav>
-      <ul class="pagination pagination-sm mb-0" id="paginationControls">
+      <ul class="pagination custom-pagination mb-0" id="paginationControls">
         <!-- Các nút phân trang sẽ được tạo động bởi JS -->
       </ul>
     </nav>
@@ -57,7 +57,7 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', function () {
     const userTableBody = document.getElementById('userTableBody');
     const paginationInfo = document.getElementById('paginationInfo');
     const paginationControls = document.getElementById('paginationControls');
@@ -70,18 +70,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Hàm gọi API để lấy danh sách người dùng
     function fetchUsers(page = 1, status = 'Active', search = '') {
-        fetch(`/admin/users?page=${page}&limit=${limit}&status=${status}&search=${search}`)
-            .then(response => response.json())
-            .then(data => {
-                const users = data.users || [];
-                const total = data.total || 0;
-                const totalPages = Math.ceil(total / limit);
+      fetch(`/admin/users?page=${page}&limit=${limit}&status=${status}&search=${search}`)
+        .then(response => response.json())
+        .then(data => {
+          const users = data.users || [];
+          const total = data.total || 0;
+          const totalPages = Math.ceil(total / limit);
 
-                // Hiển thị danh sách người dùng
-                userTableBody.innerHTML = '';
-                users.forEach(user => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
+          // Hiển thị danh sách người dùng
+          userTableBody.innerHTML = '';
+          users.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
                         <td>${user.email}</td>
                         <td>
                             <span class="badge ${user.status === 'Active' ? 'bg-success' : 'bg-danger'}">
@@ -100,105 +100,105 @@ document.addEventListener('DOMContentLoaded', function () {
                             </div>
                         </td>
                     `;
-                    userTableBody.appendChild(row);
-                });
+            userTableBody.appendChild(row);
+          });
 
-                // Cập nhật thông tin phân trang
-                paginationInfo.textContent = `Showing ${(page - 1) * limit + 1} to ${Math.min(page * limit, total)} of ${total} entries`;
+          // Cập nhật thông tin phân trang
+          paginationInfo.textContent = `Showing ${(page - 1) * limit + 1} to ${Math.min(page * limit, total)} of ${total} entries`;
 
-                // Cập nhật giao diện phân trang
-                updatePagination(page, totalPages);
-            })
-            .catch(error => console.error('Error fetching users:', error));
+          // Cập nhật giao diện phân trang
+          updatePagination(page, totalPages);
+        })
+        .catch(error => console.error('Error fetching users:', error));
     }
 
     // Hàm cập nhật giao diện phân trang
     function updatePagination(currentPage, totalPages) {
-        paginationControls.innerHTML = '';
+      paginationControls.innerHTML = '';
 
-        // Nút Previous
-        const prevLi = document.createElement('li');
-        prevLi.className = `page-item ${currentPage <= 1 ? 'disabled' : ''}`;
-        const prevLink = document.createElement('a');
-        prevLink.className = 'page-link';
-        prevLink.href = '#';
-        prevLink.textContent = 'Previous';
-        prevLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (currentPage > 1) {
-                fetchUsers(currentPage - 1, statusFilter.value, searchUser.value);
-            }
-        });
-        prevLi.appendChild(prevLink);
-        paginationControls.appendChild(prevLi);
-
-        // Các số trang
-        for (let page = 1; page <= totalPages; page++) {
-            const li = document.createElement('li');
-            li.className = `page-item ${page === currentPage ? 'active' : ''}`;
-            const link = document.createElement('a');
-            link.className = 'page-link';
-            link.href = '#';
-            link.textContent = page;
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-                fetchUsers(page, statusFilter.value, searchUser.value);
-            });
-            li.appendChild(link);
-            paginationControls.appendChild(li);
+      // Nút Previous
+      const prevLi = document.createElement('li');
+      prevLi.className = `page-item ${currentPage <= 1 ? 'disabled' : ''}`;
+      const prevLink = document.createElement('a');
+      prevLink.className = 'page-link';
+      prevLink.href = '#';
+      prevLink.innerHTML = '<i class="bi bi-chevron-left"></i>'; // Sử dụng biểu tượng mũi tên trái
+      prevLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (currentPage > 1) {
+          fetchUsers(currentPage - 1, statusFilter.value, searchUser.value);
         }
+      });
+      prevLi.appendChild(prevLink);
+      paginationControls.appendChild(prevLi);
 
-        // Nút Next
-        const nextLi = document.createElement('li');
-        nextLi.className = `page-item ${currentPage >= totalPages ? 'disabled' : ''}`;
-        const nextLink = document.createElement('a');
-        nextLink.className = 'page-link';
-        nextLink.href = '#';
-        nextLink.textContent = 'Next';
-        nextLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (currentPage < totalPages) {
-                fetchUsers(currentPage + 1, statusFilter.value, searchUser.value);
-            }
+      // Các số trang
+      for (let page = 1; page <= totalPages; page++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${page === currentPage ? 'active' : ''}`;
+        const link = document.createElement('a');
+        link.className = 'page-link';
+        link.href = '#';
+        link.textContent = page;
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          fetchUsers(page, statusFilter.value, searchUser.value);
         });
-        nextLi.appendChild(nextLink);
-        paginationControls.appendChild(nextLi);
+        li.appendChild(link);
+        paginationControls.appendChild(li);
+      }
+
+      // Nút Next
+      const nextLi = document.createElement('li');
+      nextLi.className = `page-item ${currentPage >= totalPages ? 'disabled' : ''}`;
+      const nextLink = document.createElement('a');
+      nextLink.className = 'page-link';
+      nextLink.href = '#';
+      nextLink.innerHTML = '<i class="bi bi-chevron-right"></i>'; // Sử dụng biểu tượng mũi tên phải
+      nextLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (currentPage < totalPages) {
+          fetchUsers(currentPage + 1, statusFilter.value, searchUser.value);
+        }
+      });
+      nextLi.appendChild(nextLink);
+      paginationControls.appendChild(nextLi);
     }
 
     // Xử lý sự kiện filter
     filterButton.addEventListener('click', function () {
-        fetchUsers(1, statusFilter.value, searchUser.value);
+      fetchUsers(1, statusFilter.value, searchUser.value);
     });
 
     // Xử lý sự kiện toggle lock
     userTableBody.addEventListener('click', function (e) {
-        const lockButton = e.target.closest('.toggle-lock');
-        if (lockButton) {
-            const userId = lockButton.getAttribute('data-user-id');
-            const currentStatus = lockButton.getAttribute('data-status');
-            const newStatus = currentStatus === 'Locked' ? 'Active' : 'Locked';
+      const lockButton = e.target.closest('.toggle-lock');
+      if (lockButton) {
+        const userId = lockButton.getAttribute('data-user-id');
+        const currentStatus = lockButton.getAttribute('data-status');
+        const newStatus = currentStatus === 'Locked' ? 'Active' : 'Locked';
 
-            fetch(`/admin/users/${userId}/toggle-lock`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ status: newStatus })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        fetchUsers(currentPage, statusFilter.value, searchUser.value);
-                    } else {
-                        console.error('Error toggling lock:', data.message);
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        }
+        fetch(`/admin/users/${userId}/toggle-lock`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ status: newStatus })
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              fetchUsers(currentPage, statusFilter.value, searchUser.value);
+            } else {
+              console.error('Error toggling lock:', data.message);
+            }
+          })
+          .catch(error => console.error('Error:', error));
+      }
     });
 
     // Khởi tạo: Lấy danh sách người dùng mặc định
     fetchUsers();
-});
+  });
 </script>
 {% endblock %}
