@@ -4,17 +4,17 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM loaded');
     const container = document.getElementById('myNotesContainer');
     console.log('Container found:', container);
-    
+
     // Định nghĩa hàm createNoteCard trước
     function createNoteCard(note) {
         const noteCard = document.createElement('div');
         noteCard.className = `note-card ${note.color} position-relative p-3`;
-        
+
         // Cắt nội dung nếu dài hơn 50 ký tự
-        const truncatedContent = note.content.length > 50 
-            ? note.content.substring(0, 50) + '...' 
+        const truncatedContent = note.content.length > 50
+            ? note.content.substring(0, 50) + '...'
             : note.content;
-        
+
         noteCard.innerHTML = `
             <div class="note-content">
                 <div class="note-header d-flex justify-content-between align-items-start pb-1">
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
 
         // Thêm sự kiện click cho card
-        noteCard.addEventListener('click', function(e) {
+        noteCard.addEventListener('click', function (e) {
             if (!e.target.closest('.dropdown')) {
                 window.location.href = `/note_detail/${note.id}`;
             }
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Kiểm tra xem đang ở trang nào
     const isDashboard = container.classList.contains('dashboard-container');
-    
+
     // Sau đó định nghĩa hàm fetchNotes
     async function fetchNotes() {
         if (!container) return; // Kiểm tra nếu không tìm thấy container
@@ -62,10 +62,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const response = await fetch('/api/notes?limit=9');
             const result = await response.json();
             const notes = result.data || [];
-            
+
             container.innerHTML = '';
-            
-            // Xóa mũi tên cũ nếu có
+
+            // Xóa nút arrow cũ nếu có
             const existingArrow = document.querySelector('.dashboard-arrow-redirect');
             if (existingArrow) {
                 existingArrow.remove();
@@ -80,70 +80,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            notes.forEach((note, index) => {
+            notes.forEach((note) => {
                 const noteCard = createNoteCard(note);
-                
-                // Chỉ thêm mũi tên khi đủ điều kiện:
-                // 1. Đang ở trang dashboard
-                // 2. Có đúng 9 bài note
-                if (isDashboard && index === 6 && notes.length >= 9) {
-                    const noteContainer = document.createElement('div');
-                    noteContainer.className = 'dashboard-note-container';
-                    noteContainer.appendChild(noteCard);
-                    
-                    const arrow = document.createElement('div');
-                    arrow.className = 'dashboard-arrow-redirect';
-                    arrow.innerHTML = `
-                        <i class="bi bi-arrow-right"></i>
-                        <div class="dashboard-arrow-tooltip">Xem tất cả ghi chú</div>
-                    `;
-                    
-                    // Thêm hiệu ứng click
-                    arrow.onclick = (e) => {
-                        e.preventDefault();
-                        arrow.style.transform = 'scale(0.95)';
-                        setTimeout(() => {
-                            window.location.href = '/all-my-notes';
-                        }, 150);
-                    };
-                    
-                    noteContainer.appendChild(arrow);
-                    container.appendChild(noteContainer);
-                } else {
-                    container.appendChild(noteCard);
-                }
+                container.appendChild(noteCard);
             });
 
-            // Chỉ thêm mũi tên khi đủ điều kiện:
-            // 1. Đang ở trang dashboard
-            // 2. Có đúng 9 bài note
+            // Thêm nút điều hướng ở ô thứ 10 nếu có đúng 9 notes
             if (isDashboard && notes.length === 9) {
-                const arrow = document.createElement('div');
-                arrow.className = 'dashboard-arrow-redirect';
-                arrow.innerHTML = `
+                const arrowButton = document.createElement('div');
+                arrowButton.className = 'dashboard-arrow-redirect';
+                arrowButton.innerHTML = `
                     <i class="bi bi-arrow-right"></i>
                     <div class="dashboard-arrow-tooltip">Xem tất cả ghi chú</div>
                 `;
-                
-                // Thêm hiệu ứng click
-                arrow.onclick = (e) => {
+
+                // Thêm sự kiện click cho nút điều hướng
+                arrowButton.onclick = (e) => {
                     e.preventDefault();
-                    arrow.style.transform = 'scale(0.95)';
+                    arrowButton.style.transform = 'scale(0.95)';
                     setTimeout(() => {
                         window.location.href = '/all-my-notes';
                     }, 150);
                 };
-                
-                // Thêm vào body
-                document.body.appendChild(arrow);
 
-                // Thêm animation xuất hiện
-                setTimeout(() => {
-                    arrow.style.opacity = '1';
-                    arrow.style.transform = 'translateX(0)';
-                }, 100);
+                container.appendChild(arrowButton);
             }
-
         } catch (error) {
             console.error('Error fetching notes:', error);
             container.innerHTML = `
@@ -210,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Thêm event listener cho sự kiện popstate (khi người dùng nhấn back/forward)
-    window.addEventListener('popstate', function(event) {
+    window.addEventListener('popstate', function (event) {
         // Load lại notes khi quay lại trang
         fetchNotes(1);
     });
