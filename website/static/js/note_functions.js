@@ -51,24 +51,26 @@ document.addEventListener('DOMContentLoaded', function () {
         return noteCard;
     }
 
+    // Kiểm tra xem đang ở trang nào
+    const isDashboard = container.classList.contains('dashboard-container');
+    
     // Sau đó định nghĩa hàm fetchNotes
     async function fetchNotes() {
         if (!container) return; // Kiểm tra nếu không tìm thấy container
 
         try {
-            // Thêm thông báo loading
-            container.innerHTML = '<div class="text-center">Loading notes...</div>';
-
-            // Sửa lại endpoint để lấy data từ API
             const response = await fetch('/api/notes?limit=9');
             const result = await response.json();
-            const notes = result.data || []; // Đảm bảo lấy đúng data từ response
-
-            // Log để debug
-            console.log('Fetched notes:', notes);
-
-            container.innerHTML = ''; // Xóa loading message
+            const notes = result.data || [];
             
+            container.innerHTML = '';
+            
+            // Xóa mũi tên cũ nếu có
+            const existingArrow = document.querySelector('.dashboard-arrow-redirect');
+            if (existingArrow) {
+                existingArrow.remove();
+            }
+
             if (notes.length === 0) {
                 container.innerHTML = `
                     <div class="text-center p-4">
@@ -78,16 +80,76 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            notes.forEach(note => {
-                container.appendChild(createNoteCard(note));
+            notes.forEach((note, index) => {
+                const noteCard = createNoteCard(note);
+                
+                // Chỉ thêm mũi tên khi đủ điều kiện:
+                // 1. Đang ở trang dashboard
+                // 2. Có đúng 9 bài note
+                if (isDashboard && index === 6 && notes.length >= 9) {
+                    const noteContainer = document.createElement('div');
+                    noteContainer.className = 'dashboard-note-container';
+                    noteContainer.appendChild(noteCard);
+                    
+                    const arrow = document.createElement('div');
+                    arrow.className = 'dashboard-arrow-redirect';
+                    arrow.innerHTML = `
+                        <i class="bi bi-arrow-right"></i>
+                        <div class="dashboard-arrow-tooltip">Xem tất cả ghi chú</div>
+                    `;
+                    
+                    // Thêm hiệu ứng click
+                    arrow.onclick = (e) => {
+                        e.preventDefault();
+                        arrow.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            window.location.href = '/all-my-notes';
+                        }, 150);
+                    };
+                    
+                    noteContainer.appendChild(arrow);
+                    container.appendChild(noteContainer);
+                } else {
+                    container.appendChild(noteCard);
+                }
             });
+
+            // Chỉ thêm mũi tên khi đủ điều kiện:
+            // 1. Đang ở trang dashboard
+            // 2. Có đúng 9 bài note
+            if (isDashboard && notes.length === 9) {
+                const arrow = document.createElement('div');
+                arrow.className = 'dashboard-arrow-redirect';
+                arrow.innerHTML = `
+                    <i class="bi bi-arrow-right"></i>
+                    <div class="dashboard-arrow-tooltip">Xem tất cả ghi chú</div>
+                `;
+                
+                // Thêm hiệu ứng click
+                arrow.onclick = (e) => {
+                    e.preventDefault();
+                    arrow.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        window.location.href = '/all-my-notes';
+                    }, 150);
+                };
+                
+                // Thêm vào body
+                document.body.appendChild(arrow);
+
+                // Thêm animation xuất hiện
+                setTimeout(() => {
+                    arrow.style.opacity = '1';
+                    arrow.style.transform = 'translateX(0)';
+                }, 100);
+            }
 
         } catch (error) {
             console.error('Error fetching notes:', error);
             container.innerHTML = `
                 <div class="alert alert-danger">
                     Error loading notes. Please try again.
-                    <button onclick="fetchNotes()" class="btn btn-link">Retry</button>
+                    <button class="btn btn-link" onclick="location.reload()">Retry</button>
                 </div>
             `;
         }
