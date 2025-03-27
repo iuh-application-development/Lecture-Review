@@ -4,36 +4,32 @@
     <div class="filter-bar mb-4 d-flex align-items-center gap-4">
         <div class="d-flex align-items-center gap-1">
             <label>Color:</label>
-            <select class="form-select form-select-sm">
-                <option>All Colors</option>
-                <option>Yellow</option>
-                <option>Green</option>
-                <option>Purple</option>
+            <select class="form-select form-select-sm" id="colorFilter">
+                <option value="">All Colors</option>
+                <option value="note-green">Green</option>
+                <option value="note-blue">Blue</option>
+                <option value="note-purple">Purple</option>
             </select>
         </div>
         <div class="d-flex align-items-center gap-1">
             <label>Date:</label>
-            <select class="form-select form-select-sm">
-                <option>All Time</option>
-                <option>Last 7 days</option>
-                <option>Last month</option>
+            <select class="form-select form-select-sm" id="dateFilter">
+                <option value="">All Time</option>
+                <option value="7">Last 7 days</option>
+                <option value="30">Last month</option>
             </select>
         </div>
-        <button class="btn btn-outline-dark d-flex align-items-center gap-1">
-            <i class="bi bi-sort-down"></i>
-            <span>Sort by Date</span>
-        </button>
     </div>
 
-    <!-- Note cards -->
-    <div id="myNotesContainer" data-limit="15" class="d-flex flex-wrap gap-3 mb-5">
-        <!-- Các note card sẽ được hiển thị ở đây -->
+    <!-- Note cards container -->
+    <div id="myNotesContainer" class="d-flex flex-wrap gap-3 mb-5">
+        <!-- Notes will be loaded here -->
     </div>
 
     <!-- Pagination -->
-    <nav aria-label="Page navigation">
+    <nav aria-label="Page navigation" class="mt-4">
         <ul class="pagination justify-content-center custom-pagination">
-            <!-- Các nút phân trang sẽ được tạo động bởi JS -->
+            <!-- Pagination will be generated here -->
         </ul>
     </nav>
 
@@ -45,125 +41,149 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Hàm gọi API và cập nhật giao diện note theo trang
-    function fetchNotes(page = 1) {
-        const container = document.getElementById('myNotesContainer');
-        const limit = container.getAttribute('data-limit') 
-            ? parseInt(container.getAttribute('data-limit')) 
-            : 15;
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('myNotesContainer');
+    const colorFilter = document.getElementById('colorFilter');
+    const dateFilter = document.getElementById('dateFilter');
+    let currentPage = 1;
 
-        fetch(`/api/notes-paginate?page=${page}&limit=${limit}`)
-            .then(response => response.json())
-            .then(res => {
-                const data = res.data; 
+    // Thêm hàm createNoteCard
+    function createNoteCard(note) {
+        const noteCard = document.createElement('div');
+        noteCard.className = `note-card ${note.color} position-relative p-3`;
+        
+        // Cắt nội dung nếu dài hơn 50 ký tự
+        const truncatedContent = note.content.length > 50 
+            ? note.content.substring(0, 50) + '...' 
+            : note.content;
+        
+        noteCard.innerHTML = `
+            <div class="note-content">
+                <div class="note-header d-flex justify-content-between align-items-start pb-1">
+                    <strong><em>${note.title}</em></strong>
+                    <div class="dropdown">
+                        <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/note_detail/${note.id}">
+                                <i class="bi bi-eye"></i> View Detail</a></li>
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" 
+                                data-bs-target="#editNoteModal" data-note-id="${note.id}">
+                                <i class="bi bi-pencil"></i> Edit</a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="bi bi-share"></i> Share</a></li>
+                            <li><a class="dropdown-item text-danger" href="#">
+                                <i class="bi bi-trash"></i> Delete</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-separator"></div>
+                <p class="mt-2">${truncatedContent}</p>
+            </div>
+        `;
 
-                // Hiển thị note
-                container.innerHTML = '';
-                data.notes.forEach(note => {
-                    const noteCard = document.createElement('div');
-                    noteCard.className = `note-card ${note.color} position-relative p-3`;
-                    noteCard.innerHTML = `
-                        <div class="note-header d-flex justify-content-between align-items-start pb-1">
-                            <strong><em>${note.title}</em></strong>
-                            <div class="dropdown">
-                                <button class="btn btn-link p-0 border-0" type="button"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        <a class="dropdown-item edit-note" href="#"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editNoteModal"
-                                            data-note-id="${note.id}"
-                                            data-note-color="${note.color}"
-                                            data-note-title="${note.title}"
-                                            data-note-content="${note.content}">
-                                            <i class="bi bi-pencil"></i> Edit
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            <i class="bi bi-share-fill"></i> Share
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item text-danger" href="#">
-                                            <i class="bi bi-trash3-fill"></i> Delete
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="card-separator"></div>
-                        <p class="mt-2">${note.content}</p>
-                    `;
-                    container.appendChild(noteCard);
-                });
+        // Thêm sự kiện click cho card
+        noteCard.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                window.location.href = `/note_detail/${note.id}`;
+            }
+        });
 
-                // Cập nhật giao diện phân trang
-                updatePagination(data.page, data.total_pages);
-            })
-            .catch(error => console.error('Error fetching notes:', error));
+        return noteCard;
     }
 
-    // Hàm tạo giao diện phân trang
+    // Hàm fetch notes với phân trang
+    async function fetchPagedNotes(page = 1) {
+        try {
+            const color = colorFilter.value;
+            const date = dateFilter.value;
+            
+            const url = `/api/notes-paginate?page=${page}&limit=15${color ? `&color=${color}` : ''}${date ? `&date=${date}` : ''}`;
+            const response = await fetch(url);
+            const result = await response.json();
+            const data = result.data;
+
+            // Hiển thị notes
+            container.innerHTML = '';
+            if (data.notes.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-4">
+                        <p>No notes found.</p>
+                    </div>
+                `;
+            } else {
+                data.notes.forEach(note => {
+                    container.appendChild(createNoteCard(note));
+                });
+            }
+
+            // Cập nhật phân trang
+            updatePagination(data.page, data.total_pages);
+            currentPage = data.page;
+
+        } catch (error) {
+            console.error('Error:', error);
+            container.innerHTML = '<div class="alert alert-danger">Error loading notes</div>';
+        }
+    }
+
+    // Hàm cập nhật phân trang
     function updatePagination(currentPage, totalPages) {
-        const paginationContainer = document.querySelector('.pagination.custom-pagination');
-        paginationContainer.innerHTML = '';
+        const pagination = document.querySelector('.custom-pagination');
+        pagination.innerHTML = '';
 
         // Nút Previous
         const prevLi = document.createElement('li');
         prevLi.className = `page-item ${currentPage <= 1 ? 'disabled' : ''}`;
-        const prevLink = document.createElement('a');
-        prevLink.className = 'page-link';
-        prevLink.href = '#';
-        prevLink.innerHTML = '<i class="bi bi-chevron-left"></i>';
-        prevLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (currentPage > 1) {
-                fetchNotes(currentPage - 1);
-            }
-        });
-        prevLi.appendChild(prevLink);
-        paginationContainer.appendChild(prevLi);
+        prevLi.innerHTML = `
+            <a class="page-link" href="#" ${currentPage <= 1 ? 'tabindex="-1"' : ''}>
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        `;
+        if (currentPage > 1) {
+            prevLi.onclick = (e) => {
+                e.preventDefault();
+                fetchPagedNotes(currentPage - 1);
+            };
+        }
+        pagination.appendChild(prevLi);
 
         // Các số trang
-        for (let page = 1; page <= totalPages; page++) {
+        for (let i = 1; i <= totalPages; i++) {
             const li = document.createElement('li');
-            li.className = `page-item ${page === currentPage ? 'active' : ''}`;
-            const link = document.createElement('a');
-            link.className = 'page-link';
-            link.href = '#';
-            link.textContent = page;
-            link.addEventListener('click', function (e) {
+            li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+            li.onclick = (e) => {
                 e.preventDefault();
-                fetchNotes(page);
-            });
-            li.appendChild(link);
-            paginationContainer.appendChild(li);
+                fetchPagedNotes(i);
+            };
+            pagination.appendChild(li);
         }
 
         // Nút Next
         const nextLi = document.createElement('li');
         nextLi.className = `page-item ${currentPage >= totalPages ? 'disabled' : ''}`;
-        const nextLink = document.createElement('a');
-        nextLink.className = 'page-link';
-        nextLink.href = '#';
-        nextLink.innerHTML = '<i class="bi bi-chevron-right"></i>';
-        nextLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (currentPage < totalPages) {
-                fetchNotes(currentPage + 1);
-            }
-        });
-        nextLi.appendChild(nextLink);
-        paginationContainer.appendChild(nextLi);
+        nextLi.innerHTML = `
+            <a class="page-link" href="#" ${currentPage >= totalPages ? 'tabindex="-1"' : ''}>
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        `;
+        if (currentPage < totalPages) {
+            nextLi.onclick = (e) => {
+                e.preventDefault();
+                fetchPagedNotes(currentPage + 1);
+            };
+        }
+        pagination.appendChild(nextLi);
     }
 
-    // Khởi tạo: Lấy trang đầu tiên
-    fetchNotes(1);
+    // Xử lý sự kiện thay đổi filter
+    colorFilter.addEventListener('change', () => fetchPagedNotes(1));
+    dateFilter.addEventListener('change', () => fetchPagedNotes(1));
+
+    // Khởi tạo trang đầu tiên
+    fetchPagedNotes(1);
 });
 </script>
 {% endblock %}

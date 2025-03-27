@@ -8,54 +8,88 @@ API_VERSION = 'api-v1'
 
 @api.route('/notes', methods=['GET'])
 def get_notes():
-    limit = request.args.get('limit', type=int)
-    
-    query = Note.query.filter_by(user_id=current_user.id).order_by(Note.updated_at.desc())
+    try:
+        limit = request.args.get('limit', type=int)
+        query = Note.query.filter_by(user_id=current_user.id).order_by(Note.updated_at.desc())
 
-    if limit is not None and limit > 0:
-        notes = query.limit(limit).all()
-    else:
-        notes = query.all()
+        if limit:
+            notes = query.limit(limit).all()
+        else:
+            notes = query.all()
 
-    notes_data = [
-        {
+        notes_data = [{
             'id': note.id,
             'title': note.title,
             'content': note.content,
             'color': note.color,
             'user_id': note.user_id,
-            'updated_at': note.updated_at
-        }
-        for note in notes
-    ]
-    return api_response(notes_data)
+            'updated_at': note.updated_at.isoformat() if note.updated_at else None
+        } for note in notes]
+
+        return jsonify({
+            'status': 'success',
+            'data': notes_data
+        })
+
+    except Exception as e:
+        print('Error in get_notes:', str(e))  # Log lỗi để debug
+        return jsonify({
+            'status': 'error',
+            'message': 'Error fetching notes'
+        }), 500
 
 @api.route('/notes-paginate', methods=['GET'])
 def get_notes_paginate():
-    page = request.args.get('page', 1, type=int)
-    limit = request.args.get('limit', 15, type=int)
-    
-    query = Note.query.filter_by(user_id=current_user.id).order_by(Note.updated_at.desc())
-    pagination = query.paginate(page=page, per_page=limit, error_out=False)
-    notes = pagination.items
+    try:
+        page = request.args.get('page', 1, type=int)
+        limit = request.args.get('limit', 15, type=int)
+        color = request.args.get('color', '')
+        date_filter = request.args.get('date', '', type=str)
 
-    notes_data = [
-        {
+        # Tạo query base
+        query = Note.query.filter_by(user_id=current_user.id)
+
+        # Thêm filter màu sắc
+        if color:
+            query = query.filter_by(color=color)
+
+        # Thêm filter ngày
+        if date_filter:
+            days = int(date_filter)
+            from datetime import datetime, timedelta
+            date_limit = datetime.utcnow() - timedelta(days=days)
+            query = query.filter(Note.created_at >= date_limit)
+
+        # Sắp xếp và phân trang
+        query = query.order_by(Note.updated_at.desc())
+        pagination = query.paginate(page=page, per_page=limit, error_out=False)
+
+        notes_data = [{
             'id': note.id,
             'title': note.title,
             'content': note.content,
             'color': note.color,
             'updated_at': note.updated_at.isoformat() if note.updated_at else None
-        } for note in notes
-    ]
+        } for note in pagination.items]
 
-    return api_response({
-        'notes': notes_data,
-        'page': pagination.page,
-        'limit': limit,
-        'total': pagination.total,
-        'total_pages': pagination.pages
-    })
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'notes': notes_data,
+                'page': pagination.page,
+                'total_pages': pagination.pages,
+                'total_items': pagination.total,
+                'has_next': pagination.has_next,
+                'has_prev': pagination.has_prev
+            }
+        })
+
+    except Exception as e:
+        print('Error in get_notes_paginate:', str(e))
+        return jsonify({
+            'status': 'error',
+            'message': 'Error fetching notes'
+        }), 500
 
 @api.route('/notes/create', methods=['POST'])
 def create_note():

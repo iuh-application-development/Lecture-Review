@@ -4,8 +4,10 @@
     <div class="title-block p-2 px-3 mb-3">
         <h5 class="fw-bold m-0">My Notes</h5>
     </div>
-    <div id="myNotesContainer" data-limit="9" class="d-flex flex-wrap gap-3 mb-5">
-        <!-- Các note card sẽ được hiển thị ở đây -->
+    
+    <!-- Container cho notes -->
+    <div id="myNotesContainer" class="d-flex flex-wrap gap-3 mb-5">
+        <!-- Notes sẽ được load ở đây -->
     </div>
 
     <div class="title-block p-2 px-3 mb-3">
@@ -105,11 +107,20 @@
         <!-- Các card khác tương tự -->
     </div>
 
-    <!-- Nút create - đặt ở cuối content area -->
+    <!-- Nút tạo note mới -->
     <button type="button" class="btn btn-dark rounded-circle position-fixed"
-        style="bottom: 30px; right: 30px; width: 50px; height: 50px;" data-bs-toggle="modal"
-        data-bs-target="#createNoteModal">
+        style="bottom: 30px; right: 30px; width: 50px; height: 50px;"
+        data-bs-toggle="modal" data-bs-target="#createNoteModal">
         +
     </button>
+
+    <!-- Thêm mũi tên chuyển hướng -->
+    <div class="arrow-redirect" id="redirectArrow" onclick="window.location.href='/all-my-notes'" style="display: none;">
+        <i class="bi bi-arrow-right"></i>
+        <div class="arrow-tooltip">View all notes</div>
+    </div>
 </div>
+
+<!-- Đảm bảo script được load -->
+<script src="{{ url_for('static', filename='js/note_functions.js') }}"></script>
 {% endblock %}

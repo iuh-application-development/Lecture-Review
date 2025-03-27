@@ -54,6 +54,7 @@ h4 {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.1s;
     cursor: pointer;
+    position: relative;
 }
 
 .note-header strong em {
@@ -61,7 +62,8 @@ h4 {
 }
 
 .note-card:hover {
-    transform: scale(1.03);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .note-blue {
@@ -124,26 +126,33 @@ h4 {
     border-radius: 8px;
 }
 
+.custom-pagination {
+    margin-top: 2rem;
+}
+
 .custom-pagination .page-link {
-    color: #000 !important;
-    border: 1px solid #000 !important;
-    border-radius: 6px !important;
+    color: #000;
+    border: 1px solid #000;
     margin: 0 2px;
-    background-color: #fff !important;
+    border-radius: 4px;
 }
 
 .custom-pagination .page-item.active .page-link {
-    background-color: #000 !important;
-    border-color: #000 !important;
-    color: #fff !important;
+    background-color: #000;
+    border-color: #000;
+    color: #fff;
 }
 
-.custom-pagination .page-link i {
-    color: #000 !important;
+.custom-pagination .page-item.disabled .page-link {
+    opacity: 0.5;
+    pointer-events: none;
 }
 
 .custom-pagination .page-link:hover {
-    background-color: rgba(0, 0, 0, 0.1) !important;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.custom-pagination .page-link i {
     color: #000 !important;
 }
 
@@ -223,4 +232,113 @@ h4 {
 .btn-secondary:hover {
     background-color: #b3b3b3;
     border-color: #b3b3b3;
+}
+
+.note-card p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+/* Thêm hiệu ứng khi hover */
+.note-card::after {
+    content: 'Click to view detail';
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.note-card:hover::after {
+    opacity: 0.7;
+}
+
+/* Đảm bảo dropdown không bị ảnh hưởng bởi hover effect */
+.dropdown {
+    position: relative;
+    z-index: 2;
+}
+
+.dropdown-menu {
+    z-index: 1000;
+}
+
+/* Thêm visual feedback khi click */
+.note-card:active {
+    transform: translateY(0);
+    transition: transform 0.1s;
+}
+
+.note-card .dropdown {
+    position: relative;
+    z-index: 10;
+}
+
+.arrow-redirect {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 15px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: none; /* Ẩn mặc định */
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.arrow-redirect:hover {
+    transform: scale(1.1);
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.arrow-redirect i {
+    font-size: 24px;
+}
+
+.arrow-tooltip {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    white-space: nowrap;
+    display: none;
+}
+
+.arrow-redirect:hover .arrow-tooltip {
+    display: block;
+}
+
+/* Thêm hiệu ứng pulse cho mũi tên */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+    }
+}
+
+.arrow-redirect {
+    animation: pulse 2s infinite;
+}
+
+/* Thêm hiệu ứng khi hover */
+.arrow-redirect:hover {
+    animation: none;
+    transform: scale(1.1);
+    background-color: rgba(0, 0, 0, 0.9);
 }
