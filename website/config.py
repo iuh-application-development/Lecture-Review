@@ -3,10 +3,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
-    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+    SECRET_KEY = os.getenv('SECRET_KEY', 'dev')
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'database.db'))
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'dev')
 
     # Cấu hình Email
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')

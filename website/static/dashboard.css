@@ -54,6 +54,7 @@ h4 {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.1s;
     cursor: pointer;
+    position: relative;
 }
 
 .note-header strong em {
@@ -61,7 +62,8 @@ h4 {
 }
 
 .note-card:hover {
-    transform: scale(1.03);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .note-blue {
@@ -124,27 +126,33 @@ h4 {
     border-radius: 8px;
 }
 
-/* Phân trang - Custom Pagination */
+.custom-pagination {
+    margin-top: 2rem;
+}
+
 .custom-pagination .page-link {
-    color: #000 !important;
-    border: 1px solid #000 !important;
-    border-radius: 6px !important;
+    color: #000;
+    border: 1px solid #000;
     margin: 0 2px;
-    background-color: #fff !important;
+    border-radius: 4px;
 }
 
 .custom-pagination .page-item.active .page-link {
-    background-color: #000 !important;
-    border-color: #000 !important;
-    color: #fff !important;
+    background-color: #000;
+    border-color: #000;
+    color: #fff;
 }
 
-.custom-pagination .page-link i {
-    color: #000 !important;
+.custom-pagination .page-item.disabled .page-link {
+    opacity: 0.5;
+    pointer-events: none;
 }
 
 .custom-pagination .page-link:hover {
-    background-color: rgba(0, 0, 0, 0.1) !important;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.custom-pagination .page-link i {
     color: #000 !important;
 }
 
@@ -224,4 +232,164 @@ h4 {
 .btn-secondary:hover {
     background-color: #b3b3b3;
     border-color: #b3b3b3;
+}
+
+.note-card p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+/* Thêm hiệu ứng khi hover */
+.note-card::after {
+    content: 'Click to view detail';
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.note-card:hover::after {
+    opacity: 0.7;
+}
+
+/* Đảm bảo dropdown không bị ảnh hưởng bởi hover effect */
+.dropdown {
+    position: relative;
+    z-index: 2;
+}
+
+.dropdown-menu {
+    z-index: 1000;
+}
+
+/* Thêm visual feedback khi click */
+.note-card:active {
+    transform: translateY(0);
+    transition: transform 0.1s;
+}
+
+.note-card .dropdown {
+    position: relative;
+    z-index: 10;
+}
+
+
+.dashboard-note-container {
+    display: flex; /* Biến container thành flex container */
+    align-items: center;
+    gap: 20px;
+}
+
+/* Nút điều hướng arrow */
+.dashboard-arrow-redirect {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: #2c3e50;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    margin: 10px; /* Khoảng cách giữa các notes */
+}
+
+.dashboard-arrow-redirect i {
+    font-size: 22px;
+}
+
+/* Hiệu ứng hover cho nút arrow */
+.dashboard-arrow-redirect:hover {
+    background-color: #34495e;
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Tooltip cho nút arrow */
+.dashboard-arrow-tooltip {
+    position: absolute;
+    top: 50%;
+    left: 60px; /* Đặt tooltip bên phải nút arrow */
+    transform: translateY(-50%);
+    background-color: #2c3e50;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Hiển thị tooltip khi hover */
+.dashboard-arrow-redirect:hover .dashboard-arrow-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Thêm mũi tên nhỏ cho tooltip */
+.dashboard-arrow-tooltip::before {
+    content: '';
+    position: absolute;
+    left: -6px; /* Đặt mũi tên bên trái tooltip */
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 6px 6px 6px 0;
+    border-style: solid;
+    border-color: transparent #2c3e50 transparent transparent;
+}
+
+/* Animation xuất hiện */
+@keyframes arrowAppear {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Class để trigger animation */
+.dashboard-arrow-redirect.show {
+    animation: arrowAppear 0.5s ease forwards;
+}
+
+/* Media queries cho responsive */
+@media (max-width: 768px) {
+    .dashboard-arrow-redirect {
+        width: 40px;
+        height: 40px;
+        right: 90px;      /* Điều chỉnh khoảng cách trên mobile */
+        bottom: 25px;
+    }
+
+    .dashboard-arrow-redirect i {
+        font-size: 20px;
+    }
+}
+
+/* Chỉ áp dụng cho container trong dashboard */
+.dashboard-container .dashboard-note-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+
+/* Ẩn các class arrow-redirect trong all-my-notes */
+.all-notes-container .arrow-redirect,
+.all-notes-container .note-container {
+    display: none !important;
 }
