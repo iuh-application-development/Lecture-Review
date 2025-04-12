@@ -1,0 +1,161 @@
+{% extends 'admin/base_admin.html' %}
+{% block content %}
+<div class="content p-4 flex-grow-1">
+    <!-- Tiêu đề trang + Search -->
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <!-- Tiêu đề trang -->
+        <h4 class="m-0 fw-bold">Content Management</h4>
+        <!-- Ô tìm kiếm -->
+        <div class="input-group" style="width: 300px;">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" id="searchContent" class="form-control" placeholder="Search Content">
+        </div>
+    </div>
+
+    <!-- Thanh filter -->
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="d-flex align-items-center gap-1">
+            <label class="fw-semibold">Status:</label>
+            <select id="statusFilter" class="form-select form-select-sm">
+                <option value="all">All status</option>
+                <option value="published">Published</option>
+                <option value="privated">Privated</option>
+            </select>
+        </div> 
+        <button id="filterButton" class="btn btn-outline-secondary d-flex align-items-center gap-1">
+            <i class="bi bi-funnel"></i>
+            <span>Filter</span>
+        </button>
+    </div>
+
+    <!-- Danh sách Content dạng card -->
+    <div id="contentContainer" class="row row-cols-1 row-cols-md-3 g-3">
+        <!-- Nội dung sẽ được hiển thị ở đây -->
+    </div>
+
+    <!-- Phân trang -->
+    <div class="mt-4 d-flex justify-content-center">
+        <nav>
+            <ul class="pagination custom-pagination" id="paginationControls">
+                <!-- Các nút phân trang sẽ được tạo động bởi JS -->
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const contentContainer = document.getElementById('contentContainer');
+        const paginationControls = document.getElementById('paginationControls');
+        const statusFilter = document.getElementById('statusFilter');
+        const searchContent = document.getElementById('searchContent');
+        const filterButton = document.getElementById('filterButton');
+
+        let currentPage = 1;
+        const limit = 9;
+
+        function fetchContents(page = 1, status = 'all', search = '') {
+            fetch(`/admin/contents?page=${page}&limit=${limit}&status=${status}&search=${search}`)
+                .then(response => response.json())
+                .then(data => {
+                    const contents = data.contents || [];
+                    const total = data.total || 0;
+                    const totalPages = Math.ceil(total / limit);
+
+                    contentContainer.innerHTML = '';
+                    contents.forEach(content => {
+                        const card = document.createElement('div');
+                        card.className = 'col';
+                        card.innerHTML = `
+                            <div class="card h-100 border">
+                                <div class="card-body">
+                                    <h6 class="card-title fw-bold">${content.title}</h6>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-person-fill me-2"></i>
+                                        <span>By ${content.author}</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-calendar-date-fill me-2"></i>
+                                        <span>${content.created_at}</span>
+                                    </div>
+                                </div>
+                                <div class="card-footer d-flex justify-content-between align-items-center">
+                                    <span class="badge ${content.status === 'published' ? 'bg-success' : 'bg-warning text-dark'}">
+                                        ${content.status.charAt(0).toUpperCase() + content.status.slice(1)}
+                                    </span>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-light border remove-content" data-content-id="${content.id}">
+                                            <i class="bi bi-trash-fill text-danger"></i> Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        contentContainer.appendChild(card);
+                    });
+
+                    updatePagination(page, totalPages);
+                })
+                .catch(error => console.error('Error fetching contents:', error));
+        }
+
+        function updatePagination(currentPage, totalPages) {
+            paginationControls.innerHTML = '';
+
+            // Nút Previous
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage <= 1 ? 'disabled' : ''}`;
+            const prevLink = document.createElement('a');
+            prevLink.className = 'page-link';
+            prevLink.href = '#';
+            prevLink.innerHTML = '<i class="bi bi-chevron-left"></i>';
+            prevLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (currentPage > 1) {
+                    fetchContents(currentPage - 1, statusFilter.value, searchContent.value);
+                }
+            });
+            prevLi.appendChild(prevLink);
+            paginationControls.appendChild(prevLi);
+
+            // Các số trang
+            for (let page = 1; page <= totalPages; page++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${page === currentPage ? 'active' : ''}`;
+                const link = document.createElement('a');
+                link.className = 'page-link';
+                link.href = '#';
+                link.textContent = page;
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    fetchContents(page, statusFilter.value, searchContent.value);
+                });
+                li.appendChild(link);
+                paginationControls.appendChild(li);
+            }
+
+            // Nút Next
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage >= totalPages ? 'disabled' : ''}`;
+            const nextLink = document.createElement('a');
+            nextLink.className = 'page-link';
+            nextLink.href = '#';
+            nextLink.innerHTML = '<i class="bi bi-chevron-right"></i>';
+            nextLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (currentPage < totalPages) {
+                    fetchContents(currentPage + 1, statusFilter.value, searchContent.value);
+                }
+            });
+            nextLi.appendChild(nextLink);
+            paginationControls.appendChild(nextLi);
+        }
+
+        filterButton.addEventListener('click', function () {
+            fetchContents(1, statusFilter.value, searchContent.value);
+        });
+
+        fetchContents();
+    });
+</script>
+{% endblock %}

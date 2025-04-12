@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import current_user, login_required
-from .models import Note
+from .models import Note,ShareNote
+
 
 views = Blueprint('views', __name__)
 
@@ -21,7 +22,8 @@ def all_my_notes():
 @views.route('/share-with-me')
 @login_required
 def share_with_me():
-    return render_template('share_with_me.html', user=current_user)
+    shared_notes = ShareNote.query.filter_by(recipient_id=current_user.id).all()
+    return render_template('share_with_me.html', user=current_user, shared_notes=shared_notes)
 
 @views.route('/trash')
 @login_required
@@ -33,7 +35,9 @@ def trash():
 def note_detail(note_id):
     try:
         note = Note.query.get_or_404(note_id)
-        if note.user_id != current_user.id:
+        shared = ShareNote.query.filter_by(note_id=note.id, recipient_id=current_user.id).first()
+        if note.user_id != current_user.id and not shared:
+
             flash('You do not have permission to view this note.', 'error')
             return redirect(url_for('views.dashboard'))
         return render_template('note_detail.html', user=current_user, note=note)

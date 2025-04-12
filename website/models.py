@@ -9,6 +9,9 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(150), nullable=False)
     role = db.Column(db.String(10), nullable=False, default='user')  # 'user' hoặc 'admin'
+
+    status = db.Column(db.String(20), default='Active') # ['Active', 'Locked', 'Inactive']
+
     gender = db.Column(db.String(10), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -27,4 +30,19 @@ class Note(db.Model):
     user = db.relationship('User', backref=db.backref('notes', lazy=True))
 
     def __repr__(self):
+
         return f'<Note {self.title} by Author {self.user_id}>'
+    
+
+class ShareNote(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    note_id = db.Column(db.Integer, db.ForeignKey('note.id'), nullable=False)
+    sharer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    shared_at = db.Column(db.DateTime, default=datetime.utcnow)
+    note = db.relationship('Note', backref=db.backref('shared_notes', lazy=True))
+    sharer = db.relationship('User', foreign_keys=[sharer_id], backref=db.backref('shared_note', lazy=True))
+    recipient = db.relationship('User', foreign_keys=[recipient_id], backref=db.backref('shared_with', lazy=True))
+    def __repr__(self):
+        return f'<ShareNote {self.note_id} by User {self.user_id}>'
+

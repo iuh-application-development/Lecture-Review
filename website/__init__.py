@@ -4,12 +4,17 @@ from flask_login import LoginManager
 from .config import Config
 import os
 
+
+
 db = SQLAlchemy()
+
+
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
+
     
     from .views import views
     from .auth import auth
@@ -35,6 +40,7 @@ def create_app():
     return app
 
 def create_database(app):
-    with app.app_context():
-        db.create_all()
+    if not os.path.exists('website/database.db'):
+        with app.app_context():
+            db.create_all() 
         print('Created database!')

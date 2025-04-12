@@ -1,4 +1,6 @@
 {% extends 'base.html' %} {% block content %}
+{% include 'shared_modal.html' %}
+
 <div class="content p-4 flex-grow-1">
     <!-- Filter bar -->
     <div class="filter-bar mb-4 d-flex align-items-center gap-4">
@@ -22,7 +24,8 @@
     </div>
 
     <!-- Note cards container - thêm class riêng cho all-my-notes -->
-    <div id="myNotesContainer" class="all-notes-container d-flex flex-wrap gap-3 mb-5">
+
+    <div id="myNotesContainer" class="all-notes-container d-flex flex-wrap gap-3 mb-5" data-limit="15">
         <!-- Notes will be loaded here -->
     </div>
 
@@ -38,7 +41,7 @@
         data-bs-toggle="modal" data-bs-target="#createNoteModal">
         +
     </button>
-</div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -177,6 +180,61 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         pagination.appendChild(nextLi);
     }
+
+
+    // Xử lý sự kiện nhấn nút Share
+    document.getElementById('shareNoteBtn').addEventListener('click', async function () {
+        const noteId = document.getElementById('noteIdToShare').value;
+        const recipientEmail = document.getElementById('shareEmail').value;
+    
+        if (!recipientEmail) {
+            alert("Please enter the recipient's email!");
+            return;
+        }
+    
+         try {
+            const response = await fetch('/api/share-note', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    note_id: noteId,
+                    recipient_email: recipientEmail,
+                }),
+            });
+    
+            const result = await response.json();
+            if (result.success) {
+                // Hiển thị thông báo thành công
+                alert('Share successfully!');
+                    
+                // Đóng modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('shareNoteModal'));
+                modal.hide();
+    
+                // Reset form
+                document.getElementById('shareNoteForm').reset();
+            } else {
+                alert('Failed to share note: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error sharing note:', error);
+            alert('Error sharing note. Please try again.');
+        }
+    });
+    
+    // Gán giá trị note ID vào modal khi nhấn nút Share
+    document.querySelectorAll('.share-note,.btn-share').forEach(button => {
+        button.document.addEventListener('click', function(e) {
+            const shareBtn = e.target.closest('.share-note, .btn-share');
+            if (shareBtn) {
+                e.preventDefault();
+                const noteId = shareBtn.getAttribute('data-note-id');
+                document.getElementById('noteIdToShare').value = noteId;
+            }
+        });
+    });
 
     // Xử lý sự kiện thay đổi filter
     colorFilter.addEventListener('change', () => fetchPagedNotes(1));
