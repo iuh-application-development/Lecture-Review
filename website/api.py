@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, g
 from flask_login import current_user, login_required
 from .models import User, Note, ShareNote,db
 from datetime import datetime
-from flask_mail import Mail, Message
+
 
 api = Blueprint('api', __name__)
 API_VERSION = 'api-v1'

@@ -226,15 +226,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Gán giá trị note ID vào modal khi nhấn nút Share
     document.querySelectorAll('.share-note,.btn-share').forEach(button => {
-        button.document.addEventListener('click', function(e) {
-            const shareBtn = e.target.closest('.share-note, .btn-share');
-            if (shareBtn) {
-                e.preventDefault();
-                const noteId = shareBtn.getAttribute('data-note-id');
-                document.getElementById('noteIdToShare').value = noteId;
-            }
+        button.addEventListener('click', function(e) {
+            const noteId = this.getAttribute('data-note-id');
+            document.getElementById('noteIdToShare').value = noteId;
         });
     });
+    
 
     // Xử lý sự kiện thay đổi filter
     colorFilter.addEventListener('change', () => fetchPagedNotes(1));
@@ -242,6 +239,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Khởi tạo trang đầu tiên
     fetchPagedNotes(1);
+
 });
 </script>
 {% endblock %}
+
+
