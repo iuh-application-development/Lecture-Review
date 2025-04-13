@@ -23,7 +23,14 @@ def all_my_notes():
 @login_required
 def share_with_me():
     shared_notes = ShareNote.query.filter_by(recipient_id=current_user.id).all()
-    return render_template('share_with_me.html', user=current_user, shared_notes=shared_notes)
+    return render_template('share_with_me.html', user=current_user, shared_notes=shared_notes, share_by_me=False)
+
+@views.route('/share-by-me')
+@login_required
+def share_by_me():
+    shared_notes = ShareNote.query.filter_by(sharer_id=current_user.id).all()
+    return render_template('share_with_me.html', user=current_user, shared_notes=shared_notes, shared_by_me=True)
+
 
 @views.route('/trash')
 @login_required

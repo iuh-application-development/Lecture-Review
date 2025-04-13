@@ -201,6 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
             alert("Please enter the recipient's email!");
             return;
         }
+        
     
         try {
             const response = await fetch('/api/share-note', {
@@ -238,10 +239,13 @@ document.addEventListener('DOMContentLoaded', function () {
     
     
     // Gán giá trị note ID vào modal khi nhấn nút Share
-    const shareNoteBtn = document.getElementById('shareNoteBtn');
-    if (shareNoteBtn) {
-        shareNoteBtn.addEventListener('click', shareNote);
-        }
+    const oldButton = document.getElementById('shareNoteBtn');
+    if (oldButton) {
+        const newButton = oldButton.cloneNode(true);
+        oldButton.parentNode.replaceChild(newButton, oldButton);
+        newButton.addEventListener('click', shareNote);
+    }
+
 
     // Thêm event listener cho sự kiện popstate (khi người dùng nhấn back/forward)
     window.addEventListener('popstate', function (event) {
