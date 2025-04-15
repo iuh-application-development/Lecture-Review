@@ -4,12 +4,17 @@ from flask_login import LoginManager
 from .config import Config
 import os
 
+
+
 db = SQLAlchemy()
+
+
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
+
     
     from .views import views
     from .auth import auth
