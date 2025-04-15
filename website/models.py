@@ -9,9 +9,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(150), nullable=False)
     role = db.Column(db.String(10), nullable=False, default='user')  # 'user' hoặc 'admin'
-
     status = db.Column(db.String(20), default='Active') # ['Active', 'Locked', 'Inactive']
-
     gender = db.Column(db.String(10), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 

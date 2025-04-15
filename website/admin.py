@@ -12,13 +12,19 @@ def dashboard():
     
     return render_template('admin/dashboard_admin.html')
 
-
 @admin.route('/manage-users')
 def manage_users():
     if not (current_user.is_authenticated and current_user.role == 'admin'):
         return redirect(url_for('views.home'))
     
     return render_template('admin/manage_users.html')
+
+@admin.route('/manage-contents')
+def manage_contents():
+    if not (current_user.is_authenticated and current_user.role == 'admin'):
+        return redirect(url_for('views.home'))
+    
+    return render_template('admin/manage_contents.html')
 
 # /admin/register-admin/your_secret_key?email=admin@gmail.com&password=admin123
 @admin.route('/register-admin/<string:secret_key>', methods=['GET'])
@@ -51,7 +57,6 @@ def register_admin(secret_key):
 
 @admin.route('/users', methods=['GET'])
 def get_users():
-
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 10, type=int)
     status = request.args.get('status', 'all', type=int)
