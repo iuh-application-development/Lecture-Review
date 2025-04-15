@@ -59,7 +59,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!container) return; // Kiểm tra nếu không tìm thấy container
 
         try {
-            const response = await fetch('/api/notes?limit=9');
+            const limit = container.getAttribute('data-limit')
+            const response = await fetch(`/api/notes?limit=${limit}`);
             const result = await response.json();
             const notes = result.data || [];
 
