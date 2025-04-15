@@ -35,7 +35,7 @@
                         </a>
                     </li>
                     <li class="nav-item mb-3">
-                        <a class="nav-link text-dark {% if current_path == '/share-with-me' %}active{% endif %}"
+                        <a class="nav-link text-dark {% if current_path == '/share-with-me' or current_path == '/share-by-me' %}active{% endif %}"
                             href="/share-with-me">
                             <i class="bi bi-share-fill"></i> Shared with me
                         </a>
@@ -313,6 +313,7 @@
                         console.error('Error fetching notes:', error);
                     });
             }
+
         });
     </script>
 

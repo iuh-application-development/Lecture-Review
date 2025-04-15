@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM loaded');
     const container = document.getElementById('myNotesContainer');
     console.log('Container found:', container);
+    if (!container) return;
 
     // Định nghĩa hàm createNoteCard trước
     function createNoteCard(note) {
@@ -26,10 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="/note_detail/${note.id}">
                                 <i class="bi bi-eye"></i> View Detail</a></li>
-                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" 
-                                data-bs-target="#editNoteModal" data-note-id="${note.id}">
-                                <i class="bi bi-pencil"></i> Edit</a></li>
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item share note" href="#" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="${note.id}">
                                 <i class="bi bi-share"></i> Share</a></li>
                             <li><a class="dropdown-item text-danger" href="#">
                                 <i class="bi bi-trash"></i> Delete</a></li>
@@ -47,19 +45,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.location.href = `/note_detail/${note.id}`;
             }
         });
+        // thêm sự kiện cho nút share
+        const shareButton = noteCard.querySelector('.share.note');
+        shareButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            const noteID = this.getAttribute('data-note-id');
+            document.getElementById('noteIdToShare').value = noteID;
+        });
 
         return noteCard;
     }
 
     // Kiểm tra xem đang ở trang nào
     const isDashboard = container.classList.contains('dashboard-container');
+    
 
     // Sau đó định nghĩa hàm fetchNotes
     async function fetchNotes() {
         if (!container) return; // Kiểm tra nếu không tìm thấy container
 
         try {
-            const response = await fetch('/api/notes?limit=9');
+            const limit = container.getAttribute('data-limit') ? parseInt(container.getAttribute('data-limit')) : 9;
+            const response = await fetch(`/api/notes?limit=${limit}`);
             const result = await response.json();
             const notes = result.data || [];
 
@@ -84,6 +91,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 const noteCard = createNoteCard(note);
                 container.appendChild(noteCard);
             });
+
+            console.log(notes.length);
 
             // Thêm nút điều hướng ở ô thứ 10 nếu có đúng 9 notes
             if (isDashboard && notes.length === 9) {
@@ -169,6 +178,74 @@ document.addEventListener('DOMContentLoaded', function () {
         nextLi.appendChild(nextLink);
         paginationContainer.appendChild(nextLi);
     }
+
+    
+    // Xử lý sự kiện nhấn nút Share
+    async function shareNote() {
+        const noteIdInput = document.getElementById('noteIdToShare');
+        const emailInput = document.getElementById('shareEmail');
+        const form = document.getElementById('shareNoteForm');
+        const modalElement = document.getElementById('shareNoteModal');
+    
+        if (!noteIdInput || !emailInput || !form || !modalElement) {
+            console.error('Missing required DOM elements.');
+            return;
+        }
+    
+        const noteId = noteIdInput.value;
+        const recipientEmail = emailInput.value.trim();
+    
+        console.log('Preparing to share note:', noteId, 'to:', recipientEmail);
+    
+        if (!recipientEmail) {
+            alert("Please enter the recipient's email!");
+            return;
+        }
+        
+    
+        try {
+            const response = await fetch('/api/share-note', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    note_id: noteId,
+                    recipient_email: recipientEmail,
+                }),
+            });
+    
+            const result = await response.json();
+            console.log('Share response:', result);
+    
+            if (result.success) {
+                alert('Share successfully!');
+    
+                const openButton = document.querySelector('[data-bs-target="#shareNoteModal"]');
+                if (openButton) openButton.focus();
+    
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                if (modalInstance) modalInstance.hide();
+    
+                form.reset();
+    
+            } else {
+                alert('Failed to share note: ' + result.message);
+            }
+    
+        } catch (error) {
+            console.error('Error sharing note:', error);
+            alert('Error sharing note. Please try again.');
+        }
+    }
+    
+    
+    // Gán giá trị note ID vào modal khi nhấn nút Share
+    const oldButton = document.getElementById('shareNoteBtn');
+    if (oldButton) {
+        const newButton = oldButton.cloneNode(true);
+        oldButton.parentNode.replaceChild(newButton, oldButton);
+        newButton.addEventListener('click', shareNote);
+    }
+
 
     // Thêm event listener cho sự kiện popstate (khi người dùng nhấn back/forward)
     window.addEventListener('popstate', function (event) {

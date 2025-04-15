@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request, g
-from flask_login import current_user
-from .models import User, Note, db
+from flask_login import current_user, login_required
+from .models import User, Note, ShareNote,db
 from datetime import datetime
+
 
 api = Blueprint('api', __name__)
 API_VERSION = 'api-v1'
@@ -11,6 +12,7 @@ def get_notes():
     try:
         limit = request.args.get('limit', type=int)
         query = Note.query.filter_by(user_id=current_user.id).order_by(Note.updated_at.desc())
+
 
         if limit:
             notes = query.limit(limit).all()
@@ -151,6 +153,71 @@ def get_note_detail(note_id):
         'created_at': note.created_at
     }
     return api_response(note_data)
+
+@api.route('/share-note', methods=['POST'])
+@login_required
+def share_note():
+    try:
+        data = request.get_json()
+        note_id = data.get('note_id')
+        recipient_email = data.get('recipient_email')
+
+        if not note_id or not recipient_email:
+            return jsonify({
+                'success': False,
+                'message': 'Missing note ID or recipient email'
+            }), 400
+
+        # Kiểm tra ghi chú có tồn tại không
+        note = Note.query.get(note_id)
+        if not note:
+            return jsonify({
+                'success': False,
+                'message': 'Note not found'
+            }), 404
+
+        # Kiểm tra quyền chia sẻ
+        if note.user_id != current_user.id:
+            return jsonify({
+                'success': False,
+                'message': "You don't have permission to share this note."
+            }), 403
+
+        # Kiểm tra người nhận có tồn tại không
+        recipient = User.query.filter_by(email=recipient_email).first()
+        if not recipient:
+            return jsonify({
+                'success': False,
+                'message': 'Recipient not found'
+            }), 404
+        
+        # Kiểm tra xem ghi chú đã được chia sẻ chưa
+        existinng_share = ShareNote.query.filter_by(note_id=note_id, recipient_id=recipient.id).first()
+        if existinng_share:
+            return jsonify({
+                'success': False,
+                'message': 'Note already shared with this recipient'
+            }), 400
+        
+        shared_note = ShareNote(
+            note_id=note_id,
+            sharer_id=current_user.id,
+            recipient_id=recipient.id,
+            shared_at=datetime.utcnow()
+        )
+        db.session.add(shared_note)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Note shared successfully'
+        })
+    except Exception as e:
+        print('Error in share_note:', str(e))
+        return jsonify({
+            'success': False,
+            'message': 'Error sharing note'
+        }), 500
 
 ### Standardize API responses and Handle Error ###
 @api.before_request

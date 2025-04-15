@@ -1,25 +1,47 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} 
+{% block content %}
 <div class="content p-4 flex-grow-1">
   <div id="shared-with-me">
     <!-- Tabs -->
     <div class="d-flex mb-3 border-bottom">
-      <button class="tab-button active" id="tab1">Shared with me</button>
-      <button class="tab-button" id="tab2">Shared by me</button>
+      <button class="tab-button {% if not shared_by_me %}active{% endif %}" id="tab1">Shared with me</button>
+      <button class="tab-button {% if shared_by_me %}active{% endif %}" id="tab2">Shared by me</button>
+
     </div>
 
+
     <!-- Title -->
-    <h4 class="mb-4 fw-bold">Shared with me</h4>
+    <h4 class="mb-4 fw-bold">
+      {{'Shared by me' if shared_by_me else 'Share with me'}}
+    </h4>
+
+    
 
     <!-- Cards -->
     <div class="d-flex flex-wrap gap-3">
-      <div class="card-shared bg-success-subtle" style="background-color: #BEF1C4; ">
-        <p class="fst-italic">Shared by User1</p>
-        <div class="fw-bold ms-4">Tiêu đề</div>
-        <div class="text-muted ms-4 fst-italic" style="font-size: 14px;">Nội dung</div>
+      {% if shared_notes|length == 0 %}
+      <div class="text-center w-100">
+        <p class="text-muted">
+         {{"You haven't shared any notes." if shared_by_me else 'No notes have been shared with you yet.'}}
+        </p>
+      </div>
+      {% else %}
+      {% for shared_note in shared_notes %}
+      <div class="card-shared bg-info-subtle" style="background-color: #BEF1E9; cursor: pointer;" onclick="window.location.href='/note_detail/{{ shared_note.note.id }}'">
+        <p class="fst-italic">
+          {% if shared_by_me %}
+          Shared to {{ shared_note.recipient.first_name }} {{ shared_note.recipient.last_name }}
+          {% else%}
+          Shared by {{ shared_note.sharer.first_name }} {{ shared_note.sharer.last_name }}
+          {% endif%}
+        </p>
+          
+        <div class="fw-bold ms-4">{{ shared_note.note.title }}</div>
+        <div class="text-muted ms-4 fst-italic" style="font-size: 14px;">{{ shared_note.note.content[:100] }}{% if shared_note.note.content|length > 100 %}...{% endif %}</div>
         <div class="d-flex justify-content-between align-items-center mt-3">
           <span class="fst-italic" style="font-size: 14px;">
             <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image" style="width: 22px;">
-            Shared 2 days ago
+            Shared {{ shared_note.shared_at.strftime('%d %b %Y') }}
           </span>
           <span class="tag ms-4" style="font-size: 12px; background: #D9D9D9; border: 1px solid #000000">
             <img src="{{ url_for('static', filename='images/profile.png') }}" alt="Image" style="width: 22px;">
@@ -28,38 +50,32 @@
         </div>
       </div>
 
-      <div class="card-shared" style="background-color: #E5BEF1; ">
-        <p class="fst-italic">Shared by User2</p>
-        <div class="fw-bold ms-4">Tiêu đề</div>
-        <div class="text-muted ms-4 fst-italic" style="font-size: 14px;">Nội dung</div>
-        <div class="d-flex justify-content-between align-items-center mt-3">
-          <span class="fst-italic" style="font-size: 14px;">
-            <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image" style="width: 22px;">
-            Shared 1 week ago
-          </span>
-          <span class="tag ms-4" style="font-size: 12px; background: #D9D9D9; border: 1px solid #000000">
-            <img src="{{ url_for('static', filename='images/profile.png') }}" alt="Image" style="width: 22px;">
-            Manage access
-          </span>
-        </div>
-      </div>
-
-      <div class="card-shared bg-info-subtle" style="background-color: #BEF1E9; ">
-        <p class="fst-italic">Shared by User1</p>
-        <div class="fw-bold ms-4">Tiêu đề</div>
-        <div class="text-muted ms-4 fst-italic" style="font-size: 14px;">Nội dung</div>
-        <div class="d-flex justify-content-between align-items-center mt-3">
-          <span class="fst-italic" style="font-size: 14px;">
-            <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image" style="width: 22px;">
-            Shared 2 days ago
-          </span>
-          <span class="tag ms-4" style="font-size: 12px; background: #D9D9D9; border: 1px solid #000000">
-            <img src="{{ url_for('static', filename='images/profile.png') }}" alt="Image" style="width: 22px;">
-            Manage access
-          </span>
-        </div>
-      </div>
+      {% endfor %}
+      {% endif %}
     </div>
   </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const tab1 = document.getElementById('tab1');
+  const tab2 = document.getElementById('tab2');
+
+  tab1.addEventListener('click', function() {
+      window.location.href = '/share-with-me';
+  });
+
+  tab2.addEventListener('click', function() {
+      window.location.href = '/share-by-me';
+  });
+
+  if (window.location.pathname.includes('share-by-me')) {
+      tab1.classList.remove('active');
+      tab2.classList.add('active');
+  } else {
+      tab1.classList.add('active');
+      tab2.classList.remove('active');
+  }
+});
+</script>
+
 {% endblock %}
