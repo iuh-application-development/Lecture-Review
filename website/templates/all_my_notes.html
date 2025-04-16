@@ -1,6 +1,6 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} 
 {% include 'shared_modal.html' %}
-
+{% block content %}
 <div class="content p-4 flex-grow-1">
     <!-- Filter bar -->
     <div class="filter-bar mb-4 d-flex align-items-center gap-4">
@@ -186,6 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('shareNoteBtn').addEventListener('click', async function () {
         const noteId = document.getElementById('noteIdToShare').value;
         const recipientEmail = document.getElementById('shareEmail').value;
+        const message = document.getElementById('shareMessage').value;
     
         if (!recipientEmail) {
             alert("Please enter the recipient's email!");
@@ -201,6 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({
                     note_id: noteId,
                     recipient_email: recipientEmail,
+                    message: message,
                 }),
             });
     

@@ -181,28 +181,163 @@ document.addEventListener('DOMContentLoaded', function () {
 
     
     // Xử lý sự kiện nhấn nút Share
+    console.log('note_functions.js loaded');
+
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('DOM loaded');
+
+    // Chỉ chạy logic fetchNotes nếu trang có myNotesContainer
+    const container = document.getElementById('myNotesContainer');
+    console.log('Container found:', container);
+    if (container) {
+        // Định nghĩa hàm createNoteCard trước
+        function createNoteCard(note) {
+            const noteCard = document.createElement('div');
+            noteCard.className = `note-card ${note.color} position-relative p-3`;
+
+            // Cắt nội dung nếu dài hơn 50 ký tự
+            const truncatedContent = note.content.length > 50
+                ? note.content.substring(0, 50) + '...'
+                : note.content;
+
+            noteCard.innerHTML = `
+                <div class="note-content">
+                    <div class="note-header d-flex justify-content-between align-items-start pb-1">
+                        <strong><em>${note.title}</em></strong>
+                        <div class="dropdown">
+                            <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="/note_detail/${note.id}">
+                                    <i class="bi bi-eye"></i> View Detail</a></li>
+                                <li><a class="dropdown-item share-note" href="#" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="${note.id}">
+                                    <i class="bi bi-share"></i> Share</a></li>
+                                <li><a class="dropdown-item text-danger" href="#">
+                                    <i class="bi bi-trash"></i> Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-separator"></div>
+                    <p class="mt-2">${truncatedContent}</p>
+                </div>
+            `;
+
+            // Thêm sự kiện click cho card
+            noteCard.addEventListener('click', function (e) {
+                if (!e.target.closest('.dropdown')) {
+                    window.location.href = `/note_detail/${note.id}`;
+                }
+            });
+
+            // Thêm sự kiện cho nút share
+            const shareButton = noteCard.querySelector('.share-note');
+            shareButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                const noteId = this.getAttribute('data-note-id');
+                document.getElementById('noteIdToShare').value = noteId;
+            });
+
+            return noteCard;
+        }
+
+        // Kiểm tra xem đang ở trang nào
+        const isDashboard = container.classList.contains('dashboard-container');
+
+        // Hàm fetchNotes
+        async function fetchNotes() {
+            try {
+                const limit = container.getAttribute('data-limit') ? parseInt(container.getAttribute('data-limit')) : 9;
+                const response = await fetch(`/api/notes?limit=${limit}`);
+                const result = await response.json();
+                const notes = result.data || [];
+
+                container.innerHTML = '';
+
+                // Xóa nút arrow cũ nếu có
+                const existingArrow = document.querySelector('.dashboard-arrow-redirect');
+                if (existingArrow) {
+                    existingArrow.remove();
+                }
+
+                if (notes.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center p-4">
+                            <p>No notes found. Create your first note!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                notes.forEach((note) => {
+                    const noteCard = createNoteCard(note);
+                    container.appendChild(noteCard);
+                });
+
+                if (isDashboard && notes.length === 9) {
+                    const arrowButton = document.createElement('div');
+                    arrowButton.className = 'dashboard-arrow-redirect';
+                    arrowButton.innerHTML = `
+                        <i class="bi bi-arrow-right"></i>
+                        <div class="dashboard-arrow-tooltip">Xem tất cả ghi chú</div>
+                    `;
+
+                    arrowButton.onclick = (e) => {
+                        e.preventDefault();
+                        arrowButton.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            window.location.href = '/all-my-notes';
+                        }, 150);
+                    };
+
+                    container.appendChild(arrowButton);
+                }
+            } catch (error) {
+                console.error('Error fetching notes:', error);
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        Error loading notes. Please try again.
+                        <button class="btn btn-link" onclick="location.reload()">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Initial load
+        fetchNotes();
+    }
+
+    // Xử lý sự kiện nhấn nút Share (áp dụng cho tất cả trang có shareNoteModal)
     async function shareNote() {
         const noteIdInput = document.getElementById('noteIdToShare');
         const emailInput = document.getElementById('shareEmail');
+        const messageInput = document.getElementById('shareMessage');
         const form = document.getElementById('shareNoteForm');
         const modalElement = document.getElementById('shareNoteModal');
-    
-        if (!noteIdInput || !emailInput || !form || !modalElement) {
-            console.error('Missing required DOM elements.');
+
+        if (!noteIdInput || !emailInput || !messageInput || !form || !modalElement) {
+            console.error('Missing required DOM elements:', {
+                noteIdInput: !!noteIdInput,
+                emailInput: !!emailInput,
+                messageInput: !!messageInput,
+                form: !!form,
+                modalElement: !!modalElement
+            });
+            alert('Error: Unable to share note due to missing form elements.');
             return;
         }
-    
+
         const noteId = noteIdInput.value;
         const recipientEmail = emailInput.value.trim();
-    
-        console.log('Preparing to share note:', noteId, 'to:', recipientEmail);
-    
+        const message = messageInput.value.trim();
+
+        console.log('Preparing to share note:', noteId, 'to:', recipientEmail, 'with message:', message);
+
         if (!recipientEmail) {
             alert("Please enter the recipient's email!");
             return;
         }
-        
-    
+
         try {
             const response = await fetch('/api/share-note', {
                 method: 'POST',
@@ -210,41 +345,35 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: JSON.stringify({
                     note_id: noteId,
                     recipient_email: recipientEmail,
+                    message: message
                 }),
             });
-    
+
             const result = await response.json();
             console.log('Share response:', result);
-    
+
             if (result.success) {
                 alert('Share successfully!');
-    
-                const openButton = document.querySelector('[data-bs-target="#shareNoteModal"]');
-                if (openButton) openButton.focus();
-    
                 const modalInstance = bootstrap.Modal.getInstance(modalElement);
                 if (modalInstance) modalInstance.hide();
-    
                 form.reset();
-    
             } else {
                 alert('Failed to share note: ' + result.message);
             }
-    
         } catch (error) {
             console.error('Error sharing note:', error);
             alert('Error sharing note. Please try again.');
         }
     }
-    
-    
-    // Gán giá trị note ID vào modal khi nhấn nút Share
-    const oldButton = document.getElementById('shareNoteBtn');
-    if (oldButton) {
-        const newButton = oldButton.cloneNode(true);
-        oldButton.parentNode.replaceChild(newButton, oldButton);
-        newButton.addEventListener('click', shareNote);
+
+    // Gán sự kiện cho nút Share
+    const shareButton = document.getElementById('shareNoteBtn');
+    if (shareButton) {
+        shareButton.addEventListener('click', shareNote);
+    } else {
+        console.log('Share button not found - this is normal for pages without share modal');
     }
+});
 
 
     // Thêm event listener cho sự kiện popstate (khi người dùng nhấn back/forward)

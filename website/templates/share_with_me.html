@@ -1,4 +1,5 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
+{% include 'shared_modal.html' %}
 {% block content %}
 <div class="content p-4 flex-grow-1">
   <div id="shared-with-me">
@@ -6,38 +7,42 @@
     <div class="d-flex mb-3 border-bottom">
       <button class="tab-button {% if not shared_by_me %}active{% endif %}" id="tab1">Shared with me</button>
       <button class="tab-button {% if shared_by_me %}active{% endif %}" id="tab2">Shared by me</button>
-
     </div>
-
 
     <!-- Title -->
     <h4 class="mb-4 fw-bold">
-      {{'Shared by me' if shared_by_me else 'Share with me'}}
+      {{ 'Shared by me' if shared_by_me else 'Share with me' }}
     </h4>
-
-    
 
     <!-- Cards -->
     <div class="d-flex flex-wrap gap-3">
       {% if shared_notes|length == 0 %}
       <div class="text-center w-100">
         <p class="text-muted">
-         {{"You haven't shared any notes." if shared_by_me else 'No notes have been shared with you yet.'}}
+          {{ "You haven't shared any notes." if shared_by_me else 'No notes have been shared with you yet.' }}
         </p>
       </div>
       {% else %}
       {% for shared_note in shared_notes %}
-      <div class="card-shared bg-info-subtle" style="background-color: #BEF1E9; cursor: pointer;" onclick="window.location.href='/note_detail/{{ shared_note.note.id }}'">
+      <div class="card-shared {{ shared_note.note.color }}" style="cursor: pointer;" data-note-id="{{ shared_note.note.id }}">
         <p class="fst-italic">
           {% if shared_by_me %}
           Shared to {{ shared_note.recipient.first_name }} {{ shared_note.recipient.last_name }}
-          {% else%}
+          {% else %}
           Shared by {{ shared_note.sharer.first_name }} {{ shared_note.sharer.last_name }}
-          {% endif%}
+          {% endif %}
         </p>
+
+        {% if shared_note.message is defined and shared_note.message %}
+        <div class="alert alert-info p-2 mb-2" role="alert" style="font-size: 13px;">
+          💌 {{ shared_note.message }}
+        </div>
+        {% endif %}
           
         <div class="fw-bold ms-4">{{ shared_note.note.title }}</div>
-        <div class="text-muted ms-4 fst-italic" style="font-size: 14px;">{{ shared_note.note.content[:100] }}{% if shared_note.note.content|length > 100 %}...{% endif %}</div>
+        <div class="text-muted ms-4 fst-italic" style="font-size: 14px;">
+          {{ shared_note.note.content[:100] }}{% if shared_note.note.content|length > 100 %}...{% endif %}
+        </div>
         <div class="d-flex justify-content-between align-items-center mt-3">
           <span class="fst-italic" style="font-size: 14px;">
             <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image" style="width: 22px;">
@@ -49,7 +54,6 @@
           </span>
         </div>
       </div>
-
       {% endfor %}
       {% endif %}
     </div>
@@ -75,7 +79,20 @@ document.addEventListener('DOMContentLoaded', function() {
       tab1.classList.add('active');
       tab2.classList.remove('active');
   }
+
+  // Xử lý click trên card note
+  document.querySelectorAll('.card-shared').forEach(card => {
+      card.addEventListener('click', function(e) {
+          // Ngăn click trên nút "Manage access" chuyển hướng
+          if (e.target.closest('.tag')) {
+              console.log('Clicked Manage access - no redirect');
+              return;
+          }
+          const noteId = this.getAttribute('data-note-id');
+          console.log('Navigating to note detail:', noteId);
+          window.location.href = `/note_detail/${noteId}`;
+      });
+  });
 });
 </script>
-
 {% endblock %}

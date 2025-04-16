@@ -41,6 +41,8 @@ class ShareNote(db.Model):
     note = db.relationship('Note', backref=db.backref('shared_notes', lazy=True))
     sharer = db.relationship('User', foreign_keys=[sharer_id], backref=db.backref('shared_note', lazy=True))
     recipient = db.relationship('User', foreign_keys=[recipient_id], backref=db.backref('shared_with', lazy=True))
+    can_edit = db.Column(db.Boolean, default=False)
+    message = db.Column(db.String(200), nullable=True)
     def __repr__(self):
         return f'<ShareNote {self.note_id} by User {self.user_id}>'
 
