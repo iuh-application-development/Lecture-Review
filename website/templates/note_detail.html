@@ -54,9 +54,11 @@
                     <i class="bi bi-pencil"></i> Edit Note
                 </a>
                 {% endif %}
+                {% if note.user_id == current_user.id%}
                 <button class="btn btn-share" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="{{ note.id }}">
                     <i class="bi bi-share"></i> Share
                 </button>
+                {% endif %}
                 <button class="btn btn-export">
                     <i class="bi bi-download"></i> Export as PDF
                 </button>
@@ -148,10 +150,19 @@ function saveNote() {
 // Gán sự kiện cho nút Share trong trang note_detail
 document.querySelectorAll('.btn-share').forEach(button => {
     button.addEventListener('click', function() {
+        console.log('Share button clicked!, noteId:', this.getAttribute('data-note-id'));
         const noteId = this.getAttribute('data-note-id');
         const noteIdInput = document.getElementById('noteIdToShare');
         if (noteIdInput) {
             noteIdInput.value = noteId;
+            console.log('Set noteIdToShare to:', noteIdInput.noteId);
+        } else {
+            console.error('noteIdToShare input not found!');
+        }
+        // kiểm tra xem modal đã được mở chưa
+        const modal = document.getElementById('shareNoteModal');
+        if(!modal){
+            console.error('noteIdToShare ot found in DOM')
         }
     });
 });

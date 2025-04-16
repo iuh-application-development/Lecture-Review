@@ -44,5 +44,5 @@ class ShareNote(db.Model):
     can_edit = db.Column(db.Boolean, default=False)
     message = db.Column(db.String(200), nullable=True)
     def __repr__(self):
-        return f'<ShareNote {self.note_id} by User {self.user_id}>'
+        return f'<ShareNote {self.note_id} from User {self.sharer_id} to User {self.recipient_id}>'
 

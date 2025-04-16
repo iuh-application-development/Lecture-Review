@@ -163,7 +163,7 @@ def share_note():
         note_id = data.get('note_id')
         recipient_email = data.get('recipient_email')
         message = data.get('message')
-        can_edit = data.get('can_edit', False)
+        can_edit = data.get('can_edit', True)
 
         if not note_id or not recipient_email:
             return jsonify({

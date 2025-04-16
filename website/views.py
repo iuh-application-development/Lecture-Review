@@ -47,7 +47,7 @@ def note_detail(note_id):
             flash('You do not have permission to view this note.', 'error')
             return redirect(url_for('views.share_with_me'))
         sharer = shared.sharer if shared else None
-        return render_template('note_detail.html', user=current_user, note=note, shared=shared, sharer=sharer, editing=False)
+        return render_template('note_detail.html', user=current_user, note=note, shared=shared, sharer=sharer)
     except Exception as e:
         print(f"Error loading note {note_id}: {str(e)}")
         flash('Error loading note.', 'error')
