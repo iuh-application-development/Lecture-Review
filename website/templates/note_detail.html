@@ -2,7 +2,6 @@
 {% include 'shared_modal.html' %}
 
 {% block head %}
-<!-- Thêm link đến file CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/note_detail.css') }}">
 {% endblock %}
 
@@ -11,8 +10,8 @@
     <!-- Sidebar -->
     <div class="note-sidebar">
         <div class="sidebar-header">
-            <a href="{{ url_for('views.all_my_notes') }}" class="back-btn">
-                <i class="bi bi-arrow-left"></i> Back to Notes
+            <a href="{{ url_for('views.share_with_me') if shared else url_for('views.all_my_notes') }}" class="back-btn">
+                <i class="bi bi-arrow-left"></i> Back to {{ 'Shared Notes' if shared else 'My Notes' }}
             </a>
         </div>
         <div class="sidebar-content">
@@ -25,6 +24,12 @@
                 <span class="meta-label">Last modified</span>
                 <span class="meta-value">{{ note.updated_at.strftime('%d %b %Y, %H:%M') }}</span>
             </div>
+            {% if shared and sharer %}
+            <div class="note-meta">
+                <span class="meta-label">Shared by</span>
+                <span class="meta-value">{{ sharer.first_name }} {{ sharer.last_name }}</span>
+            </div>
+            {% endif %}
 
             <!-- Color Indicator -->
             <div class="note-meta">
@@ -44,18 +49,24 @@
 
             <!-- Action Buttons -->
             <div class="action-buttons">
-                <button class="btn btn-edit" onclick="toggleEditMode()">
+                {% if note.user_id == current_user.id or (shared and shared.can_edit) %}
+                <a href="{{ url_for('views.edit_note', note_id=note.id) }}" class="btn btn-edit">
                     <i class="bi bi-pencil"></i> Edit Note
-                </button>
+                </a>
+                {% endif %}
+                {% if note.user_id == current_user.id%}
                 <button class="btn btn-share" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="{{ note.id }}">
                     <i class="bi bi-share"></i> Share
                 </button>
+                {% endif %}
                 <button class="btn btn-export">
                     <i class="bi bi-download"></i> Export as PDF
                 </button>
+                {% if note.user_id == current_user.id %}
                 <button class="btn btn-delete">
                     <i class="bi bi-trash"></i> Move to Trash
                 </button>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -63,7 +74,7 @@
     <!-- Main Content -->
     <div class="note-main-content">
         <!-- View Mode -->
-        <div id="viewMode">
+        <div id="viewMode" style="display: {% if editing|default(False) %}none{% else %}block{% endif %};">
             <div class="note-header">
                 <h1 class="note-title">{{ note.title }}</h1>
             </div>
@@ -73,13 +84,12 @@
         </div>
 
         <!-- Edit Mode -->
-        <div id="editMode" style="display: none;">
+        <div id="editMode" style="display: {% if editing|default(False) %}block{% else %}none{% endif %};">
             <div class="edit-container">
                 <div class="edit-header">
                     <input type="text" id="editTitle" class="edit-title" value="{{ note.title }}">
                     <div class="edit-actions">
                         <select id="editColor" class="form-select color-select">
-
                             <option value="note-blue" {% if note.color == 'note-blue' %}selected{% endif %}>Blue Theme</option>
                             <option value="note-green" {% if note.color == 'note-green' %}selected{% endif %}>Green Theme</option>
                             <option value="note-purple" {% if note.color == 'note-purple' %}selected{% endif %}>Purple Theme</option>
@@ -126,10 +136,9 @@ function saveNote() {
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
-            // Refresh page to show updated content
-            window.location.reload();
+            window.location.href = `/note_detail/${noteId}`;
         } else {
-            alert('Error updating note');
+            alert('Error updating note: ' + (data.message || 'Unknown error'));
         }
     })
     .catch(error => {
@@ -138,60 +147,24 @@ function saveNote() {
     });
 }
 
-// Xử lý sự kiện nhấn nút Share
-document.getElementById('shareNoteBtn').addEventListener('click', async function () {
-    const noteId = document.getElementById('noteIdToShare').value;
-    const recipientEmail = document.getElementById('shareEmail').value;
-
-    if (!recipientEmail) {
-        alert("Please enter the recipient's email!");
-        return;
-    }
-
-     try {
-        const response = await fetch('/api/share-note', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                note_id: noteId,
-                recipient_email: recipientEmail,
-            }),
-        });
-
-        const result = await response.json();
-        if (result.success) {
-            // Hiển thị thông báo thành công
-            alert('Share successfully!');
-                
-            // Đóng modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('shareNoteModal'));
-            modal.hide();
-
-            // Reset form
-            document.getElementById('shareNoteForm').reset();
+// Gán sự kiện cho nút Share trong trang note_detail
+document.querySelectorAll('.btn-share').forEach(button => {
+    button.addEventListener('click', function() {
+        console.log('Share button clicked!, noteId:', this.getAttribute('data-note-id'));
+        const noteId = this.getAttribute('data-note-id');
+        const noteIdInput = document.getElementById('noteIdToShare');
+        if (noteIdInput) {
+            noteIdInput.value = noteId;
+            console.log('Set noteIdToShare to:', noteIdInput.noteId);
         } else {
-            alert('Failed to share note: ' + result.message);
+            console.error('noteIdToShare input not found!');
         }
-    } catch (error) {
-        console.error('Error sharing note:', error);
-        alert('Error sharing note. Please try again.');
-    }
-});
-
-// Gán giá trị note ID vào modal khi nhấn nút Share
-document.querySelectorAll('.share-note,.btn-share').forEach(button => {
-    button.document.addEventListener('click', function(e) {
-        const shareBtn = e.target.closest('.share-note, .btn-share');
-        if (shareBtn) {
-            e.preventDefault();
-            const noteId = shareBtn.getAttribute('data-note-id');
-            document.getElementById('noteIdToShare').value = noteId;
+        // kiểm tra xem modal đã được mở chưa
+        const modal = document.getElementById('shareNoteModal');
+        if(!modal){
+            console.error('noteIdToShare ot found in DOM')
         }
     });
 });
-
 </script>
 {% endblock %}
-
