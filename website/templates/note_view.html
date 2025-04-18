@@ -2,22 +2,98 @@
 
 {% block load_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/note_view.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/note_detail.css') }}">
 {% endblock load_css %}
 
 {% block content %}
-<div style="border: none; max-width: 800px; margin: 0 auto;">
-    <h1 contenteditable="true" 
-        id="page-title" 
-        data-placeholder="Enter title here" 
-        style="font-size: 40px; font-weight: 700; margin-top: 30px; margin-bottom: 20px;">{% if note %}{{note.title}}{% endif %}</h1>
-</div>
+{% include 'shared_modal.html' %}
+<div class="content-wrapper">
+    <div class="note-sidebar">
+        <div class="sidebar-header">
+            <a href="{{ url_for('views.share_with_me') if shared else url_for('views.all_my_notes') }}" class="back-btn">
+                <i class="bi bi-arrow-left"></i> Back to {{ 'Shared Notes' if shared else 'My Notes' }}
+            </a>
+        </div>
+        <div class="sidebar-content">
+            <!-- Note Meta Info -->
+            <div class="note-meta">
+                <span class="meta-label">Created</span>
+                <span class="meta-value">
+                    {% if note %}
+                        {{ note.created_at.strftime("%d %b %Y") }}
+                    {% else %}
+                        {{ current_time.strftime("%d %b %Y") }}
+                    {% endif %}
+                </span>
+            </div>
+            <div class="note-meta">
+                <span class="meta-label">Last modified</span>
+                <span class="meta-value">
+                    {% if note %}
+                        {{ note.updated_at.strftime("%d %b %Y, %H:%M") }}
+                    {% else %}
+                        {{ current_time.strftime("%d %b %Y, %H:%M") }}
+                    {% endif %}
+                </span>
+            </div>
+            {% if shared and sharer %}
+            <div class="note-meta">
+                <span class="meta-label">Shared by</span>
+                <span class="meta-value">{{ sharer.first_name }} {{ sharer.last_name }}</span>
+            </div>
+            {% endif %}
 
-<div id="editorjs" 
-    data-note-content='{% if note %}{{ note.content | tojson }}{% else %}{}{% endif %}'
-    data-api-endpoint='{% if note %}{{ url_for("api.edit_note", note_id=note.id) }}{% else %}{{ url_for("api.create_note") }}{% endif %}'
-    data-redirect-url-on-create='{% if note %}{{ url_for("views.edit_note", note_id=note.id) }}{% else %}{{ "" }}{% endif %}'
-    data-user-id='{{user.id}}'
-    >
+            <!-- Color Indicator -->
+            <div class="note-meta">
+                <span class="meta-label">Note Color</span>
+                <div class="color-indicator {% if note %} {{ note.color }} {% endif %}"></div>
+            </div>
+
+            <!-- Tags Section -->
+            <div class="note-meta">
+                <span class="meta-label">Tags</span>
+                <div class="tags-container">
+                    <span class="tag">Study</span>
+                    <span class="tag">Important</span>
+                    <span class="tag">+Add</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                {% if note and note.user_id == current_user.id%}
+                <button class="btn btn-share" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="{{ note.id }}">
+                    <i class="bi bi-share"></i> Share
+                </button>
+                {% endif %}
+                <button class="btn btn-export">
+                    <i class="bi bi-download"></i> Export as PDF
+                </button>
+                {% if note and note.user_id == current_user.id %}
+                <button class="btn btn-delete">
+                    <i class="bi bi-trash"></i> Move to Trash
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="note-main-content">
+        <div style="border: none; max-width: 800px; margin: 0 auto;">
+            <h1 contenteditable="true" 
+                id="page-title" 
+                data-placeholder="Enter title here" 
+                style="font-size: 40px; font-weight: 700; text-align: center;">{% if note %}{{note.title}}{% endif %}</h1>
+        </div>
+        
+        <div id="editorjs" 
+            data-note-content='{% if note %}{{ note.content | tojson }}{% else %}{}{% endif %}'
+            data-api-endpoint='{% if note %}{{ url_for("api.edit_note", note_id=note.id) }}{% else %}{{ url_for("api.create_note") }}{% endif %}'
+            data-redirect-url-on-create='{% if note %}{{ url_for("views.edit_note", note_id=note.id) }}{% else %}{{ "" }}{% endif %}'
+            data-user-id='{{user.id}}'
+            >
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -32,4 +108,24 @@
 <script src="https://cdn.jsdelivr.net/npm/@bomdi/codebox@1.0.12/dist/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/editorjs-math/dist/bundle.min.js"></script>
 <script src=" {{ url_for('static', filename='js/note_view.js') }} "></script>
+<script>
+    document.querySelectorAll('.btn-share').forEach(button => {
+        button.addEventListener('click', function() {
+            console.log('Share button clicked!, noteId:', this.getAttribute('data-note-id'));
+            const noteId = this.getAttribute('data-note-id');
+            const noteIdInput = document.getElementById('noteIdToShare');
+            if (noteIdInput) {
+                noteIdInput.value = noteId;
+                console.log('Set noteIdToShare to:', noteIdInput.noteId);
+            } else {
+                console.error('noteIdToShare input not found!');
+            }
+            // kiểm tra xem modal đã được mở chưa
+            const modal = document.getElementById('shareNoteModal');
+            if(!modal){
+                console.error('noteIdToShare ot found in DOM')
+            }
+        });
+    });
+</script>
 {% endblock %}

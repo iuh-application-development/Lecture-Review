@@ -118,10 +118,11 @@ def create_note():
     })
 
 @api.route('/notes/edit/<int:note_id>', methods=['POST'])
+@login_required
 def edit_note(note_id):
     note = Note.query.get_or_404(note_id)
-
-    if note.user_id != current_user.id:
+    shared = ShareNote.query.filter_by(note_id=note.id, recipient_id=current_user.id).first()
+    if note.user_id != current_user.id and (not shared or not shared.can_edit):
         return jsonify({
             'status': 'error',
             'message': "You don't have permission to edit this note."
@@ -160,6 +161,8 @@ def share_note():
         data = request.get_json()
         note_id = data.get('note_id')
         recipient_email = data.get('recipient_email')
+        message = data.get('message')
+        can_edit = data.get('can_edit', True)
 
         if not note_id or not recipient_email:
             return jsonify({
@@ -202,7 +205,9 @@ def share_note():
             note_id=note_id,
             sharer_id=current_user.id,
             recipient_id=recipient.id,
-            shared_at=datetime.utcnow()
+            shared_at=datetime.utcnow(),
+            message=message,
+            can_edit=can_edit
         )
         db.session.add(shared_note)
         db.session.commit()
