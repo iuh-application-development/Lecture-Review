@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, flash, redirect, url_for
 from flask_login import current_user, login_required
 from .models import Note, ShareNote
+from datetime import datetime
 
 views = Blueprint('views', __name__)
 
@@ -36,35 +37,50 @@ def share_by_me():
 def trash():
     return render_template('trash.html', user=current_user)
 
-@views.route('/note_detail/<int:note_id>')
+@views.route('/create-note')
 @login_required
-def note_detail(note_id):
-    try:
-        note = Note.query.get_or_404(note_id)
-        shared = ShareNote.query.filter_by(note_id=note.id, recipient_id=current_user.id).first()
-        print(f"Accessing note {note_id}: user_id={current_user.id}, note_owner={note.user_id}, shared={shared}")
-        if note.user_id != current_user.id and not shared:
-            flash('You do not have permission to view this note.', 'error')
-            return redirect(url_for('views.share_with_me'))
-        sharer = shared.sharer if shared else None
-        return render_template('note_detail.html', user=current_user, note=note, shared=shared, sharer=sharer)
-    except Exception as e:
-        print(f"Error loading note {note_id}: {str(e)}")
-        flash('Error loading note.', 'error')
-        return redirect(url_for('views.share_with_me'))
+def create_note():
+    return render_template('note_view.html', user=current_user, current_time=datetime.utcnow())
 
-@views.route('/edit_note/<int:note_id>', methods=['GET'])
+@views.route('/edit-note/<int:note_id>', methods=['GET', 'POST'])
 @login_required
 def edit_note(note_id):
-    try:
-        note = Note.query.get_or_404(note_id)
-        shared = ShareNote.query.filter_by(note_id=note.id, recipient_id=current_user.id).first()
-        print(f"Editing note {note_id}: user_id={current_user.id}, note_owner={note.user_id}, shared={shared}")
-        if note.user_id != current_user.id and ( not shared or not shared.can_edit):
-            flash('You do not have permission to edit this note.', 'error')
-            return redirect(url_for('views.note_detail', note_id=note_id))
-        return render_template('note_detail.html', user=current_user, note=note, shared=shared, sharer=shared.sharer if shared else None, editing=True)
-    except Exception as e:
-        print(f"Error loading note for edit {note_id}: {str(e)}")
-        flash('Error loading note.', 'error')
+    note = Note.query.get_or_404(note_id)
+    shared = ShareNote.query.filter_by(note_id=note.id, recipient_id=current_user.id).first()
+    
+    if note.user_id != current_user.id and ( not shared or not shared.can_edit):
+        flash('You do not have permission to edit this note.', 'error')
         return redirect(url_for('views.all_my_notes'))
+
+    return render_template('note_view.html', user=current_user, note=note, shared=shared)
+
+# def note_detail(note_id):
+#     try:
+#         note = Note.query.get_or_404(note_id)
+#         shared = ShareNote.query.filter_by(note_id=note.id, recipient_id=current_user.id).first()
+#         print(f"Accessing note {note_id}: user_id={current_user.id}, note_owner={note.user_id}, shared={shared}")
+#         if note.user_id != current_user.id and not shared:
+#             flash('You do not have permission to view this note.', 'error')
+#             return redirect(url_for('views.share_with_me'))
+#         sharer = shared.sharer if shared else None
+#         return render_template('note_detail.html', user=current_user, note=note, shared=shared, sharer=sharer)
+#     except Exception as e:
+#         print(f"Error loading note {note_id}: {str(e)}")
+#         flash('Error loading note.', 'error')
+#         return redirect(url_for('views.share_with_me'))
+
+# @views.route('/edit_note/<int:note_id>', methods=['GET'])
+# @login_required
+# def edit_note(note_id):
+#     try:
+#         note = Note.query.get_or_404(note_id)
+#         shared = ShareNote.query.filter_by(note_id=note.id, recipient_id=current_user.id).first()
+#         print(f"Editing note {note_id}: user_id={current_user.id}, note_owner={note.user_id}, shared={shared}")
+#         if note.user_id != current_user.id and ( not shared or not shared.can_edit):
+#             flash('You do not have permission to edit this note.', 'error')
+#             return redirect(url_for('views.note_detail', note_id=note_id))
+#         return render_template('note_detail.html', user=current_user, note=note, shared=shared, sharer=shared.sharer if shared else None, editing=True)
+#     except Exception as e:
+#         print(f"Error loading note for edit {note_id}: {str(e)}")
+#         flash('Error loading note.', 'error')
+#         return redirect(url_for('views.all_my_notes'))

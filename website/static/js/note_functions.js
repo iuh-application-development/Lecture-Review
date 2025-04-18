@@ -92,8 +92,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Logic cho myNotesContainer (dashboard hoặc all_my_notes)
     const container = document.getElementById('myNotesContainer');
-    console.log('Container found:', container);
-    if (!container) return;
 
     // Định nghĩa hàm createNoteCard
     function createNoteCard(note) {
@@ -113,8 +111,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/note_detail/${note.id}">
-                                <i class="bi bi-eye"></i> View Detail</a></li>
                             <li><a class="dropdown-item share-note" href="#" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="${note.id}">
                                 <i class="bi bi-share"></i> Share</a></li>
                             <li><a class="dropdown-item text-danger" href="#">
@@ -129,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         noteCard.addEventListener('click', function (e) {
             if (!e.target.closest('.dropdown')) {
-                window.location.href = `/note_detail/${note.id}`;
+                window.location.href = `/edit-note/${note.id}`;
             }
         });
 
@@ -144,7 +140,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const isDashboard = container.classList.contains('dashboard-container');
-
     async function fetchNotes() {
         try {
             const limit = container.getAttribute('data-limit') ? parseInt(container.getAttribute('data-limit')) : 9;

@@ -1,6 +1,5 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %} {% block content %}
 {% include 'shared_modal.html' %}
-{% block content %}
 <div class="content p-4 flex-grow-1">
     <div class="title-block p-2 px-3 mb-3">
         <h5 class="fw-bold m-0">My Notes</h5>
@@ -21,7 +20,7 @@
         </div>
         {% else %}
         {% for shared_note in shared_notes %}
-        <div class="note-card {{ shared_note.note.color }} position-relative p-3" onclick="window.location.href='/note_detail/{{ shared_note.note.id }}'">
+        <div class="note-card {{ shared_note.note.color }} position-relative p-3" onclick="window.location.href='/edit-note/{{ shared_note.note.id }}'">
             <div class="note-content">
                 <div class="note-header d-flex justify-content-between align-items-start pb-1">
                     <strong><em>{{ shared_note.note.title }}</em></strong>
@@ -30,11 +29,6 @@
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="/note_detail/{{ shared_note.note.id }}">
-                                    <i class="bi bi-eye"></i> View Detail
-                                </a>
-                            </li>
                             <li>
                                 <a class="dropdown-item share-note" href="#" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="{{ shared_note.note.id }}">
                                     <i class="bi bi-share"></i> Share
@@ -50,7 +44,7 @@
                 </div>
                 {% endif %}
                 <p class="mt-2">
-                    {{ shared_note.note.content[:50] }}{% if shared_note.note.content|length > 50 %}...{% endif %}
+                    {{ shared_note.note.content }}
                 </p>
                 <p class="text-muted fst-italic" style="font-size: 14px;">
                     Shared by {{ shared_note.sharer.first_name }} {{ shared_note.sharer.last_name }}
@@ -62,13 +56,15 @@
     </div>
 
     <!-- Nút tạo note mới -->
-    <button type="button" class="btn btn-dark rounded-circle position-fixed"
-        style="bottom: 30px; right: 30px; width: 50px; height: 50px;"
-        data-bs-toggle="modal" data-bs-target="#createNoteModal">
+    <a href="/create-note"  
+        class="btn btn-dark rounded-circle position-fixed"
+        style="bottom: 30px; right: 30px; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center"
+        >
         +
-    </button>
+    </a>
 </div>
-
-<!-- Đảm bảo script được load -->
-<script src="{{ url_for('static', filename='js/note_functions.js') }}"></script>
 {% endblock %}
+
+{% block load_js %}
+<script src="{{ url_for('static', filename='js/note_functions.js') }}"></script>
+{% endblock load_js %}
