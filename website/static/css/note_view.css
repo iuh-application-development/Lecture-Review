@@ -1,0 +1,59 @@
+[data-placeholder]:empty:before {
+    content: attr(data-placeholder);
+    color: #888;
+    pointer-events: none;
+}
+
+#editorjs {
+    font-family: "Arial, sans-serif";
+    padding: 20px;
+    border: none;
+}
+
+#page-title:focus {
+    outline: none !important;
+    border: none;
+}
+
+.ce-header {
+    font-weight: 700;
+    color: #333;
+}
+
+.ce-paragraph {
+    font-size: 16px;
+    color: #444;
+    line-height: 1.5;
+}
+
+.codeBoxHolder {
+    position: relative;
+    overflow: visible !important;
+    background-color: #fcfbf8;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 1em;
+    margin: 1em 0;
+}
+
+.codeBoxSelectPreview {
+    position: absolute;
+    left: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    display: none;
+}
+
+.codeBoxSelectItem {
+    padding: 6px 12px;
+    font-size: 13px;
+    color: #444;
+    cursor: pointer;
+}
+
+.codeBoxSelectItem:hover {
+    background-color: #f2f2f2;
+}

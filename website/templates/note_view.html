@@ -1,0 +1,35 @@
+{% extends 'base.html' %} 
+
+{% block load_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/note_view.css') }}">
+{% endblock load_css %}
+
+{% block content %}
+<div style="border: none; max-width: 800px; margin: 0 auto;">
+    <h1 contenteditable="true" 
+        id="page-title" 
+        data-placeholder="Enter title here" 
+        style="font-size: 40px; font-weight: 700; margin-top: 30px; margin-bottom: 20px;">{% if note %}{{note.title}}{% endif %}</h1>
+</div>
+
+<div id="editorjs" 
+    data-note-content='{% if note %}{{ note.content | tojson }}{% else %}{}{% endif %}'
+    data-api-endpoint='{% if note %}{{ url_for("api.edit_note", note_id=note.id) }}{% else %}{{ url_for("api.create_note") }}{% endif %}'
+    data-redirect-url-on-create='{% if note %}{{ url_for("views.edit_note", note_id=note.id) }}{% else %}{{ "" }}{% endif %}'
+    data-user-id='{{user.id}}'
+    >
+</div>
+{% endblock %}
+
+{% block load_js %}
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/header"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/list"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/paragraph"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/table"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/marker"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code"></script>
+<script src="https://cdn.jsdelivr.net/npm/@bomdi/codebox@1.0.12/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/editorjs-math/dist/bundle.min.js"></script>
+<script src=" {{ url_for('static', filename='js/note_view.js') }} "></script>
+{% endblock %}

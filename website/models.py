@@ -1,6 +1,7 @@
 from . import db
 from flask_login import UserMixin
 from datetime import datetime
+from sqlalchemy.dialects.sqlite import JSON
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -19,7 +20,7 @@ class User(db.Model, UserMixin):
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
-    content = db.Column(db.Text, nullable=False)
+    content = db.Column(JSON)
     color = db.Column(db.String(20), default='note-green')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -28,7 +29,6 @@ class Note(db.Model):
     user = db.relationship('User', backref=db.backref('notes', lazy=True))
 
     def __repr__(self):
-
         return f'<Note {self.title} by Author {self.user_id}>'
     
 

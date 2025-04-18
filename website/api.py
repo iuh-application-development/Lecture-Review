@@ -98,24 +98,23 @@ def create_note():
     data = request.get_json()
     title = data.get('title')
     content = data.get('content')
-    color = data.get('color')
+    # color = data.get('color')
     user_id = data.get('user_id')
 
     new_note = Note(
         title=title,
         content=content,
-        color=color,
-        user_id=user_id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        # color=color,
+        user_id=user_id
     )
 
     db.session.add(new_note)
     db.session.commit()
 
     return jsonify({
-        'success': True,
-        'message': 'Note created successfully'
+        'status': 'success',
+        'message': 'Note created successfully',
+        'note_id': new_note.id
     })
 
 @api.route('/notes/edit/<int:note_id>', methods=['POST'])

@@ -1,13 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
 {% include 'shared_modal.html' %}
-{% block content %}
 <div class="content p-4 flex-grow-1">
     <div class="title-block p-2 px-3 mb-3">
         <h5 class="fw-bold m-0">My Notes</h5>
     </div>
     
     <!-- Container cho notes -->
-
     <div id="myNotesContainer" class="dashboard-container d-flex flex-wrap gap-3 mb-5" data-limit="9">
         <!-- Notes sẽ được load ở đây -->
     </div>
@@ -110,14 +108,15 @@
     </div>
 
     <!-- Nút tạo note mới -->
-    <button type="button" class="btn btn-dark rounded-circle position-fixed"
-        style="bottom: 30px; right: 30px; width: 50px; height: 50px;"
-        data-bs-toggle="modal" data-bs-target="#createNoteModal">
+    <a href="/create-note"  
+        class="btn btn-dark rounded-circle position-fixed"
+        style="bottom: 30px; right: 30px; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center"
+        >
         +
-    </button>
+    </a>
 </div>
-
-<!-- Đảm bảo script được load -->
-<script src="{{ url_for('static', filename='js/note_functions.js') }}"></script>
-
 {% endblock %}
+
+{% block load_js %}
+<script src="{{ url_for('static', filename='js/note_functions.js') }}"></script>
+{% endblock load_js %}

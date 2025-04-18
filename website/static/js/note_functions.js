@@ -1,10 +1,5 @@
-console.log('note_functions.js loaded');
-
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('DOM loaded');
     const container = document.getElementById('myNotesContainer');
-    console.log('Container found:', container);
-    if (!container) return;
 
     // Định nghĩa hàm createNoteCard trước
     function createNoteCard(note) {
@@ -25,8 +20,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/note_detail/${note.id}">
-                                <i class="bi bi-eye"></i> View Detail</a></li>
                             <li><a class="dropdown-item share note" href="#" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="${note.id}">
                                 <i class="bi bi-share"></i> Share</a></li>
                             <li><a class="dropdown-item text-danger" href="#">
@@ -42,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Thêm sự kiện click cho card
         noteCard.addEventListener('click', function (e) {
             if (!e.target.closest('.dropdown')) {
-                window.location.href = `/note_detail/${note.id}`;
+                window.location.href = `/edit-note/${note.id}`;
             }
         });
         // thêm sự kiện cho nút share
@@ -59,7 +52,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Kiểm tra xem đang ở trang nào
     const isDashboard = container.classList.contains('dashboard-container');
     
-
     // Sau đó định nghĩa hàm fetchNotes
     async function fetchNotes() {
         if (!container) return; // Kiểm tra nếu không tìm thấy container
@@ -124,61 +116,6 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
         }
     }
-
-    // Hàm tạo giao diện phân trang
-    function updatePagination(currentPage, totalPages) {
-        const paginationContainer = document.querySelector('.pagination.custom-pagination');
-        paginationContainer.innerHTML = '';
-
-        // Nút Previous
-        const prevLi = document.createElement('li');
-        prevLi.className = `page-item ${currentPage <= 1 ? 'disabled' : ''}`;
-        const prevLink = document.createElement('a');
-        prevLink.className = 'page-link';
-        prevLink.href = '#';
-        prevLink.innerHTML = '<i class="bi bi-chevron-left"></i>';
-        prevLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (currentPage > 1) {
-                fetchNotes(currentPage - 1);
-            }
-        });
-        prevLi.appendChild(prevLink);
-        paginationContainer.appendChild(prevLi);
-
-        // Các số trang
-        for (let page = 1; page <= totalPages; page++) {
-            const li = document.createElement('li');
-            li.className = `page-item ${page === currentPage ? 'active' : ''}`;
-            const link = document.createElement('a');
-            link.className = 'page-link';
-            link.href = '#';
-            link.textContent = page;
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-                fetchNotes(page);
-            });
-            li.appendChild(link);
-            paginationContainer.appendChild(li);
-        }
-
-        // Nút Next
-        const nextLi = document.createElement('li');
-        nextLi.className = `page-item ${currentPage >= totalPages ? 'disabled' : ''}`;
-        const nextLink = document.createElement('a');
-        nextLink.className = 'page-link';
-        nextLink.href = '#';
-        nextLink.innerHTML = '<i class="bi bi-chevron-right"></i>';
-        nextLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (currentPage < totalPages) {
-                fetchNotes(currentPage + 1);
-            }
-        });
-        nextLi.appendChild(nextLink);
-        paginationContainer.appendChild(nextLi);
-    }
-
     
     // Xử lý sự kiện nhấn nút Share
     async function shareNote() {
