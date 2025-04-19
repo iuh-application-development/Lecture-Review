@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Gán sự kiện cho nút Share trong modal
+    console.log ('Attaching event listener to shareNoteBtn');
     const shareButton = document.getElementById('shareNoteBtn');
     console.log('Checking shareNoteBtn:', shareButton);
     if (shareButton) {
@@ -89,6 +90,42 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         console.log('shareNoteBtn not found - this is normal for pages without share modal');
     }
+
+    // Gắn lại sự kiện khi modal được hiển thị
+    document.addEventListener('shown.bs.modal', function(e) {
+        if (e.target.id === 'shareNoteModal') {
+            console.log('Modal shown, checking shareNoteBtn');
+            const shareButton = document.getElementById('shareNoteBtn');
+            if (shareButton) {
+                console.log('shareNoteBtn found in modal, attaching event listener');
+                shareButton.removeEventListener('click', shareNote); // Tránh gắn trùng
+                shareButton.addEventListener('click', shareNote);
+            } else {
+                console.error('shareNoteBtn not found in modal');
+            }
+        }
+    });
+
+    // Xử lý sự kiện click cho tất cả nút share (tĩnh và động)
+    document.addEventListener('click', function(e) {
+        const shareButton = e.target.closest('.btn-share, .share-note');
+        if (shareButton) {
+            e.preventDefault();
+            const noteId = shareButton.getAttribute('data-note-id');
+            console.log('Share button clicked!, noteId:', noteId);
+            const noteIdInput = document.getElementById('noteIdToShare');
+            const modal = document.getElementById('shareNoteModal');
+            if (!modal) {
+                console.error('Share modal not found in DOM');
+            }
+            if (noteIdInput) {
+                noteIdInput.value = noteId;
+                console.log('Set noteIdToShare to:', noteIdInput.value);
+            } else {
+                console.error('noteIdToShare input not found!');
+            }
+        }
+    });
 
     // Logic cho myNotesContainer (dashboard hoặc all_my_notes)
     const container = document.getElementById('myNotesContainer');

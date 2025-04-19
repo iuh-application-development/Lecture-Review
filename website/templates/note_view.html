@@ -108,24 +108,5 @@
 <script src="https://cdn.jsdelivr.net/npm/@bomdi/codebox@1.0.12/dist/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/editorjs-math/dist/bundle.min.js"></script>
 <script src=" {{ url_for('static', filename='js/note_view.js') }} "></script>
-<script>
-    document.querySelectorAll('.btn-share').forEach(button => {
-        button.addEventListener('click', function() {
-            console.log('Share button clicked!, noteId:', this.getAttribute('data-note-id'));
-            const noteId = this.getAttribute('data-note-id');
-            const noteIdInput = document.getElementById('noteIdToShare');
-            if (noteIdInput) {
-                noteIdInput.value = noteId;
-                console.log('Set noteIdToShare to:', noteIdInput.value);
-            } else {
-                console.error('noteIdToShare input not found!');
-            }
-            // kiểm tra xem modal đã được mở chưa
-            const modal = document.getElementById('shareNoteModal');
-            if(!modal){
-                console.error('noteIdToShare ot found in DOM')
-            }
-        });
-    });
-</script>
+<script src=" {{ url_for('static', filename='js/note_functions.js') }} "></script>
 {% endblock %}
