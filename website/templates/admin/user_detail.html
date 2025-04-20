@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}User Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Thông tin người dùng</h5>
+                    <p><strong>Họ tên:</strong> {{ target_user.first_name }} {{ target_user.last_name }}</p>
+                    <p><strong>Email:</strong> {{ target_user.email }}</p>
+                    <p><strong>Giới tính:</strong> {{ target_user.gender }}</p>
+                    <p><strong>Vai trò:</strong> {{ target_user.role }}</p>
+                    <p><strong>Trạng thái:</strong> 
+                        <span class="badge {% if target_user.status == 'Active' %}bg-success{% elif target_user.status == 'Locked' %}bg-danger{% else %}bg-warning{% endif %}">
+                            {{ target_user.status }}
+                        </span>
+                    </p>
+                    <p><strong>Ngày tạo:</strong> {{ target_user.created_at.strftime('%d/%m/%Y') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Danh sách ghi chú</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Tiêu đề</th>
+                                    <th>Nội dung</th>
+                                    <th>Ngày tạo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for note in notes %}
+                                <tr>
+                                    <td>{{ note.title }}</td>
+                                    <td>{{ note.content }}</td>
+                                    <td>{{ note.created_at }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

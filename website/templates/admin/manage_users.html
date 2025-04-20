@@ -80,6 +80,10 @@
           userTableBody.innerHTML = '';
           users.forEach(user => {
             const row = document.createElement('tr');
+            row.style.cursor = 'pointer';
+            row.onclick = () => {
+              window.location.href = `/admin/user_detail/${user.id}`;
+            };
             row.innerHTML = `
                         <td>${user.email}</td>
                         <td>
@@ -93,12 +97,48 @@
                                 <button class="btn btn-sm btn-light border toggle-lock" data-user-id="${user.id}" data-status="${user.status}">
                                     <i class="bi ${user.status === 'Locked' ? 'bi-unlock' : 'bi-lock'}"></i>
                                 </button>
-                                <button class="btn btn-sm btn-light border delete-user" data-user-id="${user.id}">
-                                    <i class="bi bi-trash"></i>
-                                </button>
                             </div>
                         </td>
                     `;
+
+            // Thêm sự kiện click cho nút khóa/mở khóa
+            row.querySelector('.toggle-lock').addEventListener('click', (event) => {
+              event.stopPropagation();
+
+              const btn = event.currentTarget; 
+              const icon = btn.querySelector('i');
+
+              let currentStatus = btn.getAttribute('data-status');
+              const userId = btn.getAttribute('data-user-id');
+
+              if (currentStatus === 'Locked') {
+                icon.classList.replace('bi-lock', 'bi-unlock');
+                btn.setAttribute('data-status', 'Active');
+                currentStatus = 'Active';
+              } else {
+                icon.classList.replace('bi-unlock', 'bi-lock');
+                btn.setAttribute('data-status', 'Locked');
+                currentStatus = 'Locked';
+              }
+
+              fetch(`/admin/users/${userId}/toggle-lock`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: currentStatus })
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  fetchUsers(currentPage, statusFilter.value, searchUser.value);
+                } else {
+                  console.error('Error toggling lock:', data.message);
+                }
+              })
+              .catch(error => console.error('Error:', error));
+            });
+
             userTableBody.appendChild(row);
           });
 
@@ -167,33 +207,6 @@
     // Xử lý sự kiện filter
     filterButton.addEventListener('click', function () {
       fetchUsers(1, statusFilter.value, searchUser.value);
-    });
-
-    // Xử lý sự kiện toggle lock
-    userTableBody.addEventListener('click', function (e) {
-      const lockButton = e.target.closest('.toggle-lock');
-      if (lockButton) {
-        const userId = lockButton.getAttribute('data-user-id');
-        const currentStatus = lockButton.getAttribute('data-status');
-        const newStatus = currentStatus === 'Locked' ? 'Active' : 'Locked';
-
-        fetch(`/admin/users/${userId}/toggle-lock`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ status: newStatus })
-        })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              fetchUsers(currentPage, statusFilter.value, searchUser.value);
-            } else {
-              console.error('Error toggling lock:', data.message);
-            }
-          })
-          .catch(error => console.error('Error:', error));
-      }
     });
 
     // Khởi tạo: Lấy danh sách người dùng mặc định
