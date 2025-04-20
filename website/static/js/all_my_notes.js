@@ -4,16 +4,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const dateFilter = document.getElementById('dateFilter');
     let currentPage = 1;
 
-    // Thêm hàm createNoteCard
     function createNoteCard(note) {
         const noteCard = document.createElement('div');
         noteCard.className = `note-card ${note.color} position-relative p-3`;
-        
-        // Cắt nội dung nếu dài hơn 50 ký tự
-        const truncatedContent = note.content.length > 50 
-            ? note.content.substring(0, 50) + '...' 
+
+        const truncatedContent = note.content.length > 50
+            ? note.content.substring(0, 50) + '...'
             : note.content;
-        
+
         noteCard.innerHTML = `
             <div class="note-content">
                 <div class="note-header d-flex justify-content-between align-items-start pb-1">
@@ -23,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item share note" href="#" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="${note.id}">
+                            <li><a class="dropdown-item share-note" href="#" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="${note.id}">
                                 <i class="bi bi-share"></i> Share</a></li>
                             <li><a class="dropdown-item text-danger" href="#">
                                 <i class="bi bi-trash"></i> Delete</a></li>
@@ -35,16 +33,22 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
 
-        // Thêm sự kiện click cho card
-        noteCard.addEventListener('click', function(e) {
+        noteCard.addEventListener('click', function (e) {
             if (!e.target.closest('.dropdown')) {
                 window.location.href = `/edit-note/${note.id}`;
             }
         });
 
+        const shareButton = noteCard.querySelector('.share-note');
+        shareButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            const noteId = this.getAttribute('data-note-id');
+            document.getElementById('noteIdToShare').value = noteId;
+        });
+
         return noteCard;
     }
-
+    
     // Hàm fetch notes với phân trang
     async function fetchPagedNotes(page = 1) {
         try {
@@ -129,58 +133,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         pagination.appendChild(nextLi);
     }
-
-
-    // Xử lý sự kiện nhấn nút Share
-    document.getElementById('shareNoteBtn').addEventListener('click', async function () {
-        const noteId = document.getElementById('noteIdToShare').value;
-        const recipientEmail = document.getElementById('shareEmail').value;
-    
-        if (!recipientEmail) {
-            alert("Please enter the recipient's email!");
-            return;
-        }
-    
-         try {
-            const response = await fetch('/api/share-note', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    note_id: noteId,
-                    recipient_email: recipientEmail,
-                }),
-            });
-    
-            const result = await response.json();
-            if (result.success) {
-                // Hiển thị thông báo thành công
-                alert('Share successfully!');
-                    
-                // Đóng modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('shareNoteModal'));
-                modal.hide();
-    
-                // Reset form
-                document.getElementById('shareNoteForm').reset();
-            } else {
-                alert('Failed to share note: ' + result.message);
-            }
-        } catch (error) {
-            console.error('Error sharing note:', error);
-            alert('Error sharing note. Please try again.');
-        }
-    });
-    
-    // Gán giá trị note ID vào modal khi nhấn nút Share
-    document.querySelectorAll('.share-note,.btn-share').forEach(button => {
-        button.addEventListener('click', function(e) {
-            const noteId = this.getAttribute('data-note-id');
-            document.getElementById('noteIdToShare').value = noteId;
-        });
-    });
-    
 
     // Xử lý sự kiện thay đổi filter
     colorFilter.addEventListener('change', () => fetchPagedNotes(1));

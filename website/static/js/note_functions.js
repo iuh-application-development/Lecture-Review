@@ -234,58 +234,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function updatePagination(currentPage, totalPages) {
-        const paginationContainer = document.querySelector('.pagination.custom-pagination');
-        if (!paginationContainer) return;
-
-        paginationContainer.innerHTML = '';
-
-        const prevLi = document.createElement('li');
-        prevLi.className = `page-item ${currentPage <= 1 ? 'disabled' : ''}`;
-        const prevLink = document.createElement('a');
-        prevLink.className = 'page-link';
-        prevLink.href = '#';
-        prevLink.innerHTML = '<i class="bi bi-chevron-left"></i>';
-        prevLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (currentPage > 1) {
-                fetchNotes(currentPage - 1);
-            }
-        });
-        prevLi.appendChild(prevLink);
-        paginationContainer.appendChild(prevLi);
-
-        for (let page = 1; page <= totalPages; page++) {
-            const li = document.createElement('li');
-            li.className = `page-item ${page === currentPage ? 'active' : ''}`;
-            const link = document.createElement('a');
-            link.className = 'page-link';
-            link.href = '#';
-            link.textContent = page;
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-                fetchNotes(page);
-            });
-            li.appendChild(link);
-            paginationContainer.appendChild(li);
-        }
-
-        const nextLi = document.createElement('li');
-        nextLi.className = `page-item ${currentPage >= totalPages ? 'disabled' : ''}`;
-        const nextLink = document.createElement('a');
-        nextLink.className = 'page-link';
-        nextLink.href = '#';
-        nextLink.innerHTML = '<i class="bi bi-chevron-right"></i>';
-        nextLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (currentPage < totalPages) {
-                fetchNotes(currentPage + 1);
-            }
-        });
-        nextLi.appendChild(nextLink);
-        paginationContainer.appendChild(nextLi);
-    }
-
     window.addEventListener('popstate', function (event) {
         fetchNotes(1);
     });
