@@ -45,5 +45,6 @@
 {% endblock %}
 
 {% block load_js %}
+<script src="{{ url_for('static', filename='js/note_functions.js') }}"></script>
 <script src="{{ url_for('static', filename='js/all_my_notes.js') }}"></script>
 {% endblock load_js %}

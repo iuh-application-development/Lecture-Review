@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Gán sự kiện cho nút Share trong modal
+    console.log ('Attaching event listener to shareNoteBtn');
     const shareButton = document.getElementById('shareNoteBtn');
     console.log('Checking shareNoteBtn:', shareButton);
     if (shareButton) {
@@ -89,6 +90,42 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         console.log('shareNoteBtn not found - this is normal for pages without share modal');
     }
+
+    // Gắn lại sự kiện khi modal được hiển thị
+    document.addEventListener('shown.bs.modal', function(e) {
+        if (e.target.id === 'shareNoteModal') {
+            console.log('Modal shown, checking shareNoteBtn');
+            const shareButton = document.getElementById('shareNoteBtn');
+            if (shareButton) {
+                console.log('shareNoteBtn found in modal, attaching event listener');
+                shareButton.removeEventListener('click', shareNote); // Tránh gắn trùng
+                shareButton.addEventListener('click', shareNote);
+            } else {
+                console.error('shareNoteBtn not found in modal');
+            }
+        }
+    });
+
+    // Xử lý sự kiện click cho tất cả nút share (tĩnh và động)
+    document.addEventListener('click', function(e) {
+        const shareButton = e.target.closest('.btn-share, .share-note');
+        if (shareButton) {
+            e.preventDefault();
+            const noteId = shareButton.getAttribute('data-note-id');
+            console.log('Share button clicked!, noteId:', noteId);
+            const noteIdInput = document.getElementById('noteIdToShare');
+            const modal = document.getElementById('shareNoteModal');
+            if (!modal) {
+                console.error('Share modal not found in DOM');
+            }
+            if (noteIdInput) {
+                noteIdInput.value = noteId;
+                console.log('Set noteIdToShare to:', noteIdInput.value);
+            } else {
+                console.error('noteIdToShare input not found!');
+            }
+        }
+    });
 
     // Logic cho myNotesContainer (dashboard hoặc all_my_notes)
     const container = document.getElementById('myNotesContainer');
@@ -195,58 +232,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             `;
         }
-    }
-
-    function updatePagination(currentPage, totalPages) {
-        const paginationContainer = document.querySelector('.pagination.custom-pagination');
-        if (!paginationContainer) return;
-
-        paginationContainer.innerHTML = '';
-
-        const prevLi = document.createElement('li');
-        prevLi.className = `page-item ${currentPage <= 1 ? 'disabled' : ''}`;
-        const prevLink = document.createElement('a');
-        prevLink.className = 'page-link';
-        prevLink.href = '#';
-        prevLink.innerHTML = '<i class="bi bi-chevron-left"></i>';
-        prevLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (currentPage > 1) {
-                fetchNotes(currentPage - 1);
-            }
-        });
-        prevLi.appendChild(prevLink);
-        paginationContainer.appendChild(prevLi);
-
-        for (let page = 1; page <= totalPages; page++) {
-            const li = document.createElement('li');
-            li.className = `page-item ${page === currentPage ? 'active' : ''}`;
-            const link = document.createElement('a');
-            link.className = 'page-link';
-            link.href = '#';
-            link.textContent = page;
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-                fetchNotes(page);
-            });
-            li.appendChild(link);
-            paginationContainer.appendChild(li);
-        }
-
-        const nextLi = document.createElement('li');
-        nextLi.className = `page-item ${currentPage >= totalPages ? 'disabled' : ''}`;
-        const nextLink = document.createElement('a');
-        nextLink.className = 'page-link';
-        nextLink.href = '#';
-        nextLink.innerHTML = '<i class="bi bi-chevron-right"></i>';
-        nextLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (currentPage < totalPages) {
-                fetchNotes(currentPage + 1);
-            }
-        });
-        nextLi.appendChild(nextLink);
-        paginationContainer.appendChild(nextLi);
     }
 
     window.addEventListener('popstate', function (event) {

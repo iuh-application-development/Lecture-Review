@@ -57,6 +57,7 @@
 {% endblock %}
 
 {% block load_js %}
+<script src="{{ url_for('static', filename='js/note_functions.js') }}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const tab1 = document.getElementById('tab1');
