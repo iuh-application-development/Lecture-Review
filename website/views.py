@@ -14,8 +14,7 @@ def home():
 @login_required
 def dashboard():
     shared_notes = ShareNote.query.filter_by(recipient_id=current_user.id).all()
-    total_users = User.query.count()
-    return render_template('dashboard.html', user=current_user, shared_notes=shared_notes, total_users=total_users)
+    return render_template('dashboard.html', user=current_user, shared_notes=shared_notes)
 
 @views.route('/all-my-notes')
 @login_required
@@ -86,30 +85,3 @@ def edit_note(note_id):
 #         print(f"Error loading note for edit {note_id}: {str(e)}")
 #         flash('Error loading note.', 'error')
 #         return redirect(url_for('views.all_my_notes'))
-
-@views.route('/admin/user_detail/<int:user_id>')
-@login_required
-def user_detail(user_id):
-    if current_user.role != 'admin':
-        return render_template('403.html', user=current_user)
-    user = User.query.get_or_404(user_id)
-    # Dummy data for notes
-    dummy_notes = [
-        {'id': 1, 'title': 'Note 1', 'content': 'Content 1', 'created_at': '2024-01-01'},
-        {'id': 2, 'title': 'Note 2', 'content': 'Content 2', 'created_at': '2024-01-02'},
-        {'id': 3, 'title': 'Note 3', 'content': 'Content 3', 'created_at': '2024-01-03'}
-    ]
-    return render_template('admin/user_detail.html', user=current_user, target_user=user, notes=dummy_notes)
-
-@views.route('/admin/users/<int:user_id>/toggle-lock', methods=['POST'])
-@login_required
-def toggle_lock(user_id):
-    data = request.get_json()
-    new_status = data.get('status')
-
-    user = User.query.get_or_404(user_id)
-
-    user.status = new_status
-    db.session.commit()
-
-    return jsonify({'success': True})

@@ -1,18 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 {% include 'shared_modal.html' %}
 <div class="content p-4 flex-grow-1">
-    {% if user.role == 'admin' %}
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Tổng số người dùng</h5>
-                    <h2 class="card-text">{{ total_users }}</h2>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
     <div class="title-block p-2 px-3 mb-3">
         <h5 class="fw-bold m-0">My Notes</h5>
     </div>

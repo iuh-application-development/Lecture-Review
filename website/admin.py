@@ -10,7 +10,9 @@ def dashboard():
     if not (current_user.is_authenticated and current_user.role == 'admin'):
         return redirect(url_for('views.home'))
     
-    return render_template('admin/dashboard_admin.html')
+    total_users = User.query.count()
+
+    return render_template('admin/dashboard_admin.html', total_users=total_users)
 
 @admin.route('/manage-users')
 def manage_users():
@@ -128,14 +130,13 @@ def toggle_user_lock(user_id):
 
     return jsonify({'success': True, 'message': 'User status updated successfully'})
 
-@admin.route('/users/<int:user_id>', methods=['GET'])
-def get_user_detail(user_id):
+@admin.route('/user_detail/<int:user_id>')
+def user_detail(user_id):
     user = User.query.get_or_404(user_id)
-    user_data = {
-        'id': user.id,
-        'username': user.username,
-        'email': user.email,
-        'role': user.role,
-        'created_at': user.created_at
-    }
-    return jsonify(user_data)
+    # Dummy data for notes
+    dummy_notes = [
+        {'id': 1, 'title': 'Note 1', 'content': 'Content 1', 'created_at': '2024-01-01'},
+        {'id': 2, 'title': 'Note 2', 'content': 'Content 2', 'created_at': '2024-01-02'},
+        {'id': 3, 'title': 'Note 3', 'content': 'Content 3', 'created_at': '2024-01-03'}
+    ]
+    return render_template('admin/user_detail.html', user=current_user, target_user=user, notes=dummy_notes)
