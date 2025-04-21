@@ -11,8 +11,9 @@ def dashboard():
         return redirect(url_for('views.home'))
     
     total_users = User.query.count()
+    total_notes = Note.query.count()
 
-    return render_template('admin/dashboard_admin.html', total_users=total_users)
+    return render_template('admin/dashboard_admin.html', total_users=total_users, total_notes=total_notes)
 
 @admin.route('/manage-users')
 def manage_users():
