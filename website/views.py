@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, flash, redirect, url_for
+from flask import Blueprint, render_template, flash, redirect, url_for, jsonify, request
 from flask_login import current_user, login_required
-from .models import Note, ShareNote
+from .models import Note, ShareNote, User
 from datetime import datetime
+from . import db
 
 views = Blueprint('views', __name__)
 

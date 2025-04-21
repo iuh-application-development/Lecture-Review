@@ -17,6 +17,8 @@ def login():
 
         user = User.query.filter_by(email=email).first()
         if user:
+            if user.status == 'Locked':
+                return jsonify({'success': False, 'message': 'Tài khoản của bạn đã bị khóa.'})
             if check_password_hash(user.password_hash, password):
                 login_user(user)
                 return jsonify({'success': True, 'redirect': url_for('views.dashboard')})
