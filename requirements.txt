@@ -5,3 +5,4 @@ Flask-Admin
 Flask-WTF
 python-dotenv
 flask-mail
+pytz

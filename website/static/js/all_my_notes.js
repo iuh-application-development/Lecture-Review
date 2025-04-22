@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const truncatedContent = note.content.length > 50
             ? note.content.substring(0, 50) + '...'
             : note.content;
+        
+        console.log(note);
 
         noteCard.innerHTML = `
             <div class="note-content">
