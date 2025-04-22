@@ -5,19 +5,34 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPage = 1;
 
     function createNoteCard(note) {
+        const MAX_TITILE_LEN = 25;
+        const title = note.title || 'Untitled';
+        const truncatedTitle = title.length > MAX_TITILE_LEN ?
+                                title.slice(0, MAX_TITILE_LEN) + '...' :
+                                title;
+
+        var utc = note.updated_at;
+        if (!utc.endsWith("Z")) utc += "Z";
+        const updatedAt = new Date(utc);
+        const updatedStr = updatedAt.toLocaleString("vi-VN", {
+            day:   "2-digit",
+            month: "short",
+            year: "numeric",
+            hour:  "2-digit",
+            minute: "2-digit",
+            hour12: false,
+            timeZone: "Asia/Ho_Chi_Minh"
+        });
+
         const noteCard = document.createElement('div');
         noteCard.className = `note-card ${note.color} position-relative p-3`;
 
-        const truncatedContent = note.content.length > 50
-            ? note.content.substring(0, 50) + '...'
-            : note.content;
-        
-        console.log(note);
+        const keywords = ['Important', 'Study'];
 
         noteCard.innerHTML = `
             <div class="note-content">
                 <div class="note-header d-flex justify-content-between align-items-start pb-1">
-                    <strong><em>${note.title}</em></strong>
+                    <strong class="d-inline-block"><em>${truncatedTitle}</em></strong>
                     <div class="dropdown">
                         <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown">
                             <i class="bi bi-three-dots-vertical"></i>
@@ -31,7 +46,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
                 <div class="card-separator"></div>
-                <p class="mt-2">${truncatedContent}</p>
+                <div class="mt-2">
+                    ${keywords.map(k => `<span class="badge bg-secondary me-1">${k}</span>`).join("")}
+                </div>
+
+                <small class="text-muted">Last updated: ${updatedStr}</small>
+
             </div>
         `;
 

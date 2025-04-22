@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, g
 from flask_login import current_user, login_required
-from .models import User, Note, ShareNote,db
+from .models import User, Note, ShareNote, db
 from datetime import datetime
 
 
@@ -221,6 +221,47 @@ def share_note():
         return jsonify({
             'success': False,
             'message': 'Error sharing note'
+        }), 500
+
+@api.route('/shared-notes', methods=['GET'])
+def get_shared_notes():
+    try:
+        limit = request.args.get('limit', type=int)
+        by_me = request.args.get('byMe', type=int)
+
+        print(by_me)
+
+        if by_me:
+            query = ShareNote.query.join(ShareNote.note).filter(ShareNote.sharer_id==current_user.id).order_by(Note.updated_at.desc())
+        else:
+            query = ShareNote.query.join(ShareNote.note).filter(ShareNote.recipient_id==current_user.id).order_by(Note.updated_at.desc())
+
+        if limit:
+            shared_notes = query.limit(limit).all()
+        else:
+            shared_notes = query.all()
+
+        shared_notes_data = [{
+            'note_id': shared_note.note.id,
+            'title': shared_note.note.title,
+            'message': shared_note.message,
+            'updated_at': str(shared_note.note.updated_at),
+            'share_at': str(shared_note.shared_at),
+            'color': shared_note.note.color,
+            'sharer': shared_note.sharer.first_name + ' ' + shared_note.sharer.last_name,
+            'recipient': shared_note.recipient.first_name + ' ' + shared_note.recipient.last_name
+        } for shared_note in shared_notes]
+
+        return jsonify({
+            'status': 'success',
+            'data': shared_notes_data
+        })
+
+    except Exception as e:
+        print('Error in get_notes:', str(e))  # Log lỗi để debug
+        return jsonify({
+            'status': 'error',
+            'message': 'Error fetching notes'
         }), 500
 
 ### Standardize API responses and Handle Error ###

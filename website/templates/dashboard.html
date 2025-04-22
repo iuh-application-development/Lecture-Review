@@ -13,46 +13,10 @@
     <div class="title-block p-2 px-3 mb-3">
         <h5 class="fw-bold m-0">Shared</h5>
     </div>
-    <div class="d-flex flex-wrap gap-3 mb-5" id="sharedNotesContainer">
-        {% if shared_notes|length == 0 %}
-        <div class="text-center w-100">
-            <p class="text-muted">Don't have note share with you</p>
-        </div>
-        {% else %}
-        {% for shared_note in shared_notes %}
-        <div class="note-card {{ shared_note.note.color }} position-relative p-3" onclick="window.location.href='/edit-note/{{ shared_note.note.id }}'">
-            <div class="note-content">
-                <div class="note-header d-flex justify-content-between align-items-start pb-1">
-                    <strong><em>{{ shared_note.note.title }}</em></strong>
-                    <div class="dropdown">
-                        <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item share-note" href="#" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="{{ shared_note.note.id }}">
-                                    <i class="bi bi-share"></i> Share
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="card-separator"></div>
-                {% if shared_note.message %}
-                <div class="alert alert-info p-2 mb-2" role="alert" style="font-size: 13px;">
-                    💌 {{ shared_note.message }}
-                </div>
-                {% endif %}
-                <p class="mt-2">
-                    {{ shared_note.note.content }}
-                </p>
-                <p class="text-muted fst-italic" style="font-size: 14px;">
-                    Shared by {{ shared_note.sharer.first_name }} {{ shared_note.sharer.last_name }}
-                </p>
-            </div>
-        </div>
-        {% endfor %}
-        {% endif %}
+
+    <!-- Container cho shared Notes-->
+    <div id="sharedNotesContainer" class="dashboard-shared-container d-flex flex-wrap gap-3 mb-5" data-limit="9" data-by-me="0">
+        <!-- Notes sẽ được load ở đây -->
     </div>
 
     <!-- Nút tạo note mới -->

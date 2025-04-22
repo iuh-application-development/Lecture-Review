@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from .config import Config
 import os
-from datetime import datetime
 import pytz
 
 db = SQLAlchemy()
@@ -44,7 +43,7 @@ def create_database(app):
             db.create_all() 
         print('Created database!')
 
-def vn_datetime(value, fmt='%d %b %Y, %H:%M'):
+def vn_datetime(value):
     tz = pytz.timezone("Asia/Ho_Chi_Minh")
 
     if value.tzinfo is None:

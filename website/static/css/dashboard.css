@@ -164,12 +164,13 @@ h4 {
     padding: 10px 20px;
     border-bottom: 3px solid transparent;
     cursor: pointer;
+    text-decoration: none;
+    color: #000;
 }
 
 .tab-button.active {
     border-color: blue;
     font-weight: bold;
-    color: black;
 }
 
 .card-shared {
