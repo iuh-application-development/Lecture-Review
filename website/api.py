@@ -1,8 +1,11 @@
-from flask import Blueprint, jsonify, request, g
+from flask import Blueprint, jsonify, request, g, make_response, render_template
 from flask_login import current_user, login_required
 from .models import User, Note, ShareNote, db
+from .utils.convert_note_to_pdf import *
 from datetime import datetime
-
+from weasyprint import HTML
+from markupsafe import Markup
+import html
 
 api = Blueprint('api', __name__)
 API_VERSION = 'api-v1'
@@ -263,6 +266,29 @@ def get_shared_notes():
             'status': 'error',
             'message': 'Error fetching notes'
         }), 500
+
+@api.route('/export-pdf', methods=['POST'])
+def export_pdf():
+    payload = request.get_json()
+    blocks = payload.get('blocks', [])
+    title = payload.get('title', '')
+    content_html = f'<h1 style="text-align:center">{html.escape(str(title).strip())}</h1>\n'
+    content_html += blocks_to_html(blocks)
+
+    rendered = render_template(
+        'pdf_template.html',
+        content=Markup(content_html),
+        mathjax=False
+    )
+
+    # Chuyển sang PDF
+    pdf = HTML(string=rendered).write_pdf(stylesheets=[])
+
+    # Trả về PDF
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=note.pdf'
+    return response
 
 ### Standardize API responses and Handle Error ###
 @api.before_request

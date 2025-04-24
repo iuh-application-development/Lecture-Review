@@ -6,3 +6,5 @@ Flask-WTF
 python-dotenv
 flask-mail
 pytz
+weasyprint
+matplotlib
