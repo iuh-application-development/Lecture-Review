@@ -28,6 +28,7 @@ def get_notes():
             'content': note.content,
             'color': note.color,
             'user_id': note.user_id,
+            'tags': note.tags,
             'updated_at': note.updated_at.isoformat() if note.updated_at else None
         } for note in notes]
 
@@ -74,6 +75,7 @@ def get_notes_paginate():
             'title': note.title,
             'content': note.content,
             'color': note.color,
+            'tags': note.tags,
             'updated_at': note.updated_at.isoformat() if note.updated_at else None
         } for note in pagination.items]
 
@@ -101,13 +103,15 @@ def create_note():
     data = request.get_json()
     title = data.get('title')
     content = data.get('content')
-    # color = data.get('color')
+    color = data.get('color', 'note-green')
+    tags = data.get('tags', [])
     user_id = data.get('user_id')
 
     new_note = Note(
         title=title,
         content=content,
-        # color=color,
+        color=color,
+        tags=tags,
         user_id=user_id
     )
 
@@ -136,7 +140,7 @@ def edit_note(note_id):
     note.title = data.get('title', note.title)
     note.content = data.get('content', note.content)
     note.color = data.get('color', note.color)
-    note.updated_at = datetime.utcnow()
+    note.tags = data.get('tags', note.tags)
 
     db.session.commit()
 
@@ -251,6 +255,7 @@ def get_shared_notes():
             'updated_at': str(shared_note.note.updated_at),
             'share_at': str(shared_note.shared_at),
             'color': shared_note.note.color,
+            'tags': shared_note.note.tags,
             'sharer': shared_note.sharer.first_name + ' ' + shared_note.sharer.last_name,
             'recipient': shared_note.recipient.first_name + ' ' + shared_note.recipient.last_name
         } for shared_note in shared_notes]

@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const noteCard = document.createElement('div');
         noteCard.className = `note-card ${note.color} position-relative p-3`;
 
-        const keywords = ['Important', 'Study'];
+        const keywords = Array.isArray(note.tags) ? note.tags : [];
 
         noteCard.innerHTML = `
             <div class="note-content">

@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const noteCard = document.createElement('div');
         noteCard.className = `note-card ${note.color} position-relative p-3`;
 
-        const keywords = ['Important', 'Study'];
+        const keywords = Array.isArray(note.tags) ? note.tags : [];
 
         noteCard.innerHTML = `
             <div class="note-content">
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const noteCard = document.createElement('div');
         noteCard.className = `note-card ${share_note.color} position-relative p-3`;
 
-        const keywords = ['Important', 'Study'];
+        const keywords = Array.isArray(share_note.tags) ? share_note.tags : [];;
 
         noteCard.innerHTML = `
             <div class="note-content">

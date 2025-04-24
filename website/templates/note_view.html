@@ -46,17 +46,18 @@
             <!-- Color Indicator -->
             <div class="note-meta">
                 <span class="meta-label">Note Color</span>
-                <div class="color-indicator {% if note %} {{ note.color }} {% endif %}"></div>
+                <div id="color-picker" class="d-flex gap-2 mt-2">
+                    <span class="color-option note-green" data-color="note-green"></span>
+                    <span class="color-option note-blue" data-color="note-blue"></span>
+                    <span class="color-option note-purple" data-color="note-purple"></span>
+                </div>
             </div>
 
             <!-- Tags Section -->
             <div class="note-meta">
                 <span class="meta-label">Tags</span>
-                <div class="tags-container">
-                    <span class="tag">Study</span>
-                    <span class="tag">Important</span>
-                    <span class="tag">+Add</span>
-                </div>
+                <div id="tags-container" class="tags-container mb-2"></div>
+                <input type="text" id="tag-input" placeholder="Nhập tag và nhấn Enter" class="form-control form-control-sm">
             </div>
 
             <!-- Action Buttons -->
@@ -91,6 +92,7 @@
             data-api-endpoint='{% if note %}{{ url_for("api.edit_note", note_id=note.id) }}{% else %}{{ url_for("api.create_note") }}{% endif %}'
             data-redirect-url-on-create='{% if note %}{{ url_for("views.edit_note", note_id=note.id) }}{% else %}{{ "" }}{% endif %}'
             data-user-id='{{user.id}}'
+            data-note-tags='{% if note %}{{ note.tags | tojson }} {% else %} {} {% endif %}'
             >
         </div>
     </div>
