@@ -37,6 +37,7 @@ with app.app_context():
     print("Tài khoản bị khóa:")
     print(f"Email: locked@example.com")
     print(f"Mật khẩu: 123456")
+   
     print("\nTài khoản admin:")
     print(f"Email: admin@example.com")
     print(f"Mật khẩu: 123456") 

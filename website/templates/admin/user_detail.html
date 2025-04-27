@@ -35,7 +35,8 @@
                                     <th>Ngày tạo</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="userNotesTableBody">
+                                {# 
                                 {% for note in notes %}
                                 <tr>
                                     <td>{{ note.title }}</td>
@@ -43,6 +44,7 @@
                                     <td>{{ note.created_at }}</td>
                                 </tr>
                                 {% endfor %}
+                                #}
                             </tbody>
                         </table>
                     </div>
@@ -51,4 +53,33 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const userId = {{ target_user.id | tojson }};
+        const tableBody = document.getElementById('userNotesTableBody');
+    
+        fetch(`/api/user-notes/${userId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    data.notes.forEach(note => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td><a href="#">${note.title}</a></td>
+                            <td>[Nội dung ẩn]</td>
+                            <td>${new Date(note.created_at).toLocaleDateString()}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="3">Không có ghi chú nào.</td></tr>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching user notes:', error);
+                tableBody.innerHTML = '<tr><td colspan="3">Đã xảy ra lỗi khi tải ghi chú.</td></tr>';
+            });
+    });
+    </script>    
+    
 {% endblock %} 

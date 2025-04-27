@@ -265,6 +265,17 @@ def delete_note(note_id):
     db.session.commit()
     return jsonify({'success': True, 'message': 'Note permanently deleted.'})
 
+@api.route('/user-notes/<int:user_id>')
+def get_user_notes(user_id):
+    notes = Note.query.filter_by(user_id=user_id).all()
+    notes_data = [{
+        'id': note.id,
+        'title': note.title,
+        'content': note.content,
+        'created_at': note.created_at.isoformat()
+    } for note in notes]
+
+    return jsonify({'success': True, 'notes': notes_data})
 
 ### Standardize API responses and Handle Error ###
 @api.before_request
