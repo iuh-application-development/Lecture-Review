@@ -222,6 +222,50 @@ def share_note():
             'success': False,
             'message': 'Error sharing note'
         }), 500
+    
+
+#huyen them 3 api
+# MOVE TO TRASH
+@api.route('/notes/<int:note_id>/move-to-trash', methods=['POST'])
+@login_required
+def move_to_trash(note_id):
+    note = Note.query.get_or_404(note_id)
+    if note.user_id != current_user.id and current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Permission denied.'}), 403
+
+    note.is_trashed = True
+    note.deleted_at = datetime.utcnow()
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Note moved to trash.'})
+
+# RESTORE NOTE
+@api.route('/notes/<int:note_id>/restore', methods=['POST'])
+@login_required
+def restore_note(note_id):
+    note = Note.query.get_or_404(note_id)
+    if note.user_id != current_user.id and current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Permission denied.'}), 403
+
+    note.is_trashed = False
+    note.deleted_at = None
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Note restored successfully.'})
+
+# DELETE NOTE (Chỉ nếu đang ở Trash)
+@api.route('/notes/<int:note_id>/delete', methods=['DELETE'])
+@login_required
+def delete_note(note_id):
+    note = Note.query.get_or_404(note_id)
+    if note.user_id != current_user.id and current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Permission denied.'}), 403
+
+    if not note.is_trashed:
+        return jsonify({'success': False, 'message': 'Note must be moved to trash before deleting.'}), 400
+
+    db.session.delete(note)
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Note permanently deleted.'})
+
 
 ### Standardize API responses and Handle Error ###
 @api.before_request
@@ -246,3 +290,4 @@ def handle_404_error(e):
         'details': f'The requested resource at {request.path} was not found.',
         'status': 404
     }), 404
+
