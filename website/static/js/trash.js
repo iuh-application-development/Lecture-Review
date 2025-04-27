@@ -5,27 +5,19 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPage = 1;
 
     function createNoteCard(note) {
-        const MAX_TITILE_LEN = 25;
+        const MAX_TITILE_LEN = 10;
         const title = note.title || 'Untitled';
         const truncatedTitle = title.length > MAX_TITILE_LEN ?
                                 title.slice(0, MAX_TITILE_LEN) + '...' :
                                 title;
 
-        var utc = note.updated_at;
-        if (!utc.endsWith("Z")) utc += "Z";
-        const updatedAt = new Date(utc);
-        const updatedStr = updatedAt.toLocaleString("vi-VN", {
-            day:   "2-digit",
-            month: "short",
-            year: "numeric",
-            hour:  "2-digit",
-            minute: "2-digit",
-            hour12: false,
-            timeZone: "Asia/Ho_Chi_Minh"
-        });
+        const deletedAt = note.deleted_at ? new Date(note.deleted_at) : new Date();
+        const now = new Date();
+        const deletedDaysAgo = Math.floor((now - deletedAt) / (1000 * 60 * 60 * 24));
+        const remainDays = 30 - deletedDaysAgo;
 
         const noteCard = document.createElement('div');
-        noteCard.className = `note-card ${note.color} position-relative p-3`;
+        noteCard.className = `card-shared ${note.color} d-flex flex-column justify-content-between position-relative p-3`;
 
         const keywords = Array.isArray(note.tags) ? note.tags : [];
         const maxTags = 5; // số lượng tags tối đa hiển thị
@@ -43,54 +35,90 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         noteCard.innerHTML = `
-            <div class="note-content">
-                <div class="note-header d-flex justify-content-between align-items-start pb-1">
-                    <strong class="d-inline-block"><em>${truncatedTitle}</em></strong>
-                    <div class="dropdown">
-                        <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item share-note" href="#" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="${note.id}">
-                                <i class="bi bi-share"></i> Share</a></li>
-                            <li><a class="dropdown-item text-danger" href="#">
-                                <i class="bi bi-trash"></i> Delete</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="card-separator"></div>
-                <div class="mt-2">
+        <div class="note-content">
+            <strong class="d-inline-block"><em>${truncatedTitle}</em></strong>
+            <div class="d-flex flex-column align-items-start mt-3">
+                <div>
                     ${tagsHtml}
                 </div>
-
-                <small class="text-muted">Last updated: ${updatedStr}</small>
-
+                <span class="fst-italic mt-4" style="font-size: 14px;">
+                    <img src="/static/images/clock.png" alt="Clock" style="width: 22px;">
+                    Deleted ${deletedDaysAgo} days ago
+                </span>
+                <span class="fst-italic mt-2" style="font-size: 14px;">
+                    <img src="/static/images/error.png" alt="Error" style="width: 22px;">
+                    Will be permanently deleted in ${remainDays} days
+                </span>
             </div>
+            <div class="d-flex" style="position: absolute; top: 12px; right: 12px;">
+                <span class="fst-italic p-1 restore-note" style="font-size: 12px; border-radius: 20px; background: #007BFF; color: white; cursor: pointer;">
+                    <img src="/static/images/rotate.png" alt="Restore" style="width: 18px;">
+                    Restore
+                </span>
+                <span class="fst-italic p-1 ms-2 delete-note" style="font-size: 12px; border-radius: 20px; background: #FC0004CF; color: white; cursor: pointer;">
+                    <img src="/static/images/delete.png" alt="Delete" style="width: 18px;">
+                    Delete
+                </span>
+            </div>
+        </div>
         `;
 
-        noteCard.addEventListener('click', function (e) {
-            if (!e.target.closest('.dropdown')) {
-                window.location.href = `/edit-note/${note.id}`;
+        noteCard.querySelector('.restore-note').addEventListener('click', async function (e) {
+            e.preventDefault();
+            if (confirm("Bạn có chắc sẽ khôi phục ghi chú này không?")) {
+                await restoreNote(note.id);
+                fetchPagedNotes(currentPage);
             }
         });
-
-        const shareButton = noteCard.querySelector('.share-note');
-        shareButton.addEventListener('click', function (e) {
+    
+        noteCard.querySelector('.delete-note').addEventListener('click', async function (e) {
             e.preventDefault();
-            const noteId = this.getAttribute('data-note-id');
-            document.getElementById('noteIdToShare').value = noteId;
+            if (confirm("Bạn có chắc chắn xóa vĩnh viễn ghi chú này không?")) {
+                await deleteNote(note.id);
+                fetchPagedNotes(currentPage);
+            }
         });
 
         return noteCard;
     }
     
+    async function restoreNote(noteId) {
+        try {
+            const response = await fetch(`/api/notes/${noteId}/restore`, { method: 'POST' });
+            const result = await response.json();
+            if (result.success) {
+                alert("Ghi chú đã được khôi phục!");
+            } else {
+                alert("Không thể khôi phục.");
+            }
+        } catch (error) {
+            console.error('Error restoring note:', error);
+            alert("Đã xảy ra lỗi khi khôi phục.");
+        }
+    }
+
+    async function deleteNote(noteId) {
+        try {
+            const response = await fetch(`/api/notes/${noteId}/delete`, { method: 'POST' });
+            const result = await response.json();
+            if (result.success) {
+                alert("Ghi chú đã được xóa vĩnh viễn!");
+            } else {
+                alert("Không thể xóa ghi chú.");
+            }
+        } catch (error) {
+            console.error('Error deleting note:', error);
+            alert("Đã xảy ra lỗi khi xóa.");
+        }
+    }
+
     // Hàm fetch notes với phân trang
     async function fetchPagedNotes(page = 1) {
         try {
             const color = colorFilter.value;
             const date = dateFilter.value;
             
-            const url = `/api/notes-paginate?page=${page}&limit=15${color ? `&color=${color}` : ''}${date ? `&date=${date}` : ''}`;
+            const url = `/api/notes-paginate?page=${page}&limit=15&is_trashed=True${color ? `&color=${color}` : ''}${date ? `&date=${date}` : ''}`;
             const response = await fetch(url);
             const result = await response.json();
             const data = result.data;

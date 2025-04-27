@@ -26,11 +26,12 @@ class Note(db.Model):
     tags          = db.Column(db.JSON, default=list)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at    = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
-    user = db.relationship('User', backref=db.backref('notes', lazy=True))
+    user_id       = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     is_trashed = db.Column(db.Boolean, default=False)
     deleted_at = db.Column(db.DateTime, nullable=True)
+
+    user = db.relationship('User', backref=db.backref('notes', lazy=True))
+    
     def __repr__(self):
         return f'<Note {self.title!r} by Author#{self.user_id}>'
     

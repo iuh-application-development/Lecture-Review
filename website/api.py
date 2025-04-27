@@ -16,8 +16,8 @@ API_VERSION = 'api-v1'
 def get_notes():
     try:
         limit = request.args.get('limit', type=int)
-        query = Note.query.filter_by(user_id=current_user.id, is_trashed=False).order_by(Note.updated_at.desc())
-
+        is_trashed = request.args.get('is_trashed', False, type=bool)
+        query = Note.query.filter_by(user_id=current_user.id, is_trashed=is_trashed).order_by(Note.updated_at.desc())
 
         if limit:
             notes = query.limit(limit).all()
@@ -53,9 +53,10 @@ def get_notes_paginate():
         limit = request.args.get('limit', 15, type=int)
         color = request.args.get('color', '')
         date_filter = request.args.get('date', '', type=str)
+        is_trashed = request.args.get('is_trashed', False, type=bool)
 
         # Tạo query base
-        query = Note.query.filter_by(user_id=current_user.id, is_trashed=False)
+        query = Note.query.filter_by(user_id=current_user.id, is_trashed=is_trashed)
 
         # Thêm filter màu sắc
         if color:
@@ -232,8 +233,6 @@ def share_note():
             'message': 'Error sharing note'
         }), 500
     
-
-# MOVE TO TRASH
 @api.route('/notes/<int:note_id>/move-to-trash', methods=['POST'])
 @login_required
 def move_to_trash(note_id):
@@ -246,7 +245,6 @@ def move_to_trash(note_id):
     db.session.commit()
     return jsonify({'success': True, 'message': 'Note moved to trash.'})
 
-# RESTORE NOTE
 @api.route('/notes/<int:note_id>/restore', methods=['POST'])
 @login_required
 def restore_note(note_id):
@@ -259,8 +257,7 @@ def restore_note(note_id):
     db.session.commit()
     return jsonify({'success': True, 'message': 'Note restored successfully.'})
 
-# DELETE NOTE (Chỉ nếu đang ở Trash)
-@api.route('/notes/<int:note_id>/delete', methods=['DELETE'])
+@api.route('/notes/<int:note_id>/delete', methods=['POST'])
 @login_required
 def delete_note(note_id):
     note = Note.query.get_or_404(note_id)
@@ -280,8 +277,9 @@ def get_user_notes(user_id):
     notes_data = [{
         'id': note.id,
         'title': note.title,
-        'content': note.content,
-        'created_at': note.created_at.isoformat()
+        'created_at': note.created_at,
+        'updated_at': note.updated_at,
+        'tags': note.tags
     } for note in notes]
 
     return jsonify({'success': True, 'notes': notes_data})

@@ -162,7 +162,20 @@ document.addEventListener('DOMContentLoaded', function () {
         const noteCard = document.createElement('div');
         noteCard.className = `note-card ${share_note.color} position-relative p-3`;
 
-        const keywords = Array.isArray(share_note.tags) ? share_note.tags : [];;
+        const keywords = Array.isArray(share_note.tags) ? share_note.tags : [];
+        const maxTags = 5; // số lượng tags tối đa hiển thị
+        let tagsHtml = '';
+
+        if (keywords.length > maxTags) {
+            tagsHtml = keywords.slice(0, maxTags).map(k => `
+                <span class="badge bg-secondary me-1">${k.length > 10 ? k.slice(0, 7) + '...' : k}</span>
+            `).join("");
+            tagsHtml += `<span class="badge bg-light text-dark">+${keywords.length - maxTags} more</span>`;
+        } else {
+            tagsHtml = keywords.map(k => `
+                <span class="badge bg-secondary me-1">${k.length > 10 ? k.slice(0, 7) + '...' : k}</span>
+            `).join("");
+        }
 
         noteCard.innerHTML = `
             <div class="note-content">
@@ -193,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 </div>
                 <div class="mt-2">
-                    ${keywords.map(k => `<span class="badge bg-secondary me-1">${k}</span>`).join("")}
+                    ${tagsHtml}
                 </div>
 
                 <small class="text-muted">Last updated: ${updatedStr}</small>

@@ -26,26 +26,17 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Notes List</h5>
-                    <div class="table-responsive">
-                        <table class="table">
+                    <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                        <table class="table table-hover align-middle" style="table-layout: fixed; width: 100%;">
                             <thead>
                                 <tr>
-                                    <th>Title</th>
-                                    <th>Content</th>
-                                    <th>Created At</th>
+                                    <th style="width: 30%;">Title</th>
+                                    <th style="width: 40%;">Tags</th>
+                                    <th style="width: 15%;">Created At</th>
+                                    <th style="width: 15%;">Updated At</th>
                                 </tr>
                             </thead>
-                            <tbody id="userNotesTableBody">
-                                {# 
-                                {% for note in notes %}
-                                <tr>
-                                    <td>{{ note.title }}</td>
-                                    <td>{{ note.content }}</td>
-                                    <td>{{ note.created_at }}</td>
-                                </tr>
-                                {% endfor %}
-                                #}
-                            </tbody>
+                            <tbody id="userNotesTableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -64,17 +55,39 @@
                 if (data.success) {
                     data.notes.forEach(note => {
                         const row = document.createElement('tr');
-row.style.cursor = 'pointer'; 
-row.onclick = function() {
-    window.location.href = '#'
-};
-row.innerHTML = `
-    <td>${note.title}</td>
-    <td>[Hidden Content]</td>
-    <td>${new Date(note.created_at).toLocaleDateString()}</td>
-`;
-tableBody.appendChild(row);
+                        row.style.cursor = 'pointer'; 
+                        row.onclick = function() {
+                            window.location.href = '#'
+                        };
 
+                        const keywords = Array.isArray(note.tags) ? note.tags : [];
+                        const maxTags = 3; // số lượng tags tối đa hiển thị
+                        let tagsHtml = '';
+
+                        if (keywords.length > maxTags) {
+                            tagsHtml = keywords.slice(0, maxTags).map(k => `
+                                <span class="badge bg-secondary me-1">${k.length > 10 ? k.slice(0, 7) + '...' : k}</span>
+                            `).join("");
+                            tagsHtml += `<span class="badge bg-light text-dark">+${keywords.length - maxTags} more</span>`;
+                        } else {
+                            tagsHtml = keywords.map(k => `
+                                <span class="badge bg-secondary me-1">${k.length > 10 ? k.slice(0, 7) + '...' : k}</span>
+                            `).join("");
+                        }
+                        
+                        const MAX_TITILE_LEN = 25;
+                        const title = note.title || 'Untitled';
+                        const truncatedTitle = title.length > MAX_TITILE_LEN ?
+                                                title.slice(0, MAX_TITILE_LEN) + '...' :
+                                                title;
+
+                        row.innerHTML = `
+                            <td>${truncatedTitle}</td>
+                            <td>${tagsHtml}</td>
+                            <td>${new Date(note.created_at).toLocaleDateString()}</td>
+                            <td>${new Date(note.updated_at).toLocaleDateString()}</td>
+                        `;
+                        tableBody.appendChild(row);
                     });
                 } else {
                     tableBody.innerHTML = '<tr><td colspan="3">No notes found.</td></tr>';
