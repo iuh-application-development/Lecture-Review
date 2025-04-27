@@ -135,10 +135,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const noteCard = document.createElement('div');
         noteCard.className = `note-card ${note.color} position-relative p-3`;
 
-        const truncatedContent = note.content.length > 50
-            ? note.content.substring(0, 50) + '...'
-            : note.content;
-
+        let textContent = '';
+        try {
+            const parsedContent = typeof note.content === 'string' ? JSON.parse(note.content) : note.content;
+            textContent = parsedContent?.blocks?.[0]?.data?.text || '';
+        } catch (error) {
+            console.error('Error parsing note content:', error);
+        }
+        
+        const truncatedContent = textContent.length > 50
+            ? textContent.substring(0, 50) + '...'
+            : textContent;
+        
         noteCard.innerHTML = `
             <div class="note-content">
                 <div class="note-header d-flex justify-content-between align-items-start pb-1">
@@ -172,14 +180,14 @@ document.addEventListener('DOMContentLoaded', function () {
             const noteId = this.getAttribute('data-note-id');
             document.getElementById('noteIdToShare').value = noteId;
         });
-        // Xử lý sự kiện click cho nút Delete
+        // (huyen) Xử lý sự kiện click cho nút Delete
         const deleteButton = noteCard.querySelector('.dropdown-item.text-danger');
         deleteButton.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
 
             if (confirm('Bạn có chắc chắn muốn đưa ghi chú này vào Trash không?')) {
-                fetch(`/notes/${note.id}/move-to-trash`, {
+                fetch(`/api/notes/${note.id}/move-to-trash`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
                 })

@@ -11,7 +11,7 @@ API_VERSION = 'api-v1'
 def get_notes():
     try:
         limit = request.args.get('limit', type=int)
-        query = Note.query.filter_by(user_id=current_user.id).order_by(Note.updated_at.desc())
+        query = Note.query.filter_by(user_id=current_user.id, is_trashed=False).order_by(Note.updated_at.desc())
 
 
         if limit:
@@ -49,7 +49,7 @@ def get_notes_paginate():
         date_filter = request.args.get('date', '', type=str)
 
         # Tạo query base
-        query = Note.query.filter_by(user_id=current_user.id)
+        query = Note.query.filter_by(user_id=current_user.id, is_trashed=False)
 
         # Thêm filter màu sắc
         if color:
