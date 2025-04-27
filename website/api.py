@@ -224,7 +224,6 @@ def share_note():
         }), 500
     
 
-#huyen them 3 api
 # MOVE TO TRASH
 @api.route('/notes/<int:note_id>/move-to-trash', methods=['POST'])
 @login_required

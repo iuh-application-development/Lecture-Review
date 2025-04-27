@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const noteId = this.getAttribute('data-note-id');
             document.getElementById('noteIdToShare').value = noteId;
         });
-        // (huyen) Xử lý sự kiện click cho nút Delete
+        //  Xử lý sự kiện click cho nút Delete
         const deleteButton = noteCard.querySelector('.dropdown-item.text-danger');
         deleteButton.addEventListener('click', function (e) {
             e.preventDefault();
