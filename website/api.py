@@ -16,7 +16,7 @@ API_VERSION = 'api-v1'
 def get_notes():
     try:
         limit = request.args.get('limit', type=int)
-        query = Note.query.filter_by(user_id=current_user.id).order_by(Note.updated_at.desc())
+        query = Note.query.filter_by(user_id=current_user.id, is_trashed=False).order_by(Note.updated_at.desc())
 
 
         if limit:
@@ -55,7 +55,7 @@ def get_notes_paginate():
         date_filter = request.args.get('date', '', type=str)
 
         # Tạo query base
-        query = Note.query.filter_by(user_id=current_user.id)
+        query = Note.query.filter_by(user_id=current_user.id, is_trashed=False)
 
         # Thêm filter màu sắc
         if color:
@@ -231,6 +231,60 @@ def share_note():
             'success': False,
             'message': 'Error sharing note'
         }), 500
+    
+
+# MOVE TO TRASH
+@api.route('/notes/<int:note_id>/move-to-trash', methods=['POST'])
+@login_required
+def move_to_trash(note_id):
+    note = Note.query.get_or_404(note_id)
+    if note.user_id != current_user.id and current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Permission denied.'}), 403
+
+    note.is_trashed = True
+    note.deleted_at = datetime.utcnow()
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Note moved to trash.'})
+
+# RESTORE NOTE
+@api.route('/notes/<int:note_id>/restore', methods=['POST'])
+@login_required
+def restore_note(note_id):
+    note = Note.query.get_or_404(note_id)
+    if note.user_id != current_user.id and current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Permission denied.'}), 403
+
+    note.is_trashed = False
+    note.deleted_at = None
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Note restored successfully.'})
+
+# DELETE NOTE (Chỉ nếu đang ở Trash)
+@api.route('/notes/<int:note_id>/delete', methods=['DELETE'])
+@login_required
+def delete_note(note_id):
+    note = Note.query.get_or_404(note_id)
+    if note.user_id != current_user.id and current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Permission denied.'}), 403
+
+    if not note.is_trashed:
+        return jsonify({'success': False, 'message': 'Note must be moved to trash before deleting.'}), 400
+
+    db.session.delete(note)
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Note permanently deleted.'})
+
+@api.route('/user-notes/<int:user_id>')
+def get_user_notes(user_id):
+    notes = Note.query.filter_by(user_id=user_id).all()
+    notes_data = [{
+        'id': note.id,
+        'title': note.title,
+        'content': note.content,
+        'created_at': note.created_at.isoformat()
+    } for note in notes]
+
+    return jsonify({'success': True, 'notes': notes_data})
 
 @api.route('/shared-notes', methods=['GET'])
 def get_shared_notes():
@@ -337,3 +391,4 @@ def handle_404_error(e):
         'details': f'The requested resource at {request.path} was not found.',
         'status': 404
     }), 404
+

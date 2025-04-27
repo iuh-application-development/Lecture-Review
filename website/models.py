@@ -29,7 +29,8 @@ class Note(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     user = db.relationship('User', backref=db.backref('notes', lazy=True))
-
+    is_trashed = db.Column(db.Boolean, default=False)
+    deleted_at = db.Column(db.DateTime, nullable=True)
     def __repr__(self):
         return f'<Note {self.title!r} by Author#{self.user_id}>'
     

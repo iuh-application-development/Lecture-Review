@@ -140,4 +140,4 @@ def user_detail(user_id):
         {'id': 2, 'title': 'Note 2', 'content': 'Content 2', 'created_at': '2024-01-02'},
         {'id': 3, 'title': 'Note 3', 'content': 'Content 3', 'created_at': '2024-01-03'}
     ]
-    return render_template('admin/user_detail.html', user=current_user, target_user=user, notes=dummy_notes)
+    return render_template('admin/user_detail.html', user=current_user, target_user=user)
