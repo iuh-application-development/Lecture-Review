@@ -2,6 +2,8 @@ from flask import Blueprint, jsonify, request, g, make_response, render_template
 from flask_login import current_user, login_required
 from .models import User, Note, ShareNote, db
 from .utils.convert_note_to_pdf import *
+from .mailer import send_email
+import pyotp
 from datetime import datetime
 from weasyprint import HTML
 from markupsafe import Markup
@@ -236,8 +238,6 @@ def get_shared_notes():
         limit = request.args.get('limit', type=int)
         by_me = request.args.get('byMe', type=int)
 
-        print(by_me)
-
         if by_me:
             query = ShareNote.query.join(ShareNote.note).filter(ShareNote.sharer_id==current_user.id).order_by(Note.updated_at.desc())
         else:
@@ -294,6 +294,25 @@ def export_pdf():
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'attachment; filename=note.pdf'
     return response
+
+@api.route('/send-otp', methods=['POST'])
+def send_otp():
+    data = request.get_json()
+    email = data.get('email')
+
+    totp = pyotp.TOTP(pyotp.random_base32(), interval=300)
+    otp = totp.now()
+
+    message = f"""
+    <html>
+    <body>
+        <p>Mã OTP của bạn là: <strong>{otp}</strong><br>Có hiệu lực trong 5 phút.</p>
+    </body>
+    </html>
+    """
+
+    send_email('Mã OTP của bạn', email, message)
+    return message
 
 ### Standardize API responses and Handle Error ###
 @api.before_request

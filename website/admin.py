@@ -30,7 +30,7 @@ def manage_contents():
     return render_template('admin/manage_contents.html')
 
 # /admin/register-admin/your_secret_key?email=admin@gmail.com&password=admin123
-@admin.route('/register-admin/<string:secret_key>', methods=['GET'])
+@admin.route('/register-admin/<string:secret_key>', methods=['POST'])
 def register_admin(secret_key):
     if current_app.secret_key != secret_key:
         return jsonify({'error': 'Invalid secret key'}), 403

@@ -235,8 +235,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item share-note" href="#" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="${share_note.note_id}">
-                                <i class="bi bi-share"></i> Share</a></li>
                             <li><a class="dropdown-item text-danger" href="#">
                                 <i class="bi bi-trash"></i> Delete</a></li>
                         </ul>
@@ -265,13 +263,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!e.target.closest('.dropdown')) {
                 window.location.href = `/edit-note/${share_note.note_id}`;
             }
-        });
-
-        const shareButton = noteCard.querySelector('.share-note');
-        shareButton.addEventListener('click', function (e) {
-            e.preventDefault();
-            const noteId = this.getAttribute('data-note-id');
-            document.getElementById('noteIdToShare').value = noteId;
         });
 
         return noteCard;
