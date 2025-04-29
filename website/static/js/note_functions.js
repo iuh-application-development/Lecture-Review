@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('shareNoteForm');
         const modalElement = document.getElementById('shareNoteModal');
         const canEditCheckbox = document.getElementById('canEdit');
+        const isPublicCheckbox = document.getElementById('isPublic');
 
         console.log('Checking DOM elements:', {
             noteIdInput: !!noteIdInput,
@@ -41,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const recipientEmail = emailInput.value.trim();
         const message = messageInput.value.trim();
         const canEdit = canEditCheckbox.checked;
+        const isPublic = isPublicCheckbox ? isPublicCheckbox.checked : false;
 
         console.log('Preparing to share note:', { noteId, recipientEmail, message, canEdit });
 
@@ -58,7 +60,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     note_id: noteId,
                     recipient_email: recipientEmail,
                     message: message,
-                    can_edit: canEdit
+                    can_edit: canEdit,
+                    is_public: isPublic
                 })
             });
 
@@ -129,7 +132,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Logic cho myNotesContainer (dashboard hoặc all_my_notes)
     const container = document.getElementById('myNotesContainer');
-
+    if (!container) {
+        console.log('myNotesContainer not found - skipping fetchNotes');
+        return; // Thoát nếu không tìm thấy container
+    }
+    
     // Định nghĩa hàm createNoteCard
     function createNoteCard(note) {
         const noteCard = document.createElement('div');

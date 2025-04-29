@@ -10,9 +10,20 @@
 <div class="content-wrapper">
     <div class="note-sidebar">
         <div class="sidebar-header">
-            <a href="{{ url_for('views.share_with_me') if shared else url_for('views.all_my_notes') }}" class="back-btn">
-                <i class="bi bi-arrow-left"></i> Back to {{ 'Shared Notes' if shared else 'My Notes' }}
+            {% set referrer = request.args.get('from') %}
+            <a href="{% if referrer == 'public' %}{{ url_for('views.public_notes') }}{% elif shared %}{{ url_for('views.share_with_me') }}{% else %}{{ url_for('views.all_my_notes') }}{% endif %}"
+                class="back-btn">
+                    <i class="bi bi-arrow-left"></i>
+                    Back to 
+                    {% if referrer == 'public' %}
+                        Public Notes
+                    {% elif shared %}
+                        Shared Notes
+                    {% else %}
+                        My Notes
+                    {% endif %}
             </a>
+
         </div>
         <div class="sidebar-content">
             <!-- Note Meta Info -->
@@ -61,11 +72,20 @@
 
             <!-- Action Buttons -->
             <div class="action-buttons">
-                {% if note and note.user_id == current_user.id%}
-                <button class="btn btn-share" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="{{ note.id }}">
+            
+            {% if not view_only %}
+            <div class="form-check form-switch d-flex align-items-center justify-content-center my-3">
+                <input class="form-check-input me-2" type="checkbox" id="togglePublicNote" {% if note and note.is_public %}checked{% endif %}>
+                <label class="form-check-label" for="togglePublicNote">
+                    <i class="bi bi-globe"></i> Make this note public
+                </label>
+            </div>
+            {% endif %}
+                
+
+                <button class="btn btn-share" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="{% if note %}{{ note.id }}{% endif %}">
                     <i class="bi bi-share"></i> Share
-                </button>
-                {% endif %}
+                </button>  
                 <button class="btn btn-export">
                     <i class="bi bi-download"></i> Export as PDF
                 </button>
@@ -91,8 +111,32 @@
             data-api-endpoint='{% if note %}{{ url_for("api.edit_note", note_id=note.id) }}{% else %}{{ url_for("api.create_note") }}{% endif %}'
             data-redirect-url-on-create='{% if note %}{{ url_for("views.edit_note", note_id=note.id) }}{% else %}{{ "" }}{% endif %}'
             data-user-id='{{user.id}}'
+            data-note-id = '{%if note %}{{note.id}}{%else%}underfined{%endif%}'
+            data-view-only = "{{'true' if view_only else 'false'}}"
             >
         </div>
+
+        <!-- Comments Section -->
+        {% if note and (note.is_public or not view_only) %}
+        <div class="comments-section mt-4" style="max-width: 800px; margin: 0 auto;">
+            <h4>Comments</h4>
+        
+            {% if user.is_authenticated %}
+            <form id="commentForm" class="mb-3">
+                <div class="mb-2">
+                    <textarea class="form-control" id="commentContent" rows="3" placeholder="Add a comment..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Comment</button>
+            </form>
+            {% else %}
+            <p class="text-muted">Please <a href="{{ url_for('auth.login') }}">login</a> to add comments.</p>
+            {% endif %}
+        
+            <div id="commentsContainer"></div>
+        </div>
+        {% endif %}
+        
+
     </div>
 </div>
 {% endblock %}

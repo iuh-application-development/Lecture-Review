@@ -38,6 +38,11 @@ def share_by_me():
 def trash():
     return render_template('trash.html', user=current_user)
 
+@views.route ('/public-notes')
+@login_required
+def public_notes():
+    return render_template('public_notes.html', user=current_user)
+
 @views.route('/create-note')
 @login_required
 def create_note():
@@ -46,15 +51,38 @@ def create_note():
 @views.route('/edit-note/<int:note_id>', methods=['GET', 'POST'])
 @login_required
 def edit_note(note_id):
+
     note = Note.query.get_or_404(note_id)
-    shared = ShareNote.query.filter_by(note_id=note.id, recipient_id=current_user.id).first()
     
-    if note.user_id != current_user.id and ( not shared or not shared.can_edit):
-        flash('You do not have permission to edit this note.', 'error')
-        return redirect(url_for('views.all_my_notes'))
+    if note.user_id == current_user.id:
+        view_only = False
+        shared = None
+    else:
+        shared = ShareNote.query.filter_by(note_id=note.id, recipient_id=current_user.id).first()
+        if shared:
+            view_only = not shared.can_edit
+        elif note.is_public:
+            view_only = True
+            shared = None
+        else:
+            flash ("You don't have permission to view this note.", 'error')
+            return redirect(url_for('views.all_my_notes'))
 
-    return render_template('note_view.html', user=current_user, note=note, shared=shared)
-
+    sharer = None
+    if shared and shared.sharer_id:
+        sharer = User.query.get(shared.sharer_id) 
+        
+    return render_template(
+        'note_view.html',
+        note=note,
+        shared=shared,
+        sharer=sharer,
+        view_only=view_only,
+        current_time = datetime.utcnow(),
+        user = current_user
+    )
+    
+    
 # def note_detail(note_id):
 #     try:
 #         note = Note.query.get_or_404(note_id)
