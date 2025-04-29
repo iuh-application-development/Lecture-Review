@@ -30,7 +30,7 @@ def manage_contents():
     return render_template('admin/manage_contents.html')
 
 # /admin/register-admin/your_secret_key?email=admin@gmail.com&password=admin123
-@admin.route('/register-admin/<string:secret_key>', methods=['GET'])
+@admin.route('/register-admin/<string:secret_key>', methods=['POST'])
 def register_admin(secret_key):
     if current_app.secret_key != secret_key:
         return jsonify({'error': 'Invalid secret key'}), 403
@@ -134,10 +134,5 @@ def toggle_user_lock(user_id):
 @admin.route('/user_detail/<int:user_id>')
 def user_detail(user_id):
     user = User.query.get_or_404(user_id)
-    # Dummy data for notes
-    dummy_notes = [
-        {'id': 1, 'title': 'Note 1', 'content': 'Content 1', 'created_at': '2024-01-01'},
-        {'id': 2, 'title': 'Note 2', 'content': 'Content 2', 'created_at': '2024-01-02'},
-        {'id': 3, 'title': 'Note 3', 'content': 'Content 3', 'created_at': '2024-01-03'}
-    ]
-    return render_template('admin/user_detail.html', user=current_user, target_user=user, notes=dummy_notes)
+
+    return render_template('admin/user_detail.html', user=current_user, target_user=user)

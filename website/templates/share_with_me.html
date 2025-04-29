@@ -4,8 +4,8 @@
   <div id="shared-with-me">
     <!-- Tabs -->
     <div class="d-flex mb-3 border-bottom">
-      <button class="tab-button {% if not shared_by_me %}active{% endif %}" id="tab1">Shared with me</button>
-      <button class="tab-button {% if shared_by_me %}active{% endif %}" id="tab2">Shared by me</button>
+      <a class="tab-button {% if not shared_by_me %}active{% endif %}" href="/share-with-me">Shared with me</a>
+      <a class="tab-button {% if shared_by_me %}active{% endif %}" href="/share-by-me">Shared by me</a>
     </div>
 
     <!-- Title -->
@@ -14,84 +14,15 @@
     </h4>
 
     <!-- Cards -->
-    <div class="d-flex flex-wrap gap-3">
-      {% if shared_notes|length == 0 %}
-      <div class="text-center w-100">
-        <p class="text-muted">
-          {{ "You haven't shared any notes." if shared_by_me else 'No notes have been shared with you yet.' }}
-        </p>
-      </div>
-      {% else %}
-      {% for shared_note in shared_notes %}
-      <div class="note-card card-shared {{ shared_note.note.color }}" style="cursor: pointer;" data-note-id="{{ shared_note.note.id }}">
-        <p class="fst-italic">
-          {% if shared_by_me %}
-          Shared to {{ shared_note.recipient.first_name }} {{ shared_note.recipient.last_name }}
-          {% else %}
-          Shared by {{ shared_note.sharer.first_name }} {{ shared_note.sharer.last_name }}
-          {% endif %}
-        </p>
-
-        {% if shared_note.message is defined and shared_note.message %}
-        <div class="alert alert-info p-2 mb-2" role="alert" style="font-size: 13px;">
-          💌 {{ shared_note.message }}
-        </div>
-        {% endif %}
-          
-        <div class="fw-bold ms-4">{{ shared_note.note.title }}</div>
-        <p class="text-muted ms-4 fst-italic" style="font-size: 14px;">
-          {{ shared_note.note.content }}
-        </p>
-        <div class="d-flex justify-content-between align-items-center mt-3">
-          <span class="fst-italic" style="font-size: 14px;">
-            <img src="{{ url_for('static', filename='images/clock.png') }}" alt="Image" style="width: 22px;">
-            Shared {{ shared_note.shared_at.strftime('%d %b %Y') }}
-          </span>
-        </div>
-      </div>
-      {% endfor %}
-      {% endif %}
-    </div>
+     <div style="min-height: 80%;">
+       <div id="sharedNotesContainer" class="all-notes-container d-flex flex-wrap gap-3 mb-5" data-limit="15" data-by-me="{{shared_by_me}}">
+           <!-- Notes sẽ được load ở đây -->
+       </div>
+     </div>
   </div>
 </div>
 {% endblock %}
 
 {% block load_js %}
-<script src="{{ url_for('static', filename='js/note_functions.js') }}"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const tab1 = document.getElementById('tab1');
-    const tab2 = document.getElementById('tab2');
-  
-    tab1.addEventListener('click', function() {
-        window.location.href = '/share-with-me';
-    });
-  
-    tab2.addEventListener('click', function() {
-        window.location.href = '/share-by-me';
-    });
-  
-    if (window.location.pathname.includes('share-by-me')) {
-        tab1.classList.remove('active');
-        tab2.classList.add('active');
-    } else {
-        tab1.classList.add('active');
-        tab2.classList.remove('active');
-    }
-  
-    // Xử lý click trên card note
-    document.querySelectorAll('.card-shared').forEach(card => {
-        card.addEventListener('click', function(e) {
-            // Ngăn click trên nút "Manage access" chuyển hướng
-            if (e.target.closest('.tag')) {
-                console.log('Clicked Manage access - no redirect');
-                return;
-            }
-            const noteId = this.getAttribute('data-note-id');
-            console.log('Navigating to note detail:', noteId);
-            window.location.href = `/edit-note/${noteId}`;
-        });
-    });
-  });
-</script>
+<script src="{{ url_for('static', filename='js/share_with_me.js') }}"></script>
 {% endblock load_js %}

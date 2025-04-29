@@ -48,9 +48,9 @@ h4 {
 .note-card {
     border-radius: 15px;
     color: #fff;
-    padding: 20px;
+    padding: 15px;
     width: 300px;
-    min-height: 180px;
+    height: 200px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.1s;
     cursor: pointer;
@@ -164,18 +164,20 @@ h4 {
     padding: 10px 20px;
     border-bottom: 3px solid transparent;
     cursor: pointer;
+    text-decoration: none;
+    color: #000;
 }
 
 .tab-button.active {
     border-color: blue;
     font-weight: bold;
-    color: black;
 }
 
 .card-shared {
     border-radius: 15px;
     padding: 15px;
-    min-width: 250px;
+    width: 300px;
+    height: 200px;
 }
 
 .tag {

@@ -3,16 +3,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from .config import Config
 import os
-
-
+import pytz
 
 db = SQLAlchemy()
-
-
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    app.jinja_env.filters['vn_datetime'] = vn_datetime
     db.init_app(app)
 
     
@@ -44,3 +42,11 @@ def create_database(app):
         with app.app_context():
             db.create_all() 
         print('Created database!')
+
+def vn_datetime(value):
+    tz = pytz.timezone("Asia/Ho_Chi_Minh")
+
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=pytz.UTC)
+
+    return value.astimezone(tz)

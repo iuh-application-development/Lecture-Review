@@ -3,6 +3,9 @@ console.log('note_functions.js executing');
 document.addEventListener('DOMContentLoaded', function () {
     console.log('note_functions.js DOMContentLoaded');
 
+    const sharedContainer = document.getElementById('sharedNotesContainer');
+    const byMe = sharedContainer.getAttribute('data-by-me') ? parseInt(sharedContainer.getAttribute('data-by-me')) : 0;
+
     // Hàm shareNote cho modal chia sẻ
     async function shareNote(event) {
         console.log('shareNote called at:', new Date().toISOString());
@@ -127,116 +130,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Logic cho myNotesContainer (dashboard hoặc all_my_notes)
-    const container = document.getElementById('myNotesContainer');
-
-    // Định nghĩa hàm createNoteCard
-    function createNoteCard(note) {
-        const MAX_TITILE_LEN = 25;
-        const title = note.title || 'Untitled';
-        const truncatedTitle = title.length > MAX_TITILE_LEN ?
-                                title.slice(0, MAX_TITILE_LEN) + '...' :
-                                title;
-
-        var utc = note.updated_at;
-        if (!utc.endsWith("Z")) utc += "Z";
-        const updatedAt = new Date(utc);
-        const updatedStr = updatedAt.toLocaleString("vi-VN", {
-            day:   "2-digit",
-            month: "short",
-            year: "numeric",
-            hour:  "2-digit",
-            minute: "2-digit",
-            hour12: false,
-            timeZone: "Asia/Ho_Chi_Minh"
-        });
-
-        const noteCard = document.createElement('div');
-        noteCard.className = `note-card ${note.color} position-relative p-3`;
-
-        const keywords = Array.isArray(note.tags) ? note.tags : [];
-        const maxTags = 5; // số lượng tags tối đa hiển thị
-        let tagsHtml = '';
-
-        if (keywords.length > maxTags) {
-            tagsHtml = keywords.slice(0, maxTags).map(k => `
-                <span class="badge bg-secondary me-1">${k.length > 10 ? k.slice(0, 7) + '...' : k}</span>
-            `).join("");
-            tagsHtml += `<span class="badge bg-light text-dark">+${keywords.length - maxTags} more</span>`;
-        } else {
-            tagsHtml = keywords.map(k => `
-                <span class="badge bg-secondary me-1">${k.length > 10 ? k.slice(0, 7) + '...' : k}</span>
-            `).join("");
-        }
-
-        noteCard.innerHTML = `
-            <div class="note-content">
-                <div class="note-header d-flex justify-content-between align-items-start pb-1">
-                    <strong class="d-inline-block"><em>${truncatedTitle}</em></strong>
-                    <div class="dropdown">
-                        <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item share-note" href="#" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="${note.id}">
-                                <i class="bi bi-share"></i> Share</a></li>
-                            <li><a class="dropdown-item text-danger" href="#">
-                                <i class="bi bi-trash"></i> Delete</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="card-separator"></div>
-                <div class="mt-2">
-                    ${tagsHtml}
-                </div>
-
-                <small class="text-muted">Last updated: ${updatedStr}</small>
-
-            </div>
-        `;
-
-        noteCard.addEventListener('click', function (e) {
-            if (!e.target.closest('.dropdown')) {
-                window.location.href = `/edit-note/${note.id}`;
-            }
-        });
-
-        const shareButton = noteCard.querySelector('.share-note');
-        shareButton.addEventListener('click', function (e) {
-            e.preventDefault();
-            const noteId = this.getAttribute('data-note-id');
-            document.getElementById('noteIdToShare').value = noteId;
-        });
-        //  Xử lý sự kiện click cho nút Delete
-        const deleteButton = noteCard.querySelector('.dropdown-item.text-danger');
-        deleteButton.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            if (confirm('Bạn có chắc chắn muốn đưa ghi chú này vào Trash không?')) {
-                fetch(`/api/notes/${note.id}/move-to-trash`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Đã chuyển ghi chú vào Trash!');
-                        fetchNotes(); // Reload lại danh sách
-                    } else {
-                        alert('Thao tác thất bại: ' + (data.message || 'Unknown error.'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error moving note to trash:', error);
-                    alert('Đã xảy ra lỗi.');
-                });
-            }
-        });
-
-        return noteCard;
-    }
-
     function convertDatetime(utc) {
         if (!utc.endsWith("Z")) utc += "Z";
         const updatedAt = new Date(utc);
@@ -293,6 +186,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
+                            ${byMe ?
+                                `<li><a class="dropdown-item share-note" href="#" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="${share_note.note_id}">
+                                <i class="bi bi-share"></i> Share</a></li>` :
+                                ``
+                            }
                             <li><a class="dropdown-item text-danger" href="#">
                                 <i class="bi bi-trash"></i> Delete</a></li>
                         </ul>
@@ -313,9 +211,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 <small class="text-muted">Last updated: ${updatedStr}</small>
                 <br/>
-                <small class="text-muted">Shared At: ${sharedStr}</small>
+                <small class="text-muted">Shared at: ${sharedStr}</small>
                 <br/>
-                <p class="fst-italic"><small class="fst-italic">Shared by: ${share_note.sharer}</small></p>
+                <p class="fst-italic">
+                    ${byMe ? 
+                        `<small class="fst-italic">Shared to ${share_note.recipient}</small>` : 
+                        `<small class="fst-italic">Shared by ${share_note.sharer}</small>`}
+                </p>
             </div>
         `;
 
@@ -325,73 +227,21 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
+        const shareButton = noteCard.querySelector('.share-note');
+        if (shareButton) {
+            shareButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                const noteId = this.getAttribute('data-note-id');
+                document.getElementById('noteIdToShare').value = noteId;
+            });
+        }
+
         return noteCard;
     }
 
-    const isDashboard = container.classList.contains('dashboard-container');
-    async function fetchNotes() {
-        try {
-            const limit = container.getAttribute('data-limit') ? parseInt(container.getAttribute('data-limit')) : 9;
-            const response = await fetch(`/api/notes?limit=${limit}`);
-            const result = await response.json();
-            const notes = result.data || [];
-
-            container.innerHTML = '';
-
-            const existingArrow = document.querySelector('.dashboard-arrow-redirect');
-            if (existingArrow) {
-                existingArrow.remove();
-            }
-
-            if (notes.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center p-4">
-                        <p>No notes found. Create your first note!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            notes.forEach((note) => {
-                const noteCard = createNoteCard(note);
-                container.appendChild(noteCard);
-            });
-
-            if (isDashboard && notes.length === 9) {
-                const arrowButton = document.createElement('div');
-                arrowButton.className = 'dashboard-arrow-redirect';
-                arrowButton.innerHTML = `
-                    <i class="bi bi-arrow-right"></i>
-                    <div class="dashboard-arrow-tooltip">Xem tất cả ghi chú</div>
-                `;
-
-                arrowButton.onclick = (e) => {
-                    e.preventDefault();
-                    arrowButton.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        window.location.href = '/all-my-notes';
-                    }, 150);
-                };
-
-                container.appendChild(arrowButton);
-            }
-        } catch (error) {
-            console.error('Error fetching notes:', error);
-            container.innerHTML = `
-                <div class="alert alert-danger">
-                    Error loading notes. Please try again.
-                    <button class="btn btn-link" onclick="location.reload()">Retry</button>
-                </div>
-            `;
-        }
-    }
-
-    const sharedContainer = document.getElementById('sharedNotesContainer');
-    const iSharedDashboard = sharedContainer.classList.contains('dashboard-shared-container');
     async function fetchSharedNotes() {
         try {
             const limit = sharedContainer.getAttribute('data-limit') ? parseInt(sharedContainer.getAttribute('data-limit')) : 9;
-            const byMe = sharedContainer.getAttribute('data-by-me') ? parseInt(sharedContainer.getAttribute('data-by-me')) : 0;
             const response = await fetch(`/api/shared-notes?limit=${limit}&byMe=${byMe}`);
             const result = await response.json();
             const notes = result.data || [];
@@ -418,25 +268,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const noteCard = createSharedNoteCard(note);
                 sharedContainer.appendChild(noteCard);
             });
-
-            if (iSharedDashboard && notes.length === 9) {
-                const arrowButton = document.createElement('div');
-                arrowButton.className = 'dashboard-shared-arrow-redirect';
-                arrowButton.innerHTML = `
-                    <i class="bi bi-arrow-right"></i>
-                    <div class="dashboard-arrow-tooltip">Xem tất cả ghi chú đã chia sẽ với bạn</div>
-                `;
-
-                arrowButton.onclick = (e) => {
-                    e.preventDefault();
-                    arrowButton.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        window.location.href = '/share-with-me';
-                    }, 150);
-                };
-
-                sharedContainer.appendChild(arrowButton);
-            }
         } catch (error) {
             console.error('Error fetching notes:', error);
             sharedContainer.innerHTML = `
@@ -449,10 +280,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     window.addEventListener('popstate', function (event) {
-        fetchNotes(1);
         fetchSharedNotes(1);
     });
 
-    fetchNotes();
     fetchSharedNotes();
 });

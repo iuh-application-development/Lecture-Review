@@ -20,9 +20,9 @@
                 <span class="meta-label">Created</span>
                 <span class="meta-value">
                     {% if note %}
-                        {{ note.created_at.strftime("%d %b %Y") }}
+                        {{ (note.created_at | vn_datetime).strftime("%d %b %Y") }}
                     {% else %}
-                        {{ current_time.strftime("%d %b %Y") }}
+                        {{ (current_time | vn_datetime).strftime("%d %b %Y") }}
                     {% endif %}
                 </span>
             </div>
@@ -30,9 +30,9 @@
                 <span class="meta-label">Last modified</span>
                 <span class="meta-value">
                     {% if note %}
-                        {{ note.updated_at.strftime("%d %b %Y, %H:%M") }}
+                        {{ (note.updated_at | vn_datetime).strftime("%d %b %Y, %H:%M") }}
                     {% else %}
-                        {{ current_time.strftime("%d %b %Y, %H:%M") }}
+                        {{ (current_time | vn_datetime).strftime("%d %b %Y, %H:%M") }}
                     {% endif %}
                 </span>
             </div>
@@ -46,17 +46,18 @@
             <!-- Color Indicator -->
             <div class="note-meta">
                 <span class="meta-label">Note Color</span>
-                <div class="color-indicator {% if note %} {{ note.color }} {% endif %}"></div>
+                <div id="color-picker" class="d-flex gap-2 mt-2">
+                    <span class="color-option note-green" data-color="note-green"></span>
+                    <span class="color-option note-blue" data-color="note-blue"></span>
+                    <span class="color-option note-purple" data-color="note-purple"></span>
+                </div>
             </div>
 
             <!-- Tags Section -->
             <div class="note-meta">
                 <span class="meta-label">Tags</span>
-                <div class="tags-container">
-                    <span class="tag">Study</span>
-                    <span class="tag">Important</span>
-                    <span class="tag">+Add</span>
-                </div>
+                <div id="tags-container" class="tags-container mb-2"></div>
+                <input type="text" id="tag-input" placeholder="Nhập tag và nhấn Enter" class="form-control form-control-sm">
             </div>
 
             <!-- Action Buttons -->
@@ -66,7 +67,7 @@
                     <i class="bi bi-share"></i> Share
                 </button>
                 {% endif %}
-                <button class="btn btn-export">
+                <button class="btn btn-export" id="export-pdf-btn">
                     <i class="bi bi-download"></i> Export as PDF
                 </button>
                 {% if note and note.user_id == current_user.id %}
@@ -91,6 +92,7 @@
             data-api-endpoint='{% if note %}{{ url_for("api.edit_note", note_id=note.id) }}{% else %}{{ url_for("api.create_note") }}{% endif %}'
             data-redirect-url-on-create='{% if note %}{{ url_for("views.edit_note", note_id=note.id) }}{% else %}{{ "" }}{% endif %}'
             data-user-id='{{user.id}}'
+            data-note-tags='{% if note %}{{ note.tags | tojson }} {% else %} {} {% endif %}'
             >
         </div>
     </div>

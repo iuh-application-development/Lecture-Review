@@ -1,8 +1,13 @@
-from flask import Blueprint, jsonify, request, g
+from flask import Blueprint, jsonify, request, g, make_response, render_template
 from flask_login import current_user, login_required
-from .models import User, Note, ShareNote,db
+from .models import User, Note, ShareNote, db
+from .utils.convert_note_to_pdf import *
+from .mailer import send_email
+import pyotp
 from datetime import datetime
-
+from weasyprint import HTML
+from markupsafe import Markup
+import html
 
 api = Blueprint('api', __name__)
 API_VERSION = 'api-v1'
@@ -11,8 +16,8 @@ API_VERSION = 'api-v1'
 def get_notes():
     try:
         limit = request.args.get('limit', type=int)
-        query = Note.query.filter_by(user_id=current_user.id).order_by(Note.updated_at.desc())
-
+        is_trashed = request.args.get('is_trashed', False, type=bool)
+        query = Note.query.filter_by(user_id=current_user.id, is_trashed=is_trashed).order_by(Note.updated_at.desc())
 
         if limit:
             notes = query.limit(limit).all()
@@ -25,6 +30,7 @@ def get_notes():
             'content': note.content,
             'color': note.color,
             'user_id': note.user_id,
+            'tags': note.tags,
             'updated_at': note.updated_at.isoformat() if note.updated_at else None
         } for note in notes]
 
@@ -47,9 +53,10 @@ def get_notes_paginate():
         limit = request.args.get('limit', 15, type=int)
         color = request.args.get('color', '')
         date_filter = request.args.get('date', '', type=str)
+        is_trashed = request.args.get('is_trashed', False, type=bool)
 
         # Tạo query base
-        query = Note.query.filter_by(user_id=current_user.id)
+        query = Note.query.filter_by(user_id=current_user.id, is_trashed=is_trashed)
 
         # Thêm filter màu sắc
         if color:
@@ -71,6 +78,7 @@ def get_notes_paginate():
             'title': note.title,
             'content': note.content,
             'color': note.color,
+            'tags': note.tags,
             'updated_at': note.updated_at.isoformat() if note.updated_at else None
         } for note in pagination.items]
 
@@ -98,13 +106,15 @@ def create_note():
     data = request.get_json()
     title = data.get('title')
     content = data.get('content')
-    # color = data.get('color')
+    color = data.get('color', 'note-green')
+    tags = data.get('tags', [])
     user_id = data.get('user_id')
 
     new_note = Note(
         title=title,
         content=content,
-        # color=color,
+        color=color,
+        tags=tags,
         user_id=user_id
     )
 
@@ -133,7 +143,7 @@ def edit_note(note_id):
     note.title = data.get('title', note.title)
     note.content = data.get('content', note.content)
     note.color = data.get('color', note.color)
-    note.updated_at = datetime.utcnow()
+    note.tags = data.get('tags', note.tags)
 
     db.session.commit()
 
@@ -222,6 +232,139 @@ def share_note():
             'success': False,
             'message': 'Error sharing note'
         }), 500
+    
+@api.route('/notes/<int:note_id>/move-to-trash', methods=['POST'])
+@login_required
+def move_to_trash(note_id):
+    note = Note.query.get_or_404(note_id)
+    if note.user_id != current_user.id and current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Permission denied.'}), 403
+
+    note.is_trashed = True
+    note.deleted_at = datetime.utcnow()
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Note moved to trash.'})
+
+@api.route('/notes/<int:note_id>/restore', methods=['POST'])
+@login_required
+def restore_note(note_id):
+    note = Note.query.get_or_404(note_id)
+    if note.user_id != current_user.id and current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Permission denied.'}), 403
+
+    note.is_trashed = False
+    note.deleted_at = None
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Note restored successfully.'})
+
+@api.route('/notes/<int:note_id>/delete', methods=['POST'])
+@login_required
+def delete_note(note_id):
+    note = Note.query.get_or_404(note_id)
+    if note.user_id != current_user.id and current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Permission denied.'}), 403
+
+    if not note.is_trashed:
+        return jsonify({'success': False, 'message': 'Note must be moved to trash before deleting.'}), 400
+
+    db.session.delete(note)
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Note permanently deleted.'})
+
+@api.route('/user-notes/<int:user_id>')
+def get_user_notes(user_id):
+    notes = Note.query.filter_by(user_id=user_id).all()
+    notes_data = [{
+        'id': note.id,
+        'title': note.title,
+        'created_at': note.created_at,
+        'updated_at': note.updated_at,
+        'tags': note.tags
+    } for note in notes]
+
+    return jsonify({'success': True, 'notes': notes_data})
+
+@api.route('/shared-notes', methods=['GET'])
+def get_shared_notes():
+    try:
+        limit = request.args.get('limit', type=int)
+        by_me = request.args.get('byMe', type=int)
+
+        if by_me:
+            query = ShareNote.query.join(ShareNote.note).filter(ShareNote.sharer_id==current_user.id).order_by(Note.updated_at.desc())
+        else:
+            query = ShareNote.query.join(ShareNote.note).filter(ShareNote.recipient_id==current_user.id).order_by(Note.updated_at.desc())
+
+        if limit:
+            shared_notes = query.limit(limit).all()
+        else:
+            shared_notes = query.all()
+
+        shared_notes_data = [{
+            'note_id': shared_note.note.id,
+            'title': shared_note.note.title,
+            'message': shared_note.message,
+            'updated_at': str(shared_note.note.updated_at),
+            'share_at': str(shared_note.shared_at),
+            'color': shared_note.note.color,
+            'tags': shared_note.note.tags,
+            'sharer': shared_note.sharer.first_name + ' ' + shared_note.sharer.last_name,
+            'recipient': shared_note.recipient.first_name + ' ' + shared_note.recipient.last_name
+        } for shared_note in shared_notes]
+
+        return jsonify({
+            'status': 'success',
+            'data': shared_notes_data
+        })
+
+    except Exception as e:
+        print('Error in get_notes:', str(e))  # Log lỗi để debug
+        return jsonify({
+            'status': 'error',
+            'message': 'Error fetching notes'
+        }), 500
+
+@api.route('/export-pdf', methods=['POST'])
+def export_pdf():
+    payload = request.get_json()
+    blocks = payload.get('blocks', [])
+    title = payload.get('title', '')
+    content_html = f'<h1 style="text-align:center">{html.escape(str(title).strip())}</h1>\n'
+    content_html += blocks_to_html(blocks)
+
+    rendered = render_template(
+        'pdf_template.html',
+        content=Markup(content_html),
+        mathjax=False
+    )
+
+    # Chuyển sang PDF
+    pdf = HTML(string=rendered).write_pdf(stylesheets=[])
+
+    # Trả về PDF
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=note.pdf'
+    return response
+
+@api.route('/send-otp', methods=['POST'])
+def send_otp():
+    data = request.get_json()
+    email = data.get('email')
+
+    totp = pyotp.TOTP(pyotp.random_base32(), interval=300)
+    otp = totp.now()
+
+    message = f"""
+    <html>
+    <body>
+        <p>Mã OTP của bạn là: <strong>{otp}</strong><br>Có hiệu lực trong 5 phút.</p>
+    </body>
+    </html>
+    """
+
+    send_email('Mã OTP của bạn', email, message)
+    return message
 
 ### Standardize API responses and Handle Error ###
 @api.before_request
@@ -246,3 +389,4 @@ def handle_404_error(e):
         'details': f'The requested resource at {request.path} was not found.',
         'status': 404
     }), 404
+
