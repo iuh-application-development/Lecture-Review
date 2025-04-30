@@ -12,80 +12,129 @@
 </head>
 
 <body>
-    <div class="d-flex" style="height: 100vh;">
-        <!-- Sidebar -->
-        <div class="sidebar d-flex flex-column justify-content-between p-3 border-end">
-            {% set current_path = request.path %}
-            <div>
-                <div class="sidebar-logo text-center mb-4">
-                    <i class="bi bi-journal-bookmark-fill fs-4"></i>
-                    <a href="/" class="nav-link text-dark"><span class="fw-bold fs-5">Lecture Notes</span></a>
-                </div>
-                <ul class="nav flex-column mt-4">
-                    <li class="nav-item mb-3">
-                        <a class="nav-link text-dark {% if current_path == '/dashboard' %}active{% endif %}"
-                            href="/dashboard">
-                            <i class="bi bi-house-door-fill"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item mb-3">
-                        <a class="nav-link text-dark {% if current_path == '/all-my-notes' %}active{% endif %}"
-                            href="/all-my-notes">
-                            <i class="bi bi-journal-text"></i> All my notes
-                        </a>
-                    </li>
-                    <li class="nav-item mb-3">
-                        <a class="nav-link text-dark {% if current_path == '/share-with-me' or current_path == '/share-by-me' %}active{% endif %}"
-                            href="/share-with-me">
-                            <i class="bi bi-share-fill"></i> Shared with me
-                        </a>
-                    </li>
-                    <li class="nav-item mb-5">
-                        <a class="nav-link text-dark {% if current_path == '/trash' %}active{% endif %}" href="/trash">
-                            <i class="bi bi-trash3-fill"></i> Trash
-                        </a>
-                    </li>
-                </ul>
+<div class="d-flex" style="height: 100vh;">
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column justify-content-between p-3 border-end">
+        {% set current_path = request.path %}
+        <div>
+            <div class="sidebar-logo text-center mb-4">
+                <i class="bi bi-journal-bookmark-fill fs-4"></i>
+                <a href="/" class="nav-link text-dark"><span class="fw-bold fs-5">Lecture Notes</span></a>
             </div>
-            <div>
-                <ul class="nav flex-column">
-                    <li class="nav-item mb-2">
-                        <a class="nav-link text-dark" href="#"><i class="bi bi-chat-left-text"></i> Support</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" href="#"><i class="bi bi-gear-fill"></i> Setting</a>
-                    </li>
-                </ul>
-            </div>
+            <ul class="nav flex-column mt-4">
+                <li class="nav-item mb-3">
+                    <a class="nav-link text-dark {% if current_path == '/dashboard' %}active{% endif %}"
+                       href="/dashboard">
+                        <i class="bi bi-house-door-fill"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item mb-3">
+                    <a class="nav-link text-dark {% if current_path == '/all-my-notes' %}active{% endif %}"
+                       href="/all-my-notes">
+                        <i class="bi bi-journal-text"></i> All my notes
+                    </a>
+                </li>
+                <li class="nav-item mb-3">
+                    <a class="nav-link text-dark {% if current_path == '/share-with-me' or current_path == '/share-by-me' %}active{% endif %}"
+                       href="/share-with-me">
+                        <i class="bi bi-share-fill"></i> Shared with me
+                    </a>
+                </li>
+                <li class="nav-item mb-5">
+                    <a class="nav-link text-dark {% if current_path == '/trash' %}active{% endif %}" href="/trash">
+                        <i class="bi bi-trash3-fill"></i> Trash
+                    </a>
+                </li>
+            </ul>
         </div>
+        <div>
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="#"><i class="bi bi-chat-left-text"></i> Support</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="#"><i class="bi bi-gear-fill"></i> Setting</a>
+                </li>
+            </ul>
+        </div>
+    </div>
 
-        <!-- Main area -->
-        <div class="main-area d-flex flex-column flex-grow-1">
-            <!-- Topbar -->
-            <div class="topbar d-flex justify-content-between align-items-center px-4 py-3 border-bottom">
-                <div style="width: 35px;"></div>
-                <form class="d-flex w-50 justify-content-center">
-                    <input class="form-control w-75" type="search" placeholder="Search" aria-label="Search">
-                </form>
+    <!-- Main area -->
+    <div class="main-area d-flex flex-column flex-grow-1">
+        <!-- Topbar -->
+        <div class="topbar d-flex justify-content-between align-items-center px-4 py-3 border-bottom">
+            <div style="width: 35px;"></div>
+            <form class="d-flex w-50 justify-content-center">
+                <input class="form-control w-75" type="search" placeholder="Search" aria-label="Search">
+            </form>
+            <div class="d-flex align-items-center">
+                <!-- Nút thông báo -->
+                <!-- Trong topbar, phần notification dropdown -->
+                <div class="dropdown me-3 notification-dropdown">
+                    <a href="#" class="position-relative" id="notificationDropdown" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        <i class="bi bi-bell-fill fs-5 text-muted"></i>
+                        <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                id="unreadCount"
+                                style="display: none; font-size: 0.6rem;"
+                        >
+            0
+        </span>
+                    </a>
+                    <div
+                            class="dropdown-menu dropdown-menu-end notification-menu shadow"
+                            aria-labelledby="notificationDropdown"
+                            style="width: 350px; max-height: 450px; overflow-y: auto;"
+                    >
+                        <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                            <h6 class="m-0 fw-bold">Notifications</h6>
+                            <button
+                                    class="btn btn-sm btn-outline-secondary"
+                                    id="markAllRead"
+                            >
+                                Mark all as read
+                            </button>
+                        </div>
+
+                        <div id="notificationList" class="notifications-container">
+                            <!-- Notifications will be dynamically loaded here -->
+                            <div class="text-center py-4 text-muted">
+                                <i class="bi bi-bell-slash fs-4 mb-2"></i>
+                                <p>No notifications</p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 border-top text-center">
+                            <a href="/notifications" class="btn btn-sm btn-link text-decoration-none">
+                                View all notifications
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User dropdown menu -->
                 <div class="dropdown">
                     <img src="#" alt="User" class="rounded-circle me-2">
                     <a href="#" class="dropdown-toggle text-decoration-none" data-bs-toggle="dropdown"
-                        aria-expanded="false" style="color: black;">☰</a>
+                       aria-expanded="false" style="color: black;">☰</a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         {% if user.role == 'admin' %}
-                        <li><a class="dropdown-item" href="/admin">Quản trị</a></li>
+                            <li><a class="dropdown-item" href="/admin">Quản trị</a></li>
                         {% endif %}
                         <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
                     </ul>
                 </div>
             </div>
-
-            <!-- Content -->
-            {% block content %}{% endblock %}
         </div>
+
+        <!-- Content -->
+        {% block content %}{% endblock %}
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    {% block load_js %}{% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% block load_js %}{% endblock %}
+<script src="{{ url_for('static', filename='js/notification.js') }}"></script>
 </body>
 </html>

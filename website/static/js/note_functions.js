@@ -132,17 +132,37 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Định nghĩa hàm createNoteCard
     function createNoteCard(note) {
+        // Xử lý tiêu đề rỗng - hiển thị "Untitled"
+        const noteTitle = note.title && note.title.trim() ? note.title : 'Untitled';
+
+        // Xử lý nội dung
+        let displayContent = '';
+        if (note.content) {
+            if (typeof note.content === 'string') {
+                displayContent = note.content.length > 50 ? note.content.substring(0, 50) + '...' : note.content;
+            } else if (typeof note.content === 'object') {
+                // Nếu là EditorJS data
+                if (note.content.blocks && Array.isArray(note.content.blocks)) {
+                    const textBlocks = note.content.blocks.filter(block => block.type === 'paragraph');
+                    if (textBlocks.length > 0 && textBlocks[0].data && textBlocks[0].data.text) {
+                        const text = textBlocks[0].data.text;
+                        displayContent = text.length > 50 ? text.substring(0, 50) + '...' : text;
+                    } else {
+                        displayContent = 'Content available';
+                    }
+                } else {
+                    displayContent = 'Content available';
+                }
+            }
+        }
+
         const noteCard = document.createElement('div');
         noteCard.className = `note-card ${note.color} position-relative p-3`;
-
-        const truncatedContent = note.content.length > 50
-            ? note.content.substring(0, 50) + '...'
-            : note.content;
 
         noteCard.innerHTML = `
             <div class="note-content">
                 <div class="note-header d-flex justify-content-between align-items-start pb-1">
-                    <strong><em>${note.title}</em></strong>
+                    <strong><em>${noteTitle}</em></strong>
                     <div class="dropdown">
                         <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown">
                             <i class="bi bi-three-dots-vertical"></i>
@@ -156,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                 </div>
                 <div class="card-separator"></div>
-                <p class="mt-2">${truncatedContent}</p>
+                <p class="mt-2">${displayContent}</p>
             </div>
         `;
 
@@ -176,8 +196,11 @@ document.addEventListener('DOMContentLoaded', function () {
         return noteCard;
     }
 
-    const isDashboard = container.classList.contains('dashboard-container');
+    const isDashboard = container?.classList.contains('dashboard-container');
+
     async function fetchNotes() {
+        if (!container) return;
+
         try {
             const limit = container.getAttribute('data-limit') ? parseInt(container.getAttribute('data-limit')) : 9;
             const response = await fetch(`/api/notes?limit=${limit}`);

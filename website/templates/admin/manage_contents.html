@@ -18,14 +18,22 @@
             <label class="fw-semibold">Status:</label>
             <select id="statusFilter" class="form-select form-select-sm">
                 <option value="all">All status</option>
-                <option value="published">Published</option>
-                <option value="privated">Privated</option>
+                <option value="note-green">Published</option>
+                <option value="note-blue">Privated</option>
             </select>
-        </div> 
+        </div>
         <button id="filterButton" class="btn btn-outline-secondary d-flex align-items-center gap-1">
             <i class="bi bi-funnel"></i>
             <span>Filter</span>
         </button>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="loadingIndicator" class="text-center py-5" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Loading contents...</p>
     </div>
 
     <!-- Danh sách Content dạng card -->
@@ -50,57 +58,137 @@
         const statusFilter = document.getElementById('statusFilter');
         const searchContent = document.getElementById('searchContent');
         const filterButton = document.getElementById('filterButton');
+        const loadingIndicator = document.getElementById('loadingIndicator');
 
         let currentPage = 1;
         const limit = 9;
 
+        // Helper function để format nội dung
+        function formatContent(content) {
+            if (!content) return '';
+
+            if (typeof content === 'string') {
+                return content.length > 100 ? content.substring(0, 100) + '...' : content;
+            }
+
+            if (typeof content === 'object') {
+                // Trường hợp là EditorJS content
+                if (content.blocks && Array.isArray(content.blocks)) {
+                    const textBlocks = content.blocks.filter(block => block.type === 'paragraph');
+                    if (textBlocks.length > 0 && textBlocks[0].data && textBlocks[0].data.text) {
+                        const text = textBlocks[0].data.text;
+                        return text.length > 100 ? text.substring(0, 100) + '...' : text;
+                    }
+                }
+                return 'Content available';
+            }
+
+            return '';
+        }
+
         function fetchContents(page = 1, status = 'all', search = '') {
+            // Show loading indicator
+            loadingIndicator.style.display = 'block';
+            contentContainer.style.display = 'none';
+
             fetch(`/admin/contents?page=${page}&limit=${limit}&status=${status}&search=${search}`)
                 .then(response => response.json())
                 .then(data => {
+                    // Hide loading indicator
+                    loadingIndicator.style.display = 'none';
+                    contentContainer.style.display = 'flex';
+
                     const contents = data.contents || [];
                     const total = data.total || 0;
                     const totalPages = Math.ceil(total / limit);
 
                     contentContainer.innerHTML = '';
+
+                    if (contents.length === 0) {
+                        contentContainer.innerHTML = `
+                            <div class="col-12 text-center py-5">
+                                <i class="bi bi-inbox fs-1 text-muted"></i>
+                                <p class="mt-3 text-muted">No contents found matching your criteria.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
                     contents.forEach(content => {
+                        // Kiểm tra tiêu đề rỗng và gán "Untitled"
+                        const title = content.title && content.title.trim() ? content.title : 'Untitled';
+
                         const card = document.createElement('div');
                         card.className = 'col';
                         card.innerHTML = `
-                            <div class="card h-100 border">
+                            <div class="card h-100 border shadow-sm">
                                 <div class="card-body">
-                                    <h6 class="card-title fw-bold">${content.title}</h6>
+                                    <h6 class="card-title fw-bold text-truncate" title="${title}">${title}</h6>
                                     <div class="d-flex align-items-center mb-2">
-                                        <i class="bi bi-person-fill me-2"></i>
-                                        <span>By ${content.author}</span>
+                                        <i class="bi bi-person-fill me-2 text-primary"></i>
+                                        <span class="small text-muted">By ${content.author}</span>
                                     </div>
                                     <div class="d-flex align-items-center mb-2">
-                                        <i class="bi bi-calendar-date-fill me-2"></i>
-                                        <span>${content.created_at}</span>
+                                        <i class="bi bi-calendar-date-fill me-2 text-secondary"></i>
+                                        <span class="small text-muted">${content.created_at}</span>
                                     </div>
+                                    <p class="card-text small text-truncate" title="${formatContent(content.content)}">
+                                        ${formatContent(content.content)}
+                                    </p>
                                 </div>
-                                <div class="card-footer d-flex justify-content-between align-items-center">
+                                <div class="card-footer d-flex justify-content-between align-items-center bg-light">
                                     <span class="badge ${content.status === 'published' ? 'bg-success' : 'bg-warning text-dark'}">
                                         ${content.status.charAt(0).toUpperCase() + content.status.slice(1)}
                                     </span>
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-sm btn-light border remove-content" data-content-id="${content.id}">
-                                            <i class="bi bi-trash-fill text-danger"></i> Remove
+                                        <a href="/admin/view-note/${content.id}" class="btn btn-sm btn-primary d-flex align-items-center gap-1">
+                                            <i class="bi bi-eye-fill"></i> View
+                                        </a>
+                                        <button class="btn btn-sm btn-danger d-flex align-items-center gap-1 remove-content" data-content-id="${content.id}">
+                                            <i class="bi bi-trash-fill"></i> Remove
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         `;
+
+                        // Add event listener for remove button
+                        const removeButton = card.querySelector('.remove-content');
+                        removeButton.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            if (confirm('Are you sure you want to remove this content?')) {
+                                // Here you'd add the actual delete functionality
+                                alert('Delete functionality will be implemented in future');
+                            }
+                        });
+
                         contentContainer.appendChild(card);
                     });
 
                     updatePagination(page, totalPages);
                 })
-                .catch(error => console.error('Error fetching contents:', error));
+                .catch(error => {
+                    console.error('Error fetching contents:', error);
+                    loadingIndicator.style.display = 'none';
+                    contentContainer.style.display = 'block';
+                    contentContainer.innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                Error loading contents. Please try again.
+                                <button class="btn btn-sm btn-danger ms-3" onclick="location.reload()">Retry</button>
+                            </div>
+                        </div>
+                    `;
+                });
         }
 
         function updatePagination(currentPage, totalPages) {
             paginationControls.innerHTML = '';
+
+            if (totalPages <= 1) {
+                return;
+            }
 
             // Nút Previous
             const prevLi = document.createElement('li');
@@ -118,8 +206,16 @@
             prevLi.appendChild(prevLink);
             paginationControls.appendChild(prevLi);
 
+            // Generate range of pages to show
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+
+            if (endPage - startPage < 4) {
+                startPage = Math.max(1, endPage - 4);
+            }
+
             // Các số trang
-            for (let page = 1; page <= totalPages; page++) {
+            for (let page = startPage; page <= endPage; page++) {
                 const li = document.createElement('li');
                 li.className = `page-item ${page === currentPage ? 'active' : ''}`;
                 const link = document.createElement('a');
@@ -151,10 +247,29 @@
             paginationControls.appendChild(nextLi);
         }
 
+        // Add debounce for search input to prevent too many requests
+        let searchTimeout;
+        searchContent.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                fetchContents(1, statusFilter.value, searchContent.value);
+            }, 500);
+        });
+
+        // Filter button click handler
         filterButton.addEventListener('click', function () {
             fetchContents(1, statusFilter.value, searchContent.value);
         });
 
+        // Enter key on search input
+        searchContent.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                fetchContents(1, statusFilter.value, searchContent.value);
+            }
+        });
+
+        // Initialize - fetch contents on page load
         fetchContents();
     });
 </script>

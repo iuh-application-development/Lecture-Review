@@ -23,7 +23,7 @@
         <div class="note-card {{ shared_note.note.color }} position-relative p-3" onclick="window.location.href='/edit-note/{{ shared_note.note.id }}'">
             <div class="note-content">
                 <div class="note-header d-flex justify-content-between align-items-start pb-1">
-                    <strong><em>{{ shared_note.note.title }}</em></strong>
+                    <strong><em>{% if shared_note.note.title and shared_note.note.title.strip() %}{{ shared_note.note.title }}{% else %}Untitled{% endif %}</em></strong>
                     <div class="dropdown">
                         <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-three-dots-vertical"></i>
@@ -44,7 +44,13 @@
                 </div>
                 {% endif %}
                 <p class="mt-2">
-                    {{ shared_note.note.content }}
+                    {% if shared_note.note.content %}
+                        {% if shared_note.note.content is string %}
+                            {{ shared_note.note.content|truncate(50) }}
+                        {% else %}
+                            Content available
+                        {% endif %}
+                    {% endif %}
                 </p>
                 <p class="text-muted fst-italic" style="font-size: 14px;">
                     Shared by {{ shared_note.sharer.first_name }} {{ shared_note.sharer.last_name }}
@@ -56,7 +62,7 @@
     </div>
 
     <!-- Nút tạo note mới -->
-    <a href="/create-note"  
+    <a href="/create-note"
         class="btn btn-dark rounded-circle position-fixed"
         style="bottom: 30px; right: 30px; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center"
         >

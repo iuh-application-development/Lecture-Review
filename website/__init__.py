@@ -1,13 +1,10 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from .config import Config
 import os
-
-
+from website.config import Config
 
 db = SQLAlchemy()
-
 
 
 def create_app():
@@ -15,7 +12,6 @@ def create_app():
     app.config.from_object(Config)
     db.init_app(app)
 
-    
     from .views import views
     from .auth import auth
     from .api import api
@@ -27,7 +23,7 @@ def create_app():
     app.register_blueprint(admin, url_prefix='/admin')
 
     from .models import User
-    
+
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
@@ -39,8 +35,9 @@ def create_app():
     create_database(app)
     return app
 
+
 def create_database(app):
     if not os.path.exists('website/database.db'):
         with app.app_context():
-            db.create_all() 
+            db.create_all()
         print('Created database!')
