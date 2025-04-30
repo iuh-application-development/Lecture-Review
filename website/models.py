@@ -27,9 +27,10 @@ class Note(db.Model):
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at    = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     user_id       = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    is_trashed = db.Column(db.Boolean, default=False)
-    deleted_at = db.Column(db.DateTime, nullable=True)
-
+    is_trashed    = db.Column(db.Boolean, default=False)
+    deleted_at    = db.Column(db.DateTime, nullable=True)
+    is_public     = db.Column(db.Boolean, default=False)
+    
     user = db.relationship('User', backref=db.backref('notes', lazy=True))
     
     def __repr__(self):
@@ -53,3 +54,15 @@ class ShareNote(db.Model):
     def __repr__(self):
         return f'<ShareNote note#{self.note_id} from User#{self.sharer_id} to User#{self.recipient_id}>'
 
+class Comment (db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    note_id = db.Column(db.Integer, db.ForeignKey('notes.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    note = db.relationship('Note', backref=db.backref('comments', lazy=True))
+    user = db.relationship('User', backref=db.backref('comments', lazy=True))
+
+    def __repr__(self):
+        return f'<Comment on Note {self.note_id} by User#{self.user_id}>'
