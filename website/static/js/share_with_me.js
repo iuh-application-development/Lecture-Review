@@ -181,20 +181,21 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="note-content">
                 <div class="note-header d-flex justify-content-between align-items-start pb-1">
                     <strong class="d-inline-block"><em>${truncatedTitle}</em></strong>
-                    <div class="dropdown">
+                    ${byMe ?
+                    `<div class="dropdown">
                         <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown">
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
+                        
                         <ul class="dropdown-menu dropdown-menu-end">
-                            ${byMe ?
-                                `<li><a class="dropdown-item share-note" href="#" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="${share_note.note_id}">
-                                <i class="bi bi-share"></i> Share</a></li>` :
-                                ``
-                            }
-                            <li><a class="dropdown-item text-danger" href="#">
+                            
+                                <li><a class="dropdown-item share-note" href="#" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="${share_note.note_id}">
+                                <i class="bi bi-share"></i> Share</a></li>
+                                <li><a class="dropdown-item text-danger" href="#">
                                 <i class="bi bi-trash"></i> Delete</a></li>
                         </ul>
-                    </div>
+                    </div>`:``
+                    }
                 </div>
                 <div class="card-separator"></div>
                 
@@ -236,6 +237,33 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
+        if (byMe) {
+            const deleteButton = noteCard.querySelector('.dropdown-item.text-danger');
+            deleteButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (confirm('Bạn có chắc chắn muốn đưa ghi chú này vào Trash không?')) {
+                    fetch(`/api/notes/${share_note.note_id}/move-to-trash`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Đã chuyển ghi chú vào Trash!');
+                            fetchSharedNotes(); // Reload lại danh sách
+                        } else {
+                            alert('Thao tác thất bại: ' + (data.message || 'Unknown error.'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error moving note to trash:', error);
+                        alert('Đã xảy ra lỗi.');
+                    });
+                }
+            });
+        }
         return noteCard;
     }
 

@@ -114,10 +114,13 @@
             data-redirect-url-on-create='{% if note %}{{ url_for("views.edit_note", note_id=note.id) }}{% else %}{{ "" }}{% endif %}'
             data-user-id='{{user.id}}'
             data-note-id = '{%if note %}{{note.id}}{%else%}underfined{%endif%}'
+            data-note-color = '{%if note %}{{note.color}}{%else%}note-green{%endif%}'
             data-view-only = "{{'true' if view_only else 'false'}}"
             data-note-tags='{% if note %}{{ note.tags | tojson }} {% else %} {} {% endif %}'
             >
         </div>
+
+        <div class="card-separator"></div>
 
         <!-- Comments Section -->
         {% if note and (note.is_public or not view_only) %}

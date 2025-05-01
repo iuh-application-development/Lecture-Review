@@ -81,6 +81,32 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('noteIdToShare').value = noteId;
         });
 
+        const deleteButton = noteCard.querySelector('.dropdown-item.text-danger');
+        deleteButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (confirm('Bạn có chắc chắn muốn đưa ghi chú này vào Trash không?')) {
+                fetch(`/api/notes/${note.id}/move-to-trash`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Đã chuyển ghi chú vào Trash!');
+                        fetchPagedNotes(1); // Reload lại danh sách
+                    } else {
+                        alert('Thao tác thất bại: ' + (data.message || 'Unknown error.'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error moving note to trash:', error);
+                    alert('Đã xảy ra lỗi.');
+                });
+            }
+        });
+
         return noteCard;
     }
     

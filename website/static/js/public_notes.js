@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const notesContainer = document.getElementById('publicNotesContainer');
     const searchInput = document.getElementById('searchPublicNotes');
     let currentPage = 1;
-    const limit = 15;
+    const limit = 10;
 
     // Lấy tham số search từ URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -39,14 +39,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 const noteCard = document.createElement('div');
                 noteCard.className = `note-card ${note.color || 'note-green'} position-relative p-3`;
                 
-                const truncatedContent = note.content.length > 50
-                    ? note.content.substring(0, 50) + '...'
-                    : note.content;
+                const MAX_TITILE_LEN = 25;
+                const title = note.title || 'Untitled';
+                const truncatedTitle = title.length > MAX_TITILE_LEN ?
+                                        title.slice(0, MAX_TITILE_LEN) + '...' :
+                                        title;
+
+                const keywords = Array.isArray(note.tags) ? note.tags : [];
+                const maxTags = 5; // số lượng tags tối đa hiển thị
+                let tagsHtml = '';
+        
+                if (keywords.length > maxTags) {
+                    tagsHtml = keywords.slice(0, maxTags).map(k => `
+                        <span class="badge bg-secondary me-1">${k.length > 10 ? k.slice(0, 7) + '...' : k}</span>
+                    `).join("");
+                    tagsHtml += `<span class="badge bg-light text-dark">+${keywords.length - maxTags} more</span>`;
+                } else {
+                    tagsHtml = keywords.map(k => `
+                        <span class="badge bg-secondary me-1">${k.length > 10 ? k.slice(0, 7) + '...' : k}</span>
+                    `).join("");
+                }
 
                 noteCard.innerHTML = `
                     <div class="note-content">
                         <div class="note-header d-flex justify-content-between align-items-start pb-1">
-                            <strong><em>${note.title}</em></strong>
+                            <strong class="d-inline-block"><em>${truncatedTitle}</em></strong>
                             <div class="dropdown">
                                 <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown">
                                     <i class="bi bi-three-dots-vertical"></i>
@@ -58,7 +75,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             </div>
                         </div>
                         <div class="card-separator"></div>
-                        <p class="mt-2">${truncatedContent}</p>
+                        <div class="mt-2">
+                            ${tagsHtml}
+                        </div>
+        
                         <small class="text-muted">Created: ${new Date(note.created_at).toLocaleString('vi-VN')}</small>
                     </div>
                 `;

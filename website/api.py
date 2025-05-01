@@ -323,9 +323,9 @@ def get_shared_notes():
         by_me = request.args.get('byMe', type=int)
 
         if by_me:
-            query = ShareNote.query.join(ShareNote.note).filter(ShareNote.sharer_id==current_user.id).order_by(Note.updated_at.desc())
+            query = ShareNote.query.join(ShareNote.note).filter(ShareNote.sharer_id==current_user.id, Note.is_trashed==False).order_by(Note.updated_at.desc())
         else:
-            query = ShareNote.query.join(ShareNote.note).filter(ShareNote.recipient_id==current_user.id).order_by(Note.updated_at.desc())
+            query = ShareNote.query.join(ShareNote.note).filter(ShareNote.recipient_id==current_user.id, Note.is_trashed==False).order_by(Note.updated_at.desc())
 
         if limit:
             shared_notes = query.limit(limit).all()
@@ -424,6 +424,7 @@ def get_public_notes():
             'content': note.content,
             'color': note.color,
             'user_id': note.user_id,
+            'tags': note.tags,
             # 'user_name': f'{note.user.first_name} {note.user.last_name}',
             'is_public': note.is_public,
             'updated_at': note.created_at.strftime('%Y-%m-%d %H:%M:%S'),

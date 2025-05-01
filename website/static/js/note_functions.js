@@ -295,15 +295,6 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="note-content">
                 <div class="note-header d-flex justify-content-between align-items-start pb-1">
                     <strong class="d-inline-block"><em>${truncatedTitle}</em></strong>
-                    <div class="dropdown">
-                        <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item text-danger" href="#">
-                                <i class="bi bi-trash"></i> Delete</a></li>
-                        </ul>
-                    </div>
                 </div>
                 <div class="card-separator"></div>
                 
