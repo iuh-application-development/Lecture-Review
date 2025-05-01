@@ -15,10 +15,10 @@
     <div class="d-flex align-items-center gap-1">
       <label class="fw-semibold">Status:</label>
       <select id="statusFilter" class="form-select form-select-sm">
-        <option value="all" selected>All status</option>
-        <option value="active">Active</option>
-        <option value="locked">Locked</option>
-        <option value="inactive">Inactive</option>
+        <option value="All" selected>All status</option>
+        <option value="Active">Active</option>
+        <option value="Locked">Locked</option>
+        <option value="Inactive">Inactive</option>
       </select>
     </div>
     <button id="filterButton" class="btn btn-outline-secondary d-flex align-items-center gap-1">
@@ -68,7 +68,7 @@
     const limit = 10;
 
     // Hàm gọi API để lấy danh sách người dùng
-    function fetchUsers(page = 1, status = 'all', search = '') {
+    function fetchUsers(page = 1, status = 'All', search = '') {
       fetch(`/admin/users?page=${page}&limit=${limit}&status=${status}&search=${search}`)
         .then(response => response.json())
         .then(data => {

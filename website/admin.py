@@ -70,11 +70,11 @@ def get_users():
     
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 10, type=int)
-    status = request.args.get('status', 'all', type=str)
+    status = request.args.get('status', 'All', type=str)
     search = request.args.get('search', '')
 
     query = User.query
-    if status != 'all':
+    if status != 'All':
         query = query.filter_by(status=status)
     if search:
         query = query.filter(User.email.ilike(f'%{search}%'))
