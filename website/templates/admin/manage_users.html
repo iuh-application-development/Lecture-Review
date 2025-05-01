@@ -68,7 +68,7 @@
     const limit = 10;
 
     // Hàm gọi API để lấy danh sách người dùng
-    function fetchUsers(page = 1, status = 'Active', search = '') {
+    function fetchUsers(page = 1, status = 'all', search = '') {
       fetch(`/admin/users?page=${page}&limit=${limit}&status=${status}&search=${search}`)
         .then(response => response.json())
         .then(data => {
