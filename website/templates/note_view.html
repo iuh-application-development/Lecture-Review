@@ -120,10 +120,9 @@
             >
         </div>
 
-        <div class="card-separator"></div>
-
         <!-- Comments Section -->
-        {% if note and (note.is_public or not view_only) %}
+        {% if note and (note.is_public) %}
+        <div class="card-separator"></div>
         <div class="comments-section mt-4" style="max-width: 800px; margin: 0 auto;">
             <h4>Comments</h4>
         

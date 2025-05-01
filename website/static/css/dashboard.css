@@ -55,6 +55,7 @@ h4 {
     transition: transform 0.1s;
     cursor: pointer;
     position: relative;
+    z-index: 1;
 }
 
 .note-header strong em {
@@ -394,4 +395,53 @@ h4 {
 .all-notes-container .arrow-redirect,
 .all-notes-container .note-container {
     display: none !important;
+}
+
+/* Notification System Styles */
+.notification-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+}
+
+.notification-dropdown .dropdown-menu {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border: none;
+    border-radius: 0.5rem;
+    z-index: 1000;
+}
+
+.notification-item {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.notification-item:hover {
+    background-color: rgba(0, 123, 255, 0.05) !important;
+}
+
+.bg-light-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    border-left: 3px solid #ffc107;
+}
+
+.notifications-container {
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.notifications-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notifications-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.notifications-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.notifications-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }

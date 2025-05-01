@@ -30,6 +30,7 @@ class Note(db.Model):
     is_trashed    = db.Column(db.Boolean, default=False)
     deleted_at    = db.Column(db.DateTime, nullable=True)
     is_public     = db.Column(db.Boolean, default=False)
+    disable        = db.Column(db.Boolean, default=False)
     
     user = db.relationship('User', backref=db.backref('notes', lazy=True))
     
@@ -55,14 +56,51 @@ class ShareNote(db.Model):
         return f'<ShareNote note#{self.note_id} from User#{self.sharer_id} to User#{self.recipient_id}>'
 
 class Comment (db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    note_id = db.Column(db.Integer, db.ForeignKey('notes.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    id            = db.Column(db.Integer, primary_key=True)
+    note_id       = db.Column(db.Integer, db.ForeignKey('notes.id'), nullable=False)
+    user_id       = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    content       = db.Column(db.Text, nullable=False)
+    created_at    = db.Column(db.DateTime, default=datetime.utcnow)
     
-    note = db.relationship('Note', backref=db.backref('comments', lazy=True))
-    user = db.relationship('User', backref=db.backref('comments', lazy=True))
+    note          = db.relationship('Note', backref=db.backref('comments', lazy=True))
+    user          = db.relationship('User', backref=db.backref('comments', lazy=True))
 
     def __repr__(self):
         return f'<Comment on Note {self.note_id} by User#{self.user_id}>'
+
+class UserWarning(db.Model):
+    __tablename__ = 'user_warnings'
+    id            = db.Column(db.Integer, primary_key=True)
+    user_id       = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    note_id       = db.Column(db.Integer, db.ForeignKey('notes.id'), nullable=True)
+    admin_id      = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    reason        = db.Column(db.String(50), nullable=False)  # 'inappropriate', 'copyright', 'spam', 'other'
+    message       = db.Column(db.Text, nullable=False)
+    created_at    = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read       = db.Column(db.Boolean, default=False)
+
+    user          = db.relationship('User', foreign_keys=[user_id], backref=db.backref('warnings_received', lazy=True))
+    admin         = db.relationship('User', foreign_keys=[admin_id], backref=db.backref('warnings_given', lazy=True))
+    note          = db.relationship('Note', backref=db.backref('warnings', lazy=True))
+
+    def __repr__(self):
+        return f'<UserWarning user#{self.user_id} note#{self.note_id} by admin#{self.admin_id}>'
+    
+class UserNotification(db.Model):
+    __tablename__ = 'user_notifications'
+    __table_args__ = (
+        db.Index('idx_user_notifications_user_id_is_read', 'user_id', 'is_read'),
+    )
+    id            = db.Column(db.Integer, primary_key=True)
+    user_id       = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    title         = db.Column(db.String(100), nullable=False)
+    message       = db.Column(db.Text, nullable=False)
+    type          = db.Column(db.String(20), default='info')  # 'info', 'warning', 'success', 'error'
+    link          = db.Column(db.String(200), nullable=True)
+    created_at    = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read       = db.Column(db.Boolean, default=False)
+
+    user          = db.relationship('User', backref=db.backref('notifications', lazy=True))
+
+    def __repr__(self):
+        return f'<UserNotification id#{self.id} user_id#{self.user_id} type#{self.type}>'

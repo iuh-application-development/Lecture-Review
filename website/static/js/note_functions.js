@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
 
         noteCard.addEventListener('click', function (e) {
-            if (!e.target.closest('.dropdown')) {
+            if (!e.target.closest('.dropdown') || e.target.closest('.notification')) {
                 window.location.href = `/edit-note/${share_note.note_id}`;
             }
         });

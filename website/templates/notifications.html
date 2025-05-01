@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+
+{% block load_css %}
+<style>
+    .notification-item {
+        border-left: 3px solid #e9ecef;
+        transition: all 0.2s ease;
+    }
+
+    .notification-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .notification-item.unread {
+        border-left: 3px solid #ffc107;
+        background-color: rgba(255, 193, 7, 0.05);
+    }
+
+    .notification-time {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+    .notification-content {
+        font-size: 0.95rem;
+    }
+
+    .notification-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    .notification-icon.warning {
+        background-color: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+    }
+
+    .notification-icon.info {
+        background-color: rgba(13, 110, 253, 0.2);
+        color: #0d6efd;
+    }
+
+    .notification-icon.success {
+        background-color: rgba(25, 135, 84, 0.2);
+        color: #198754;
+    }
+
+    .notification-icon.error {
+        background-color: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+    }
+
+    .notification-empty {
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content p-4 flex-grow-1">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="m-0 fw-bold">Notifications</h4>
+        <button type="submit" class="btn btn-outline-secondary btn-sm" id="markAllRead-container">
+            <i class="bi bi-check-all"></i> Mark all as read
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div id="notificationContainer">
+                <!-- Notifications will be populated here -->
+                <div class="text-center p-4 notification-empty">
+                    <i class="bi bi-bell-slash fs-1 text-muted mb-3"></i>
+                    <p class="text-muted">Loading notifications...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block load_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Function to load notifications
+        async function loadNotifications() {
+            try {
+                const response = await fetch('/api/notifications?limit=50');
+                const result = await response.json();
+                console.log(response);
+                if (result.status === 'success') {
+                    const notificationContainer = document.getElementById('notificationContainer');
+                    const notifications = result.data.notifications;
+
+                    if (!notifications || notifications.length === 0) {
+                        notificationContainer.innerHTML = `
+                            <div class="text-center p-4 notification-empty">
+                                <i class="bi bi-bell-slash fs-1 text-muted mb-3"></i>
+                                <p class="text-muted">No notifications</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    // Clear the loading message
+                    notificationContainer.innerHTML = '';
+
+                    // Add each notification
+                    notifications.forEach(notification => {
+                        const notificationItem = document.createElement('div');
+                        notificationItem.className = `notification-item p-3 border-bottom ${!notification.is_read ? 'unread' : ''}`;
+
+                        // Set notification icon based on type
+                        let iconClass = 'info';
+                        let iconName = 'info-circle-fill';
+
+                        if (notification.type === 'warning') {
+                            iconClass = 'warning';
+                            iconName = 'exclamation-triangle-fill';
+                        } else if (notification.type === 'success') {
+                            iconClass = 'success';
+                            iconName = 'check-circle-fill';
+                        } else if (notification.type === 'error') {
+                            iconClass = 'error';
+                            iconName = 'x-circle-fill';
+                        }
+
+                        notificationItem.innerHTML = `
+                            <div class="d-flex">
+                                <div class="notification-icon ${iconClass} me-3">
+                                    <i class="bi bi-${iconName}"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <strong>${notification.title}</strong>
+                                        <span class="notification-time">${formatTimeAgo(notification.created_at)}</span>
+                                    </div>
+                                    <div class="notification-content">${notification.message}</div>
+                                </div>
+                            </div>
+                        `;
+
+                        // Add click handler to mark as read and navigate
+                        if (!notification.is_read || notification.link) {
+                            notificationItem.style.cursor = 'pointer';
+
+                            notificationItem.addEventListener('click', async function() {
+                                // If notification is not read, mark it as read
+                                if (!notification.is_read) {
+                                    await fetch(`/api/notifications/mark-read/${notification.id}`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        }
+                                    });
+
+                                    // Update UI
+                                    notificationItem.classList.remove('unread');
+                                }
+
+                                // If notification has a link, navigate to it
+                                if (notification.link) {
+                                    window.location.href = notification.link;
+                                }
+                            });
+                        }
+
+                        notificationContainer.appendChild(notificationItem);
+                    });
+                } else {
+                    console.error('Failed to load notifications:', result.message);
+                }
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+            }
+        }
+
+        // Format time ago function
+        function formatTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffSec = Math.floor(diffMs / 1000);
+            const diffMin = Math.floor(diffSec / 60);
+            const diffHour = Math.floor(diffMin / 60);
+            const diffDay = Math.floor(diffHour / 24);
+
+            if (diffSec < 60) {
+                return 'Just now';
+            } else if (diffMin < 60) {
+                return `${diffMin} min ago`;
+            } else if (diffHour < 24) {
+                return `${diffHour} hr ago`;
+            } else if (diffDay < 7) {
+                return `${diffDay} day ago`;
+            } else {
+                return date.toLocaleDateString();
+            }
+        }
+
+        async function markAllAsRead(e) {
+            if (e) e.preventDefault();
+    
+            try {
+                console.log('Marking all notifications as read');
+                const response = await fetch('/api/notifications/mark-all-read', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+    
+                const data = await response.json();
+                console.log('Mark all read response:', data);
+    
+                if (data.status === 'success') {
+                    // Tải lại thông báo
+                    loadNotifications();
+                }
+            } catch (error) {
+                console.error('Error marking all notifications as read:', error);
+            }
+        }
+
+        const markAllReadBtn = document.getElementById('markAllRead-container');
+        markAllReadBtn.addEventListener('click', markAllAsRead);
+
+        // Load notifications
+        loadNotifications();
+    });
+</script>
+{% endblock %}

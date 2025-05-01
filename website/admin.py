@@ -1,7 +1,9 @@
-from flask import Blueprint, render_template, redirect, url_for, request, jsonify, current_app
+from flask import Blueprint, render_template, redirect, url_for, request, jsonify, current_app, flash
 from werkzeug.security import generate_password_hash
 from flask_login import current_user
-from .models import User, Note, db
+from .models import User, Note, UserWarning, UserNotification, db
+import datetime
+import traceback
 
 admin = Blueprint('admin', __name__)
 
@@ -60,9 +62,15 @@ def register_admin(secret_key):
 
 @admin.route('/users', methods=['GET'])
 def get_users():
+    if not (current_user.is_authenticated and current_user.role == 'admin'):
+        return jsonify({
+                    'status': 'error',
+                    'message': "You don't have permission."
+                }), 403
+    
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 10, type=int)
-    status = request.args.get('status', 'all', type=int)
+    status = request.args.get('status', 'all', type=str)
     search = request.args.get('search', '')
 
     query = User.query
@@ -90,14 +98,20 @@ def get_users():
 
 @admin.route('/contents', methods=['GET'])
 def get_contents():
+    if not (current_user.is_authenticated and current_user.role == 'admin'):
+        return jsonify({
+                    'status': 'error',
+                    'message': "You don't have permission."
+                }), 403
+    
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 10, type=int)
-    status = request.args.get('status', 'all')
+    disable = request.args.get('disable', 'all')
     search = request.args.get('search', '')
 
     query = Note.query
-    if status != 'all':
-        query = query.filter_by(color=status)  # Giả sử `color` đại diện cho trạng thái
+    if disable != 'all':
+        query = query.filter_by(disable=disable == "true")
     if search:
         query = query.filter(Note.title.ilike(f'%{search}%'))
 
@@ -107,10 +121,10 @@ def get_contents():
     contents_data = [
         {
             'id': content.id,
-            'title': content.title,
+            'title': content.title if content.title else "Untitled",
             'author': f'{content.user.first_name} {content.user.last_name}',
             'created_at': content.created_at.strftime('%Y-%m-%d'),
-            'status': 'published' if content.color == 'note-green' else 'privated'
+            'disable': content.disable
         }
         for content in contents
     ]
@@ -122,6 +136,12 @@ def get_contents():
 
 @admin.route('/users/<int:user_id>/toggle-lock', methods=['POST'])
 def toggle_user_lock(user_id):
+    if not (current_user.is_authenticated and current_user.role == 'admin'):
+        return jsonify({
+                    'status': 'error',
+                    'message': "You don't have permission."
+                }), 403
+    
     user = User.query.get_or_404(user_id)
     data = request.get_json()
     new_status = data.get('status')
@@ -133,6 +153,82 @@ def toggle_user_lock(user_id):
 
 @admin.route('/user_detail/<int:user_id>')
 def user_detail(user_id):
+    if not (current_user.is_authenticated and current_user.role == 'admin'):
+        return redirect(url_for('views.home'))
     user = User.query.get_or_404(user_id)
 
     return render_template('admin/user_detail.html', user=current_user, target_user=user)
+
+@admin.route('/view-note/<int:note_id>')
+def view_note(note_id):
+    if not (current_user.is_authenticated and current_user.role == 'admin'):
+        return redirect(url_for('views.home'))
+    
+    note = Note.query.get_or_404(note_id)
+    return render_template('admin/admin_note_view.html', note=note)
+
+@admin.route('/send-warning-form', methods=['POST'])
+def send_warning_form():
+    if not (current_user.is_authenticated and current_user.role == 'admin'):
+        return redirect(url_for('views.home'))
+    
+    try:
+        note_id = request.form.get('note_id')
+        user_id = request.form.get('user_id')
+        reason = request.form.get('reason')
+        message = request.form.get('message')
+        disable_content = request.form.get('disable_content') == 'true'
+
+        if not user_id or not note_id or not message:
+            flash('Missing required fields', 'danger')
+            return redirect(url_for('admin.view_note', note_id=note_id))
+        
+        user = User.query.get(user_id)
+        note = Note.query.get(note_id)
+
+        if not user or not note:
+            flash('User or Note not found', 'danger')
+            return redirect(url_for('admin.view_note', note_id=note_id))
+        
+        new_warning = UserWarning(
+            user_id=user_id,
+            note_id=note_id,
+            reason=reason,
+            message=message,
+            admin_id=current_user.id
+        )
+
+        db.session.add(new_warning)
+
+        try:
+            user_notification = UserNotification(
+                user_id=user_id,
+                title='Cảnh báo từ quản trị viên',
+                message=message,
+                type='warning',
+                link=f'/edit-note/{note_id}' if note_id else None,
+                is_read=False
+            )
+            db.session.add(user_notification)
+            print(f'Created notification for User#{user_id}')
+        except Exception as e:
+            print(f'Error creating notification: {str(e)}')
+
+        if disable_content:
+            note.disable = True
+            print(f'Changed note#{note_id} disable to True')
+        
+        db.session.commit()
+        print(f'Warning created with id#{new_warning.id}')
+
+        flash('Waring sent successfully!', 'success')
+        return redirect(url_for('admin.view_note', note_id=note_id))
+
+    except Exception as e:
+        error_traceback = traceback.format_exc()
+        print('Error sending warning', str(e))
+        print('Traceback:', error_traceback)
+        db.session.rollback()
+
+        flash(f'Error sending warning: {str(e)}', 'danger')
+        return redirect(url_for('admin.view_note', note_id=note_id))

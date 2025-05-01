@@ -307,6 +307,44 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    async function exportPDF(blocks, title) {
+        try {
+            const response = await fetch('/api/export-pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ blocks, title })
+            });
+            if (!response.ok) throw new Error(`Export PDF failed: ${response.status}`);
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'note.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('Export PDF error:', err);
+        }
+    }
+
+    // Bắt sự kiện Export PDF
+    const exportBtn = document.getElementById('export-pdf-btn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', async () => {
+            try {
+                const { blocks } = await editor.save();
+                const title = document.getElementById('page-title')?.textContent.trim() || '';
+                await exportPDF(blocks, title);
+            } catch (err) {
+                console.error('Export PDF error:', err);
+            }
+        });
+    } else {
+        console.warn('Export PDF button not found');
+    }
+
     window.addEventListener('popstate', function (event) {
         fetchSharedNotes(1);
     });

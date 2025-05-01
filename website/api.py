@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, g, make_response, render_template
 from flask_login import current_user, login_required
-from .models import User, Note, ShareNote, Comment, db
+from .models import User, Note, ShareNote, Comment, UserWarning, UserNotification, db
 from .utils.convert_note_to_pdf import *
 from .mailer import send_email
 import pyotp
@@ -296,7 +296,7 @@ def delete_note(note_id):
     if note.user_id != current_user.id and current_user.role != 'admin':
         return jsonify({'success': False, 'message': 'Permission denied.'}), 403
 
-    if not note.is_trashed:
+    if (not note.is_trashed) and current_user.role != 'admin':
         return jsonify({'success': False, 'message': 'Note must be moved to trash before deleting.'}), 400
 
     db.session.delete(note)
@@ -450,7 +450,7 @@ def get_comments(note_id):
         note = Note.query.get_or_404(note_id)
         if not note.is_public and note.user_id != current_user.id:
             shared = ShareNote.query.filter_by(note_id=note_id, recipient_id=current_user.id).first()
-            if not shared:
+            if not shared and current_user.role != 'admin':
                 return jsonify({
                     'status': 'error',
                     'message': 'You are not allowed to access this note'
@@ -525,8 +525,106 @@ def create_comment(note_id):
             'message': 'Error creating comment'
         }), 500
  
- 
+@api.route('/notifications', methods=['GET'])
+@login_required
+def get_notifications():
+    try:
+        # Limit mặc định là 5 để phù hợp với frontend
+        limit = request.args.get('limit', 5, type=int)
+
+        # Truy vấn thông báo, ưu tiên thông báo chưa đọc
+        query = UserNotification.query.filter_by(user_id=current_user.id)
+        query = query.order_by(
+            UserNotification.created_at.desc()
+        )
+
+        # Giới hạn số lượng thông báo
+        notifications = query.limit(limit).all()
+
+        # Chuyển đổi thông báo sang định dạng JSON
+        notifications_data = [{
+            'id': notification.id,
+            'title': notification.title,
+            'message': notification.message,
+            'type': notification.type,
+            'link': notification.link,
+            'created_at': notification.created_at.isoformat(),
+            'is_read': notification.is_read
+        } for notification in notifications]
+
+        # Đếm số thông báo chưa đọc
+        unread_count = UserNotification.query.filter_by(
+            user_id=current_user.id,
+            is_read=False
+        ).count()
+
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'notifications': notifications_data,
+                'unread_count': unread_count
+            }
+        })
+    except Exception as e:
+        # In ra lỗi để debug
+        print(f'Error getting notifications: {str(e)}')
+        return jsonify({
+            'status': 'error',
+            'message': 'Error fetching notifications'
+        }), 500
         
+@api.route('/notifications/mark-read/<int:notification_id>', methods=['POST'])
+@login_required
+def mark_notification_read(notification_id):
+    try:
+        notification = UserNotification.query.get_or_404(notification_id)
+
+        if notification.user_id != current_user.id:
+            return jsonify({
+                'status': 'error',
+                'message': 'Unauthorized'
+            }), 403
+
+        notification.is_read = True
+        db.session.commit()
+
+        return jsonify({
+            'status': 'success',
+            'message': 'Notification marked as read'
+        })
+    except Exception as e:
+        print('Error marking notification as read:', str(e))
+        return jsonify({
+            'status': 'error',
+            'message': 'Error updating notification'
+        }), 500
+
+@api.route('/notifications/mark-all-read', methods=['POST'])
+@login_required
+def mark_all_notifications_read():
+    try:
+        unread_notifications = UserNotification.query.filter_by(
+            user_id=current_user.id,
+            is_read=False
+        ).all()
+
+        for notification in unread_notifications:
+            notification.is_read = True
+
+        db.session.commit()
+
+        return jsonify({
+            'status': 'success',
+            'message': 'All notifications marked as read',
+            'count': len(unread_notifications)
+        })
+    except Exception as e:
+        print('Error marking all notifications as read:', str(e))
+        return jsonify({
+            'status': 'error',
+            'message': 'Error updating notifications'
+        }), 500
+
 ### Standardize API responses and Handle Error ###
 @api.before_request
 def before_api_request():
