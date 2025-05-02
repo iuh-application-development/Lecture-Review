@@ -1,72 +1,58 @@
-# Hệ Thống Sổ Tay Ghi Chú Bài Giảng
+# Lecture-Review: Hệ Thống Sổ Tay Ghi Chú Bài Giảng
 
 ## Giới thiệu
-Hệ thống sổ tay ghi chú bài giảng là một nền tảng trực tuyến giúp người dùng tạo, quản lý và chia sẻ các bản tóm tắt bài giảng một cách hiệu quả. Hệ thống hỗ trợ người dùng tìm kiếm, xem nội dung ghi chú, quản lý bản ghi cá nhân và theo dõi số lượng người đã xem bài giảng đó. Ngoài ra, hệ thống còn cung cấp giao diện quản trị để quản lý toàn bộ dữ liệu và người dùng.
 
-### Thông tin sinh viên
-- **Trịnh Nguyễn Hoàng Vũ - 22642231**
-- **Kiều Trương Hàm Hương - 22719241**
-- **Trần Thị Huyền - 22657821**
-- **Phạm Thanh Thảo - 22695701**
+Lecture-Review là một nền tảng trực tuyến giúp người dùng dễ dàng tạo, quản lý và chia sẻ các bản tóm tắt bài giảng. Hệ thống này hỗ trợ tối ưu hóa việc học tập và cộng tác thông qua việc chia sẻ kiến thức với cộng đồng.
+
+## Thông tin nhóm phát triển
+
+- **Trịnh Nguyễn Hoàng Vũ** - 22642231
+- **Kiều Trương Hàm Hương** - 22719241
+- **Trần Thị Huyền** - 22657821
+- **Phạm Thanh Thảo** - 22695701
 
 ## Công nghệ sử dụng
-- **Python** (Flask Framework)
-- **HTML, CSS, JavaScript** (Giao diện người dùng)
-- **SQLite** (Cơ sở dữ liệu)
-- **Bootstrap, CSS** (Thiết kế giao diện)
-- **Jinja2** (Template Engine)
-- **JWT Authentication** (Bảo mật đăng nhập)
+
+- **Backend**: Python (Flask Framework)
+- **Frontend**: HTML, CSS, JavaScript
+- **Cơ sở dữ liệu**: SQLite
+- **Thiết kế giao diện**: Bootstrap, CSS
+- **Template Engine**: Jinja2
 
 ## Chức năng chính
-### Người dùng
-- Đăng ký, đăng nhập, đăng xuất, quên mật khẩu
-- Cập nhật thông tin cá nhân
-- Tạo, chỉnh sửa, xóa, tìm kiếm và chia sẻ bản tóm tắt bài giảng
-- Đánh giá và bình luận trên các bản tóm tắt bài giảng
-- Sao chép bản tóm tắt để sử dụng cho mục đích cá nhân
 
-### Quản trị viên
-- Quản lý người dùng (xem danh sách, khóa/mở khóa tài khoản, đặt lại mật khẩu)
-- Quản lý nội dung (xem xét, phê duyệt, yêu cầu chỉnh sửa, xóa nội dung không phù hợp)
-- Giám sát và theo dõi lượng truy cập, xuất báo cáo thống kê
+### Dành cho người dùng
+- Đăng ký, đăng nhập và khôi phục mật khẩu.
+- Cập nhật thông tin cá nhân.
+- Tạo, chỉnh sửa, xóa, tìm kiếm và chia sẻ các bản tóm tắt bài giảng.
+- Đánh giá và bình luận trên các bản tóm tắt.
+- Sao chép nội dung các bản tóm tắt bài giảng.
 
-## Cấu trúc chính của thư mục dự án
-```
-Lecture-Review/
-│── website/
-│   ├── static/ (Chứa file CSS, JS, hình ảnh)
-│   ├── templates/ (Chứa các file HTML)
-│   │   ├── admin/ (Chứa các file HTML của giao diện admin)
-│   ├── __init__.py (Khởi tạo website)
-│   ├── config.py (Cấu hình hệ thống)
-│   ├── views.py (Xử lý giao diện người dùng)
-│   ├── auth.py (Xử lý các xác thực)
-│   ├── admin.py (Xử lý giao diện admin)
-│   ├── api.py (Xử lý các API)
-│   ├── models.py (Định nghĩa mô hình dữ liệu)
-│── .env (Các biến môi trường của hệ thống)
-│── main.py (Chạy ứng dụng Flask)
-│── requirements.txt (Danh sách thư viện cần cài đặt)
-│── README.md (Tài liệu hướng dẫn sử dụng)
-```
+### Dành cho quản trị viên
+- Quản lý người dùng: Khóa/mở khóa tài khoản, đặt lại mật khẩu.
+- Quản lý nội dung: Phê duyệt, yêu cầu chỉnh sửa hoặc xóa nội dung không phù hợp.
+- Theo dõi thống kê lượng truy cập.
 
-## Cài đặt và chạy ứng dụng
-### 1. Tải hệ thống
+## Hướng dẫn cài đặt và chạy ứng dụng
+
+### 1. Tải mã nguồn
 ```bash
-git clone <url>
+git clone https://github.com/iuh-application-development/Lecture-Review.git
 cd Lecture-Review
 ```
 
-### 2. Cài đặt môi trường ảo (khuyến nghị)
+### 2. Thiết lập môi trường ảo (khuyến nghị)
 ```bash
 python -m venv venv
-source venv/bin/activate  # Trên macOS/Linux
-venv\Scripts\activate  # Trên Windows
+# Trên macOS/Linux:
+source venv/bin/activate
+# Trên Windows:
+venv\Scripts\activate
 ```
 
-### 3. Cài đặt các thư viện cần thiết
+### 3. Cài đặt các thư viện phụ thuộc
 ```bash
-python -m pip install --upgrade pip  # Nâng cấp phiên bản mới nhất của pip
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
@@ -74,11 +60,38 @@ pip install -r requirements.txt
 ```bash
 python main.py
 ```
-Ứng dụng sẽ chạy trên `http://127.0.0.1:5000/`
+Ứng dụng sẽ chạy tại: [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 
-## Môi trường cấu hình
-- `.env` file chứa các biến môi trường:
+## Cấu trúc thư mục chính
+
+```plaintext
+Lecture-Review/
+│── website/
+│   ├── static/        # Tệp tĩnh (CSS, JS, hình ảnh)
+│   │   ├── css/       # Tệp CSS
+│   │   ├── images/    # Hình ảnh
+│   │   └── js/        # Tệp JavaScript
+│   ├── templates/     # Tệp HTML
+│   │   ├── admin/     # Giao diện quản trị viên
+│   ├── utils/         # Tiện ích bổ sung (ví dụ: chuyển đổi PDF)
+│   ├── __init__.py    # Khởi tạo ứng dụng Flask
+│   ├── config.py      # Cấu hình hệ thống
+│   ├── views.py       # Xử lý giao diện người dùng
+│   ├── auth.py        # Xử lý xác thực
+│   ├── admin.py       # Xử lý giao diện quản trị viên
+│   ├── api.py         # API
+│   ├── models.py      # Định nghĩa cơ sở dữ liệu
+│   ├── mailer.py      # Xử lý gửi email
+│── .env               # Biến môi trường
+│── main.py            # Tệp chính để chạy ứng dụng
+│── requirements.txt   # Danh sách thư viện cần thiết
+│── README.md          # Tài liệu hướng dẫn dự án
 ```
+
+## Cấu hình môi trường
+
+Tạo file `.env` trong thư mục gốc và thêm các biến sau:
+```plaintext
 FLASK_APP=main.py
 FLASK_ENV=development
 SECRET_KEY=your_secret_key
@@ -91,6 +104,11 @@ MAIL_USERNAME=your_email@example.com
 MAIL_PASSWORD=your_email_password
 ```
 
-## Ghi chú
-- Đảm bảo đã cài đặt **Python 3.8+**
-- Nếu sử dụng **PostgreSQL**, cần cập nhật `DATABASE_URL` trong file `.env`
+## Ghi chú quan trọng
+
+- Yêu cầu Python phiên bản **3.8+**.
+- Nếu sử dụng PostgreSQL, cập nhật `DATABASE_URL` trong file `.env`.
+
+---
+
+Hãy bắt đầu sử dụng Lecture-Review để tối ưu hóa việc học tập của bạn ngay hôm nay!
