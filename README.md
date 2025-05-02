@@ -26,7 +26,7 @@ Lecture-Review là một nền tảng trực tuyến giúp người dùng dễ d
 - Cập nhật thông tin cá nhân.
 - Tạo, chỉnh sửa, xóa, tìm kiếm và chia sẻ các bản tóm tắt bài giảng.
 - Đánh giá và bình luận trên các bản tóm tắt.
-- Sao chép nội dung các bản tóm tắt bài giảng.
+- Xuất bản tóm tắt dưới dạng PDF.
 
 ### Dành cho quản trị viên
 - Quản lý người dùng: Khóa/mở khóa tài khoản, đặt lại mật khẩu.

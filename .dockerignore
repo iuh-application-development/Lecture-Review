@@ -1,0 +1,8 @@
+instance/
+venv/
+*pyc
+.git
+.gitignore
+README.md
+SRS.pdf
+Dockerfile

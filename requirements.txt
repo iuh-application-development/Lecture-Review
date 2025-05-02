@@ -9,3 +9,4 @@ pytz
 weasyprint
 matplotlib
 pyotp
+gunicorn
