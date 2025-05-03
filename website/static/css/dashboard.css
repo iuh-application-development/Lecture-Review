@@ -93,6 +93,7 @@ h4 {
     cursor: pointer;
     position: relative;
     z-index: 1;
+    overflow: visible !important;
 }
 
 .note-header strong em {
@@ -223,11 +224,49 @@ h4 {
 }
 
 .create-note-btn {
-    color: #007bff;
-    font-weight: bold;
+    background: linear-gradient(135deg, #232526 0%, #414345 100%);
+    color: #fff !important;
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 4px 24px rgba(44, 62, 80, 0.18), 0 1.5px 6px rgba(0,0,0,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    z-index: 2000;
+    transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+}
+.create-note-btn:hover, .create-note-btn:focus {
+    background: linear-gradient(135deg, #393939 0%, #232526 100%);
+    box-shadow: 0 8px 32px rgba(44, 62, 80, 0.28), 0 2px 8px rgba(0,0,0,0.22);
+    transform: scale(1.08);
+    color: #fff;
+}
+.create-note-btn i {
+    font-size: 2rem;
+    line-height: 1;
+    margin: 0;
+}
+@media (max-width: 900px) {
+    .create-note-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 1.3rem;
+        right: auto;
+        left: 50%;
+        bottom: 16px;
+        transform: translateX(-50%);
+    }
+    .create-note-btn i {
+        font-size: 1.5rem;
+    }
 }
 
-/*Định dạng bộ chọn màu*/
 .color-pick {
     width: 20px;
     height: 20px;
@@ -235,7 +274,7 @@ h4 {
     cursor: pointer;
     border: 2px solid #efe6e6;
 }
-/*Định dạng ô nhập liệu*/
+
 .form-control {
     border:  1px solid #ddd;
     border-radius: 5px;
@@ -245,13 +284,11 @@ h4 {
     border-color: #007bff;
     box-shadow: none;
 }
-/*Định dạng nhãn*/
 .form-label {
     font-size: 14px;
     color: #333;
     margin-bottom: 5px;
 }
-/*Định dạng nút*/
 .btn-primary {
     background-color: #007bff;
     border: none;
@@ -276,7 +313,6 @@ h4 {
     -webkit-box-orient: vertical;
 }
 
-/* Thêm hiệu ứng khi hover */
 .note-card::after {
     content: 'Click to view detail';
     position: absolute;
@@ -291,17 +327,25 @@ h4 {
     opacity: 0.7;
 }
 
-/* Đảm bảo dropdown không bị ảnh hưởng bởi hover effect */
 .dropdown {
     position: relative;
     z-index: 2;
 }
 
 .dropdown-menu {
-    z-index: 1000;
+    z-index: 1050 !important;
+    position: absolute !important;
+    min-width: 160px;
+    right: 0;
+    left: auto;
+    top: 100%;
+    margin-top: 0.25rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    overflow: hidden;
+    padding: 0.3rem 0;
 }
 
-/* Thêm visual feedback khi click */
 .note-card:active {
     transform: translateY(0);
     transition: transform 0.1s;
@@ -312,14 +356,12 @@ h4 {
     z-index: 10;
 }
 
-
 .dashboard-note-container {
-    display: flex; /* Biến container thành flex container */
+    display: flex; 
     align-items: center;
     gap: 20px;
 }
 
-/* Nút điều hướng arrow */
 .dashboard-arrow-redirect {
     width: 45px;
     height: 45px;
@@ -333,25 +375,23 @@ h4 {
     transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    margin: auto 0; /* Khoảng cách giữa các notes */
+    margin: auto 0; 
 }
 
 .dashboard-arrow-redirect i {
     font-size: 22px;
 }
 
-/* Hiệu ứng hover cho nút arrow */
 .dashboard-arrow-redirect:hover {
     background-color: #34495e;
     transform: scale(1.1);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Tooltip cho nút arrow */
 .dashboard-arrow-tooltip {
     position: absolute;
     top: 50%;
-    left: 60px; /* Đặt tooltip bên phải nút arrow */
+    left: 60px; 
     transform: translateY(-50%);
     background-color: #2c3e50;
     color: white;
@@ -364,17 +404,15 @@ h4 {
     transition: all 0.3s ease;
 }
 
-/* Hiển thị tooltip khi hover */
 .dashboard-arrow-redirect:hover .dashboard-arrow-tooltip {
     opacity: 1;
     visibility: visible;
 }
 
-/* Thêm mũi tên nhỏ cho tooltip */
 .dashboard-arrow-tooltip::before {
     content: '';
     position: absolute;
-    left: -6px; /* Đặt mũi tên bên trái tooltip */
+    left: -6px;
     top: 50%;
     transform: translateY(-50%);
     border-width: 6px 6px 6px 0;
@@ -382,7 +420,6 @@ h4 {
     border-color: transparent #2c3e50 transparent transparent;
 }
 
-/* Animation xuất hiện */
 @keyframes arrowAppear {
     from {
         opacity: 0;
@@ -394,17 +431,15 @@ h4 {
     }
 }
 
-/* Class để trigger animation */
 .dashboard-arrow-redirect.show {
     animation: arrowAppear 0.5s ease forwards;
 }
 
-/* Media queries cho responsive */
 @media (max-width: 768px) {
     .dashboard-arrow-redirect {
         width: 40px;
         height: 40px;
-        right: 90px;      /* Điều chỉnh khoảng cách trên mobile */
+        right: 90px;
         bottom: 25px;
     }
 
@@ -413,22 +448,17 @@ h4 {
     }
 }
 
-/* Chỉ áp dụng cho container trong dashboard */
 .dashboard-container .dashboard-note-container {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-
-
-/* Ẩn các class arrow-redirect trong all-my-notes */
 .all-notes-container .arrow-redirect,
 .all-notes-container .note-container {
     display: none !important;
 }
 
-/* Notification System Styles */
 .notification-badge {
     font-size: 0.65rem;
     padding: 0.2rem 0.4rem;
@@ -477,7 +507,6 @@ h4 {
     background: #555;
 }
 
-/* User Dropdown Styles */
 .dropdown-menu {
     border: none;
     border-radius: 8px;
@@ -485,15 +514,20 @@ h4 {
 }
 
 .dropdown-item {
-    padding: 8px 16px;
-    font-size: 14px;
-    color: #333;
-    transition: all 0.2s ease;
+    border-radius: 8px;
+    margin: 0 6px;
+    transition: background 0.18s, color 0.18s;
+    padding: 0.6rem 1.2rem;
 }
 
-.dropdown-item:hover {
-    background-color: #f8f9fa;
+.dropdown-item:hover, .dropdown-item:focus {
+    background: #f3f4f6;
     color: #0d6efd;
+}
+
+.dropdown-item.text-danger:hover, .dropdown-item.text-danger:focus {
+    background: #fff5f5;
+    color: #dc3545;
 }
 
 .dropdown-item i {
@@ -512,7 +546,6 @@ h4 {
     color: #dc3545;
 }
 
-/* User Avatar Styles */
 .user-avatar {
     position: relative;
     display: inline-block;
@@ -545,7 +578,6 @@ h4 {
     background-color: #ffc107;
 }
 
-/* Mobile Responsive Styles */
 @media (max-width: 768px) {
     .sidebar {
         position: fixed;
@@ -564,7 +596,6 @@ h4 {
     }
 }
 
-/* Hover and Transition Effects */
 .nav-link {
     transition: all 0.3s ease;
     border-radius: 6px;
@@ -593,8 +624,10 @@ h4 {
     transition: all 0.2s ease;
 }
 
-.btn-link:hover {
-    transform: scale(1.1);
+.btn-link:hover, .btn-link:focus {
+    color: #0d47a1;
+    background: transparent;
+    text-decoration: underline;
 }
 
 .notification-menu .dropdown-item {
@@ -641,7 +674,6 @@ h4 {
     color: white;
 }
 
-/* Sidebar Toggle Button Styles */
 #sidebarToggle {
     background: none;
     border: none;
@@ -668,4 +700,104 @@ h4 {
 
 #sidebarToggle:hover i {
     transform: rotate(90deg);
+}
+
+.content {
+    height: 100vh;
+    overflow-y: auto;
+    max-width: 100vw;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0;
+    background: transparent;
+}
+
+.notes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem;
+    width: 100%;
+    padding-right: 0;
+}
+@media (max-width: 900px) {
+    .notes-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.notes-grid .note-card {
+    width: 100%;
+    min-width: unset;
+    max-width: unset;
+    margin: 0;
+}
+
+.notes-end-message {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.create-note-btn-rect, .btn-link {
+    font-size: 1.08rem;
+    line-height: 1.5;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+}
+.create-note-btn-rect {
+    background: #e0e3e8;
+    color: #232526 !important;
+    border: 1.5px solid #bfc2c7;
+    border-radius: 10px;
+    font-weight: 500;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.08);
+    transition: background 0.18s, box-shadow 0.18s, color 0.18s, border 0.18s, transform 0.18s;
+    gap: 0.5rem;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+}
+.create-note-btn-rect:hover, .create-note-btn-rect:focus {
+    background: #cfd4db;
+    color: #232526;
+    border: 1.5px solid #a6aab2;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.13);
+    transform: translateY(-2px) scale(1.04);
+    text-decoration: none;
+}
+.create-note-btn-rect i {
+    font-size: 1.2rem;
+    margin: 0;
+    color: #232526 !important;
+    vertical-align: middle;
+}
+.btn-link {
+    font-weight: 500;
+    color: #1976d2;
+    text-decoration: none;
+    transition: color 0.18s, background 0.18s;
+    border-radius: 8px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+.btn-link:hover, .btn-link:focus {
+    color: #0d47a1;
+    background: transparent;
+    text-decoration: underline;
+}
+@media (max-width: 600px) {
+    .create-note-btn-rect {
+        padding: 0.5rem 0.7rem;
+        font-size: 1rem;
+    }
+    .create-note-btn-rect span {
+        display: none !important;
+    }
+    .btn-link {
+        padding-left: 0.7rem;
+        padding-right: 0.7rem;
+        font-size: 1rem;
+    }
 }

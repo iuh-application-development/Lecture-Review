@@ -329,17 +329,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const isDashboard = container.classList.contains('dashboard-container');
     async function fetchNotes() {
         try {
-            const limit = container.getAttribute('data-limit') ? parseInt(container.getAttribute('data-limit')) : 9;
+            const limit = container.getAttribute('data-limit') ? parseInt(container.getAttribute('data-limit')) : 10;
             const response = await fetch(`/api/notes?limit=${limit}`);
             const result = await response.json();
             const notes = result.data || [];
 
             container.innerHTML = '';
-
-            const existingArrow = document.querySelector('.dashboard-arrow-redirect');
-            if (existingArrow) {
-                existingArrow.remove();
-            }
 
             if (notes.length === 0) {
                 container.innerHTML = `
@@ -355,23 +350,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 container.appendChild(noteCard);
             });
 
-            if (isDashboard && notes.length === 9) {
-                const arrowButton = document.createElement('div');
-                arrowButton.className = 'dashboard-arrow-redirect';
-                arrowButton.innerHTML = `
-                    <i class="bi bi-arrow-right"></i>
-                    <div class="dashboard-arrow-tooltip">Xem tất cả ghi chú</div>
-                `;
-
-                arrowButton.onclick = (e) => {
-                    e.preventDefault();
-                    arrowButton.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        window.location.href = '/all-my-notes';
-                    }, 150);
-                };
-
-                container.appendChild(arrowButton);
+            // Thêm thông điệp nếu đã đủ limit
+            if (notes.length === limit) {
+                const endMsg = document.createElement('div');
+                endMsg.className = 'notes-end-message d-flex justify-content-center text-center w-100 text-muted py-2';
+                endMsg.style.fontSize = '0.98rem';
+                endMsg.innerHTML = '<span><i class="bi bi-info-circle me-1"></i>Bạn đã xem hết các ghi chú gần đây. <a href="/all-my-notes" class="fw-semibold">Xem tất cả để xem thêm!</a></span>';
+                container.appendChild(endMsg);
             }
         } catch (error) {
             console.error('Error fetching notes:', error);
@@ -388,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const iSharedDashboard = sharedContainer.classList.contains('dashboard-shared-container');
     async function fetchSharedNotes() {
         try {
-            const limit = sharedContainer.getAttribute('data-limit') ? parseInt(sharedContainer.getAttribute('data-limit')) : 9;
+            const limit = sharedContainer.getAttribute('data-limit') ? parseInt(sharedContainer.getAttribute('data-limit')) : 10;
             const byMe = sharedContainer.getAttribute('data-by-me') ? parseInt(sharedContainer.getAttribute('data-by-me')) : 0;
             const response = await fetch(`/api/shared-notes?limit=${limit}&byMe=${byMe}`);
             const result = await response.json();
@@ -397,11 +382,6 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log(result);
 
             sharedContainer.innerHTML = '';
-
-            const existingArrow = document.querySelector('dashboard-shared-arrow-redirect');
-            if (existingArrow) {
-                existingArrow.remove();
-            }
 
             if (notes.length === 0) {
                 sharedContainer.innerHTML = `
@@ -417,23 +397,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 sharedContainer.appendChild(noteCard);
             });
 
-            if (iSharedDashboard && notes.length === 9) {
-                const arrowButton = document.createElement('div');
-                arrowButton.className = 'dashboard-shared-arrow-redirect';
-                arrowButton.innerHTML = `
-                    <i class="bi bi-arrow-right"></i>
-                    <div class="dashboard-arrow-tooltip">Xem tất cả ghi chú đã chia sẽ với bạn</div>
-                `;
-
-                arrowButton.onclick = (e) => {
-                    e.preventDefault();
-                    arrowButton.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        window.location.href = '/share-with-me';
-                    }, 150);
-                };
-
-                sharedContainer.appendChild(arrowButton);
+            // Thêm thông điệp nếu đã đủ limit
+            if (notes.length === limit) {
+                const endMsg = document.createElement('div');
+                endMsg.className = 'notes-end-message d-flex justify-content-center text-center w-100 text-muted py-2';
+                endMsg.style.fontSize = '0.98rem';
+                endMsg.innerHTML = '<span><i class="bi bi-info-circle me-1"></i>Bạn đã xem hết các ghi chú được chia sẻ gần đây. <a href="/share-with-me" class="fw-semibold">Xem tất cả để xem thêm!</a></span>';
+                sharedContainer.appendChild(endMsg);
             }
         } catch (error) {
             console.error('Error fetching notes:', error);
