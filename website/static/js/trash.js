@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById('myNotesContainer');
     const colorFilter = document.getElementById('colorFilter');
     const dateFilter = document.getElementById('dateFilter');
+    const paginationContainer = document.querySelector('.pagination-container');
+    const currentPageInfo = document.getElementById('currentPageInfo');
+    const totalPagesInfo = document.getElementById('totalPagesInfo');
     let currentPage = 1;
 
     function createNoteCard(note) {
@@ -131,11 +134,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p>No notes found.</p>
                     </div>
                 `;
+                paginationContainer.style.display = 'none';
             } else {
                 data.notes.forEach(note => {
                     container.appendChild(createNoteCard(note));
                 });
+                paginationContainer.style.display = 'block';
             }
+
+            // Cập nhật thông tin trang
+            currentPageInfo.textContent = data.page;
+            totalPagesInfo.textContent = data.total_pages;
 
             // Cập nhật phân trang
             updatePagination(data.page, data.total_pages);
@@ -144,6 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error:', error);
             container.innerHTML = '<div class="alert alert-danger">Error loading notes</div>';
+            paginationContainer.style.display = 'none';
         }
     }
 
