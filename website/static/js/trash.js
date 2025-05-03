@@ -139,7 +139,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 data.notes.forEach(note => {
                     container.appendChild(createNoteCard(note));
                 });
-                paginationContainer.style.display = 'block';
+                // Chỉ hiển thị pagination khi có nhiều hơn 1 trang
+                paginationContainer.style.display = data.total_pages > 1 ? 'block' : 'none';
             }
 
             // Cập nhật thông tin trang
@@ -178,8 +179,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         pagination.appendChild(prevLi);
 
+        // Logic hiển thị số trang
+        const maxVisiblePages = 5; // Số trang tối đa hiển thị
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        // Điều chỉnh startPage nếu endPage đã đạt giới hạn
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // Thêm nút First Page nếu không ở trang đầu
+        if (startPage > 1) {
+            const firstLi = document.createElement('li');
+            firstLi.className = 'page-item';
+            firstLi.innerHTML = '<a class="page-link" href="#">1</a>';
+            firstLi.onclick = (e) => {
+                e.preventDefault();
+                fetchPagedNotes(1);
+            };
+            pagination.appendChild(firstLi);
+
+            // Thêm dấu ... nếu có khoảng trống
+            if (startPage > 2) {
+                const ellipsisLi = document.createElement('li');
+                ellipsisLi.className = 'page-item disabled';
+                ellipsisLi.innerHTML = '<span class="page-link">...</span>';
+                pagination.appendChild(ellipsisLi);
+            }
+        }
+
         // Các số trang
-        for (let i = 1; i <= totalPages; i++) {
+        for (let i = startPage; i <= endPage; i++) {
             const li = document.createElement('li');
             li.className = `page-item ${i === currentPage ? 'active' : ''}`;
             li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
@@ -188,6 +219,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 fetchPagedNotes(i);
             };
             pagination.appendChild(li);
+        }
+
+        // Thêm nút Last Page nếu không ở trang cuối
+        if (endPage < totalPages) {
+            // Thêm dấu ... nếu có khoảng trống
+            if (endPage < totalPages - 1) {
+                const ellipsisLi = document.createElement('li');
+                ellipsisLi.className = 'page-item disabled';
+                ellipsisLi.innerHTML = '<span class="page-link">...</span>';
+                pagination.appendChild(ellipsisLi);
+            }
+
+            const lastLi = document.createElement('li');
+            lastLi.className = 'page-item';
+            lastLi.innerHTML = `<a class="page-link" href="#">${totalPages}</a>`;
+            lastLi.onclick = (e) => {
+                e.preventDefault();
+                fetchPagedNotes(totalPages);
+            };
+            pagination.appendChild(lastLi);
         }
 
         // Nút Next
