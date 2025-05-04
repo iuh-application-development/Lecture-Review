@@ -340,15 +340,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const noteCard = createNoteCard(note);
                 container.appendChild(noteCard);
             });
-
-            // Thêm thông điệp nếu đã đủ limit
-            if (notes.length === limit) {
-                const endMsg = document.createElement('div');
-                endMsg.className = 'notes-end-message d-flex justify-content-center text-center w-100 text-muted py-2';
-                endMsg.style.fontSize = '0.98rem';
-                endMsg.innerHTML = '<span><i class="bi bi-info-circle me-1"></i>Bạn đã xem hết các ghi chú gần đây. <a href="/all-my-notes" class="fw-semibold">Xem tất cả để xem thêm!</a></span>';
-                container.appendChild(endMsg);
-            }
         } catch (error) {
             console.error('Error fetching notes:', error);
             container.innerHTML = `
@@ -387,15 +378,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const noteCard = createSharedNoteCard(note);
                 sharedContainer.appendChild(noteCard);
             });
-
-            // Thêm thông điệp nếu đã đủ limit
-            if (notes.length === limit) {
-                const endMsg = document.createElement('div');
-                endMsg.className = 'notes-end-message d-flex justify-content-center text-center w-100 text-muted py-2';
-                endMsg.style.fontSize = '0.98rem';
-                endMsg.innerHTML = '<span><i class="bi bi-info-circle me-1"></i>Bạn đã xem hết các ghi chú được chia sẻ gần đây. <a href="/share-with-me" class="fw-semibold">Xem tất cả để xem thêm!</a></span>';
-                sharedContainer.appendChild(endMsg);
-            }
         } catch (error) {
             console.error('Error fetching notes:', error);
             sharedContainer.innerHTML = `
