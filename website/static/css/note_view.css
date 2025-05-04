@@ -59,26 +59,50 @@
 }
 
 .tags-container .tag {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     padding: 2px 8px;
     border-radius: 12px;
     background: #e9ecef;
     margin: 2px;
     font-size: .85rem;
+    cursor: pointer;
+    max-width: 200px;
+    overflow: hidden;
+}
+
+.tags-container .tag .tag-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
 }
 
 .tags-container .tag .remove-tag {
     margin-left: 4px;
     cursor: pointer;
+    opacity: 0.6;
+    flex-shrink: 0;
 }
-  
+
+.tags-container .tag .remove-tag:hover {
+    opacity: 1;
+}
+
 .color-option {
-    width: 24px; height: 24px;
+    width: 24px; 
+    height: 24px;
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid transparent;
+    transition: transform 0.2s ease;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
 }
 
 .color-option.selected {
     border-color: #000;
+    transform: scale(1.1);
 }

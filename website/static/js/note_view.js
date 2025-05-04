@@ -83,7 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderTags() {
         if (!tagsContainer) return;
         tagsContainer.innerHTML = tags.map(tag =>
-            `<span class="tag">${tag}
+            `<span class="tag">
+                <span class="tag-text">${tag}</span>
                 <i class="remove-tag bi bi-x-circle-fill" data-tag="${tag}"></i>
             </span>`
         ).join('');
