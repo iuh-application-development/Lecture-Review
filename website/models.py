@@ -62,7 +62,7 @@ class Comment (db.Model):
     content       = db.Column(db.Text, nullable=False)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
     
-    note          = db.relationship('Note', backref=db.backref('comments', lazy=True))
+    note          = db.relationship('Note', backref=db.backref('comments', lazy=True, cascade='all, delete'))
     user          = db.relationship('User', backref=db.backref('comments', lazy=True))
 
     def __repr__(self):
