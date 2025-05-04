@@ -106,3 +106,89 @@
     border-color: #000;
     transform: scale(1.1);
 }
+
+/* New styles for editor and comments layout */
+.note-main-content {
+    display: flex;
+    flex: 1;
+}
+
+.editor-comments-container {
+    display: flex;
+    flex: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 20px;
+}
+
+.editor-section {
+    flex: 1;
+    max-width: 800px;
+}
+
+.comments-section {
+    width: 300px;
+    background: #fff;
+    border-left: 1px solid #ddd;
+    padding: 20px;
+    overflow-y: auto;
+    height: calc(100vh - 100px); /* Adjust based on your header/footer height */
+}
+
+.comments-section h4 {
+    margin-bottom: 20px;
+}
+
+.comment {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    word-wrap: break-word; /* Ensure long words break */
+    overflow-wrap: break-word; /* Modern equivalent of word-wrap */
+}
+
+.comment p {
+    margin: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Optional: truncate very long single lines */
+    word-break: break-word; /* Break long words */
+}
+
+.comment .d-flex {
+    flex-wrap: wrap; /* Allow wrapping of user name and timestamp */
+}
+
+.comment strong,
+.comment small {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; /* Prevent wrapping of user name and timestamp */
+}
+
+#commentContent {
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical; /* Allow vertical resizing only */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+@media (max-width: 992px) {
+    .editor-comments-container {
+        flex-direction: column;
+    }
+
+    .comments-section {
+        width: 100%;
+        height: auto;
+        border-left: none;
+        border-top: 1px solid #ddd;
+    }
+
+    .comment {
+        max-width: 100%;
+    }
+}

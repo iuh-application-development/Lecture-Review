@@ -168,6 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await resp.json();
             if (data.note_id) {
                 window.location.href = `/edit-note/${data.note_id}`;
+            } else {
+                window.location.reload();
             }
             console.log('Saved successfully');
         } catch (err) {
