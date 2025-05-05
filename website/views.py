@@ -1,8 +1,11 @@
-from flask import Blueprint, render_template, flash, redirect, url_for
+from flask import Blueprint, render_template, flash, redirect, url_for, request, current_app
 from flask_login import current_user, login_required
+from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 from .models import Note, ShareNote, User
 from datetime import datetime
 from . import db
+import os
 
 views = Blueprint('views', __name__)
 
@@ -83,3 +86,49 @@ def edit_note(note_id):
 @login_required
 def notifications():
     return render_template('notifications.html', user=current_user)
+@views.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html', user=current_user)
+
+@views.route('/update-avatar', methods=['POST'])
+@login_required
+def update_avatar():
+    if 'avatar' not in request.files:
+        flash('No image file found.', 'error')
+        return redirect(url_for('views.profile'))
+
+    file = request.files['avatar']
+    if file.filename == '':
+        flash('You have not selected an image.', 'error')
+        return redirect(url_for('views.profile'))
+
+    filename = secure_filename(file.filename)
+
+    upload_folder = os.path.join('website', 'static', 'images', 'uploads')
+    os.makedirs(upload_folder, exist_ok=True)
+
+    upload_path = os.path.join(upload_folder, filename)
+    file.save(upload_path)
+
+    current_user.avatar_url = f'/static/images/uploads/{filename}'
+    db.session.commit()
+
+    flash('Avatar updated successfully!', 'success')
+    return redirect(url_for('views.profile'))
+
+
+@views.route('/change-password', methods=['POST'])
+@login_required
+def change_password():
+    current_password = request.form.get('current_password')
+    new_password = request.form.get('new_password')
+
+    if not check_password_hash(current_user.password_hash, current_password):
+        flash('Incorrect current password.', 'error')
+        return redirect(url_for('views.profile'))
+
+    current_user.password_hash = generate_password_hash(new_password)
+    db.session.commit()
+    flash('Password changed successfully!', 'success')
+    return redirect(url_for('views.profile'))
