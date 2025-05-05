@@ -4,8 +4,8 @@
     <div class="row">
         <!-- Avatar Section -->
         <div class="col-md-4 text-center">
-            <img src="{{ user.avatar_url }}" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-            <form method="POST" action="/update-avatar" enctype="multipart/form-data">
+            <img src="{{ url_for('static', filename=user.avatar_url) }}" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+            <form method="POST" action="/api/update-avatar" enctype="multipart/form-data">
                 <input type="file" name="avatar" accept="image/*" class="form-control mb-2">
                 <button class="btn btn-primary" type="submit">Update Avatar</button>
             </form>

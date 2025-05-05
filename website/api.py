@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, g, make_response, render_template
+from flask import Blueprint, jsonify, request, g, make_response, render_template, flash, redirect, url_for
 from flask_login import current_user, login_required
 from .models import User, Note, ShareNote, Comment, UserWarning, UserNotification, db
 from .utils.convert_note_to_pdf import *
@@ -9,6 +9,8 @@ from weasyprint import HTML
 from markupsafe import Markup
 import html
 from sqlalchemy.sql.expression import or_
+from werkzeug.utils import secure_filename
+import os
 
 
 api = Blueprint('api', __name__)
@@ -635,6 +637,32 @@ def mark_all_notifications_read():
             'status': 'error',
             'message': 'Error updating notifications'
         }), 500
+
+@api.route('/update-avatar', methods=['POST'])
+@login_required
+def update_avatar():
+    if 'avatar' not in request.files:
+        flash('No image file found.', 'error')
+        return redirect(url_for('views.profile'))
+
+    file = request.files['avatar']
+    if file.filename == '':
+        flash('You have not selected an image.', 'error')
+        return redirect(url_for('views.profile'))
+
+    filename = secure_filename(file.filename)
+
+    upload_folder = os.path.join('website', 'static', 'images', 'uploads')
+    os.makedirs(upload_folder, exist_ok=True)
+
+    upload_path = os.path.join(upload_folder, filename)
+    file.save(upload_path)
+
+    current_user.avatar_url = f'images/uploads/{filename}'
+    db.session.commit()
+
+    flash('Avatar updated successfully!', 'success')
+    return redirect(url_for('views.profile'))
 
 ### Standardize API responses and Handle Error ###
 @api.before_request

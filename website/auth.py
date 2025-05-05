@@ -62,3 +62,18 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('views.home'))
+
+@auth.route('/change-password', methods=['POST'])
+@login_required
+def change_password():
+    current_password = request.form.get('current_password')
+    new_password = request.form.get('new_password')
+
+    if not check_password_hash(current_user.password_hash, current_password):
+        flash('Incorrect current password.', 'danger')
+        return redirect(url_for('views.profile'))
+
+    current_user.password_hash = generate_password_hash(new_password)
+    db.session.commit()
+    flash('Password changed successfully!', 'success')
+    return redirect(url_for('views.profile'))

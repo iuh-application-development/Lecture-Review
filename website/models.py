@@ -13,7 +13,7 @@ class User(db.Model, UserMixin):
     status        = db.Column(db.String(20), default='Active') # ['Active', 'Locked', 'Inactive']
     gender        = db.Column(db.String(10), nullable=False)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
-    avatar_url = db.Column(db.String(300), nullable=True, default='/static/images/default-avatar.jpg')
+    avatar_url = db.Column(db.String(300), nullable=True, default='images/uploads/default-avatar.jpg')
 
     def __repr__(self):
         return f'<User {self.email!r}>'
