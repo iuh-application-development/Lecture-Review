@@ -268,8 +268,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                 title.slice(0, MAX_TITILE_LEN) + '...' :
                                 title;
 
-        const message = share_note.message;
-
         const updatedStr = convertDatetime(share_note.updated_at);
         const sharedStr = convertDatetime(share_note.share_at);
 
@@ -297,13 +295,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     <strong class="d-inline-block"><em>${truncatedTitle}</em></strong>
                 </div>
                 <div class="card-separator"></div>
-                
-                ${message ? `
-                    <div class="alert alert-info p-2 mb-2" role="alert" style="font-size: 13px;"> 
-                        💌 ${message}
-                    </div>
-                    ` : ''}
-
                 </div>
                 <div class="mt-2">
                     ${tagsHtml}
@@ -329,17 +320,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const isDashboard = container.classList.contains('dashboard-container');
     async function fetchNotes() {
         try {
-            const limit = container.getAttribute('data-limit') ? parseInt(container.getAttribute('data-limit')) : 9;
+            const limit = container.getAttribute('data-limit') ? parseInt(container.getAttribute('data-limit')) : 10;
             const response = await fetch(`/api/notes?limit=${limit}`);
             const result = await response.json();
             const notes = result.data || [];
 
             container.innerHTML = '';
-
-            const existingArrow = document.querySelector('.dashboard-arrow-redirect');
-            if (existingArrow) {
-                existingArrow.remove();
-            }
 
             if (notes.length === 0) {
                 container.innerHTML = `
@@ -354,25 +340,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const noteCard = createNoteCard(note);
                 container.appendChild(noteCard);
             });
-
-            if (isDashboard && notes.length === 9) {
-                const arrowButton = document.createElement('div');
-                arrowButton.className = 'dashboard-arrow-redirect';
-                arrowButton.innerHTML = `
-                    <i class="bi bi-arrow-right"></i>
-                    <div class="dashboard-arrow-tooltip">Xem tất cả ghi chú</div>
-                `;
-
-                arrowButton.onclick = (e) => {
-                    e.preventDefault();
-                    arrowButton.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        window.location.href = '/all-my-notes';
-                    }, 150);
-                };
-
-                container.appendChild(arrowButton);
-            }
         } catch (error) {
             console.error('Error fetching notes:', error);
             container.innerHTML = `
@@ -388,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const iSharedDashboard = sharedContainer.classList.contains('dashboard-shared-container');
     async function fetchSharedNotes() {
         try {
-            const limit = sharedContainer.getAttribute('data-limit') ? parseInt(sharedContainer.getAttribute('data-limit')) : 9;
+            const limit = sharedContainer.getAttribute('data-limit') ? parseInt(sharedContainer.getAttribute('data-limit')) : 10;
             const byMe = sharedContainer.getAttribute('data-by-me') ? parseInt(sharedContainer.getAttribute('data-by-me')) : 0;
             const response = await fetch(`/api/shared-notes?limit=${limit}&byMe=${byMe}`);
             const result = await response.json();
@@ -397,11 +364,6 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log(result);
 
             sharedContainer.innerHTML = '';
-
-            const existingArrow = document.querySelector('dashboard-shared-arrow-redirect');
-            if (existingArrow) {
-                existingArrow.remove();
-            }
 
             if (notes.length === 0) {
                 sharedContainer.innerHTML = `
@@ -416,25 +378,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const noteCard = createSharedNoteCard(note);
                 sharedContainer.appendChild(noteCard);
             });
-
-            if (iSharedDashboard && notes.length === 9) {
-                const arrowButton = document.createElement('div');
-                arrowButton.className = 'dashboard-shared-arrow-redirect';
-                arrowButton.innerHTML = `
-                    <i class="bi bi-arrow-right"></i>
-                    <div class="dashboard-arrow-tooltip">Xem tất cả ghi chú đã chia sẽ với bạn</div>
-                `;
-
-                arrowButton.onclick = (e) => {
-                    e.preventDefault();
-                    arrowButton.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        window.location.href = '/share-with-me';
-                    }, 150);
-                };
-
-                sharedContainer.appendChild(arrowButton);
-            }
         } catch (error) {
             console.error('Error fetching notes:', error);
             sharedContainer.innerHTML = `

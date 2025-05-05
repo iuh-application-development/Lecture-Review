@@ -23,7 +23,6 @@
                         My Notes
                     {% endif %}
             </a>
-
         </div>
         <div class="sidebar-content">
             <!-- Note Meta Info -->
@@ -73,7 +72,6 @@
 
             <!-- Action Buttons -->
             <div class="action-buttons">
-            
                 {% if not view_only %}
                 <div class="form-check form-switch d-flex align-items-center justify-content-center my-3">
                     <input class="form-check-input me-2" type="checkbox" id="togglePublicNote" {% if note and note.is_public %}checked{% endif %}>
@@ -101,48 +99,44 @@
     </div>
 
     <div class="note-main-content">
-        <div style="border: none; max-width: 800px; margin: 0 auto;">
-            <h1 contenteditable="true" 
-                id="page-title" 
-                data-placeholder="Enter title here" 
-                style="font-size: 40px; font-weight: 700; text-align: center;">{% if note %}{{note.title}}{% endif %}</h1>
-        </div>
-        
-        <div id="editorjs" 
-            data-note-content='{% if note %}{{ note.content | tojson }}{% else %}{}{% endif %}'
-            data-api-endpoint='{% if note %}{{ url_for("api.edit_note", note_id=note.id) }}{% else %}{{ url_for("api.create_note") }}{% endif %}'
-            data-redirect-url-on-create='{% if note %}{{ url_for("views.edit_note", note_id=note.id) }}{% else %}{{ "" }}{% endif %}'
-            data-user-id='{{user.id}}'
-            data-note-id = '{%if note %}{{note.id}}{%else%}underfined{%endif%}'
-            data-note-color = '{%if note %}{{note.color}}{%else%}note-green{%endif%}'
-            data-view-only = "{{'true' if view_only else 'false'}}"
-            data-note-tags='{% if note %}{{ note.tags | tojson }} {% else %} {} {% endif %}'
-            >
-        </div>
-
-        <!-- Comments Section -->
-        {% if note and (note.is_public) %}
-        <div class="card-separator"></div>
-        <div class="comments-section mt-4" style="max-width: 800px; margin: 0 auto;">
-            <h4>Comments</h4>
-        
-            {% if user.is_authenticated %}
-            <form id="commentForm" class="mb-3">
-                <div class="mb-2">
-                    <textarea class="form-control" id="commentContent" rows="3" placeholder="Add a comment..." required></textarea>
+        <div class="editor-comments-container">
+            <div class="editor-section">
+                <div class="editor-title" style="border: none; max-width: 800px; margin: 0 auto;">
+                    <h1 contenteditable="true" 
+                        id="page-title" 
+                        data-placeholder="Enter title here" 
+                        style="font-size: 40px; font-weight: 700; text-align: center;">{% if note %}{{note.title}}{% endif %}</h1>
                 </div>
-                <button type="submit" class="btn btn-primary">Add Comment</button>
-            </form>
-            {% else %}
-            <p class="text-muted">Please <a href="{{ url_for('auth.login') }}">login</a> to add comments.</p>
-            {% endif %}
-        
-            <div id="commentsContainer"></div>
+                <div id="editorjs" 
+                    data-note-content='{% if note %}{{ note.content | tojson }}{% else %}{}{% endif %}'
+                    data-api-endpoint='{% if note %}{{ url_for("api.edit_note", note_id=note.id) }}{% else %}{{ url_for("api.create_note") }}{% endif %}'
+                    data-redirect-url-on-create='{% if note %}{{ url_for("views.edit_note", note_id=note.id) }}{% else %}{{ "" }}{% endif %}'
+                    data-user-id='{{user.id}}'
+                    data-note-id='{% if note %}{{note.id}}{% else %}undefined{% endif %}'
+                    data-note-color='{% if note %}{{note.color}}{% else %}note-green{% endif %}'
+                    data-view-only="{{'true' if view_only else 'false'}}"
+                    data-note-tags='{% if note %}{{ note.tags | tojson }} {% else %} {} {% endif %}'>
+                </div>
+            </div>
         </div>
-        {% endif %}
-        
-
     </div>
+    <!-- Comments Section -->
+    {% if note and (note.is_public) %}
+    <div class="comments-section">
+        <h4>Comments</h4>
+        {% if user.is_authenticated %}
+        <form id="commentForm" class="mb-3">
+            <div class="mb-2">
+                <textarea class="form-control" id="commentContent" rows="3" placeholder="Add a comment..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Comment</button>
+        </form>
+        {% else %}
+        <p class="text-muted">Please <a href="{{ url_for('auth.login') }}">login</a> to add comments.</p>
+        {% endif %}
+        <div id="commentsContainer"></div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
 
@@ -156,6 +150,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code"></script>
 <script src="https://cdn.jsdelivr.net/npm/@bomdi/codebox@1.0.12/dist/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/editorjs-math/dist/bundle.min.js"></script>
-<script src=" {{ url_for('static', filename='js/note_view.js') }} "></script>
-<script src=" {{ url_for('static', filename='js/note_functions.js') }} "></script>
+<script src="{{ url_for('static', filename='js/note_view.js') }}"></script>
+<script src="{{ url_for('static', filename='js/note_functions.js') }}"></script>
 {% endblock %}

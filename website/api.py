@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, g, make_response, render_template
+from flask import Blueprint, jsonify, request, g, make_response, render_template, flash, redirect, url_for
 from flask_login import current_user, login_required
 from .models import User, Note, ShareNote, Comment, UserWarning, UserNotification, db
 from .utils.convert_note_to_pdf import *
@@ -9,6 +9,8 @@ from weasyprint import HTML
 from markupsafe import Markup
 import html
 from sqlalchemy.sql.expression import or_
+from werkzeug.utils import secure_filename
+import os
 
 
 api = Blueprint('api', __name__)
@@ -197,7 +199,7 @@ def share_note():
             return jsonify({
                 'success': False,
                 'message': 'Missing note ID or recipient email'
-            }), 400
+            }, 400)
 
         # Kiểm tra ghi chú có tồn tại không
         note = Note.query.get(note_id)
@@ -205,14 +207,14 @@ def share_note():
             return jsonify({
                 'success': False,
                 'message': 'Note not found'
-            }), 404
+            }, 404)
 
         # Kiểm tra quyền chia sẻ
         if note.user_id != current_user.id:
             return jsonify({
                 'success': False,
                 'message': "You don't have permission to share this note."
-            }), 403
+            }, 403)
         
         #Kiểm tra và chuyển đổi is_public thành boolean
         if not isinstance(is_public, bool):
@@ -220,7 +222,7 @@ def share_note():
             return jsonify({
                 'success': False,
                 'message': 'Invalid is_public value'
-            }), 400
+            }, 400)
         
         # Cập nhật trạng thái công khai
         note.is_public = is_public
@@ -233,7 +235,7 @@ def share_note():
             return jsonify({
                 'success': False,
                 'message': 'Recipient not found'
-            }), 404
+            }, 404)
         
         # Kiểm tra xem ghi chú đã được chia sẻ chưa
         existinng_share = ShareNote.query.filter_by(note_id=note_id, recipient_id=recipient.id).first()
@@ -241,17 +243,28 @@ def share_note():
             return jsonify({
                 'success': False,
                 'message': 'Note already shared with this recipient'
-            }), 400
+            }, 400)
         
         shared_note = ShareNote(
             note_id=note_id,
             sharer_id=current_user.id,
             recipient_id=recipient.id,
             shared_at=datetime.utcnow(),
-            message=message,
             can_edit=can_edit
         )
         db.session.add(shared_note)
+        db.session.commit()
+        
+        # Create notification for recipient
+        notification = UserNotification(
+            user_id=recipient.id,
+            title=f"A note has been shared with you",
+            message=message or f"{current_user.first_name} {current_user.last_name} shared a note with you.",
+            type='info',
+            link=f"/edit-note/{note_id}",
+            is_read=False
+        )
+        db.session.add(notification)
         db.session.commit()
         
         return jsonify({
@@ -624,6 +637,32 @@ def mark_all_notifications_read():
             'status': 'error',
             'message': 'Error updating notifications'
         }), 500
+
+@api.route('/update-avatar', methods=['POST'])
+@login_required
+def update_avatar():
+    if 'avatar' not in request.files:
+        flash('No image file found.', 'error')
+        return redirect(url_for('views.profile'))
+
+    file = request.files['avatar']
+    if file.filename == '':
+        flash('You have not selected an image.', 'error')
+        return redirect(url_for('views.profile'))
+
+    filename = secure_filename(file.filename)
+
+    upload_folder = os.path.join('website', 'static', 'images', 'uploads')
+    os.makedirs(upload_folder, exist_ok=True)
+
+    upload_path = os.path.join(upload_folder, filename)
+    file.save(upload_path)
+
+    current_user.avatar_url = f'images/uploads/{filename}'
+    db.session.commit()
+
+    flash('Avatar updated successfully!', 'success')
+    return redirect(url_for('views.profile'))
 
 ### Standardize API responses and Handle Error ###
 @api.before_request

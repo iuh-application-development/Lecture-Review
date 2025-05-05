@@ -111,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const notificationItem = document.createElement('div');
             notificationItem.className = `dropdown-item py-2 ${!notification.is_read ? 'bg-light-subtle' : ''}`;
             notificationItem.setAttribute('data-id', notification.id);
+            notificationItem.style.transition = 'none';
 
             // Chọn icon dựa trên loại thông báo
             let iconClass = 'text-primary';

@@ -154,8 +154,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                 title.slice(0, MAX_TITILE_LEN) + '...' :
                                 title;
 
-        const message = share_note.message;
-
         const updatedStr = convertDatetime(share_note.updated_at);
         const sharedStr = convertDatetime(share_note.share_at);
 
@@ -198,13 +196,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 </div>
                 <div class="card-separator"></div>
-                
-                ${message ? `
-                    <div class="alert alert-info p-2 mb-2" role="alert" style="font-size: 13px;"> 
-                        💌 ${message}
-                    </div>
-                    ` : ''}
-
                 </div>
                 <div class="mt-2">
                     ${tagsHtml}

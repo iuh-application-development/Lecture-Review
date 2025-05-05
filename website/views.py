@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, flash, redirect, url_for
 from flask_login import current_user, login_required
 from .models import Note, ShareNote, User
 from datetime import datetime
-from . import db
 
 views = Blueprint('views', __name__)
 
@@ -83,3 +82,8 @@ def edit_note(note_id):
 @login_required
 def notifications():
     return render_template('notifications.html', user=current_user)
+
+@views.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html', user=current_user)

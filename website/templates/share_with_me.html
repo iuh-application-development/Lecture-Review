@@ -1,4 +1,25 @@
 {% extends 'base.html' %} {% block content %}
+<style>
+  .tab-button {
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #666;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+    font-weight: normal;
+  }
+  
+  .tab-button:hover {
+    color: #333;
+    border-bottom: 2px solid #333;
+  }
+  
+  .tab-button.active {
+    color: #333;
+    border-bottom: 2px solid #333;
+    font-weight: normal;
+  }
+</style>
 {% include 'shared_modal.html' %}
 <div class="content p-4 flex-grow-1">
   <div id="shared-with-me">

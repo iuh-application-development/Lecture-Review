@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Avatar Section -->
+        <div class="col-md-4 text-center">
+            <img src="{{ url_for('static', filename=user.avatar_url) }}" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+            <form method="POST" action="/api/update-avatar" enctype="multipart/form-data">
+                <input type="file" name="avatar" accept="image/*" class="form-control mb-2">
+                <button class="btn btn-primary" type="submit">Update Avatar</button>
+            </form>
+        </div>
+
+        <!-- Info + Change Password -->
+        <div class="col-md-8">
+            <div class="card shadow-sm p-4">
+                <h4>User Information</h4>
+                <p><strong>Full Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Gender:</strong> {{ user.gender }}</p>
+                <p><strong>Role:</strong> {{ user.role }}</p>
+                <p><strong>Status:</strong> 
+                    {% if user.status == 'Active' %}
+                        <span class="badge bg-success">Active</span>
+                    {% elif user.status == 'Locked' %}
+                        <span class="badge bg-danger">Locked</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ user.status }}</span>
+                    {% endif %}
+                </p>
+                <p><strong>Created At:</strong> {{ user.created_at.strftime('%d/%m/%Y') }}</p>
+
+                <hr>
+                <h5>Change Password</h5>
+                <form method="POST" action="/change-password">
+                    <div class="mb-3">
+                        <label>Current Password</label>
+                        <input type="password" class="form-control" name="current_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>New Password</label>
+                        <input type="password" class="form-control" name="new_password" required>
+                    </div>
+                    <button class="btn btn-danger" type="submit">Change Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

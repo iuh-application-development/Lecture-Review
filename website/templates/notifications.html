@@ -4,7 +4,20 @@
 <style>
     .notification-item {
         border-left: 3px solid #e9ecef;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
+        position: relative;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 
     .notification-item:hover {
@@ -23,6 +36,7 @@
 
     .notification-content {
         font-size: 0.95rem;
+        line-height: 1.4;
     }
 
     .notification-icon {
@@ -61,6 +75,68 @@
         align-items: center;
         justify-content: center;
     }
+
+    .notification-actions {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .notification-item:hover .notification-actions {
+        opacity: 1;
+    }
+
+    .filter-buttons {
+        margin-bottom: 1rem;
+    }
+
+    .filter-buttons .btn {
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .delete-notification {
+        color: #dc3545;
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        opacity: 0;
+    }
+
+    .notification-item:hover .delete-notification {
+        opacity: 1;
+    }
+
+    .delete-notification:hover {
+        background-color: rgba(220, 53, 69, 0.1);
+    }
+
+    .notification-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .notification-title {
+        font-weight: bold;
+    }
+
+    .notification-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
 </style>
 {% endblock %}
 
@@ -68,9 +144,22 @@
 <div class="content p-4 flex-grow-1">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="m-0 fw-bold">Notifications</h4>
-        <button type="submit" class="btn btn-outline-secondary btn-sm" id="markAllRead-container">
-            <i class="bi bi-check-all"></i> Mark all as read
-        </button>
+        <div>
+            <button type="button" class="btn btn-outline-secondary btn-sm me-2" id="markAllRead-container">
+                <i class="bi bi-check-all"></i> Mark all as read
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm" id="deleteAll-container">
+                <i class="bi bi-trash"></i> Delete all
+            </button>
+        </div>
+    </div>
+
+    <div class="filter-buttons">
+        <button class="btn btn-outline-primary btn-sm active" data-filter="all">All</button>
+        <button class="btn btn-outline-warning btn-sm" data-filter="warning">Warning</button>
+        <button class="btn btn-outline-info btn-sm" data-filter="info">Info</button>
+        <button class="btn btn-outline-success btn-sm" data-filter="success">Success</button>
+        <button class="btn btn-outline-danger btn-sm" data-filter="error">Error</button>
     </div>
 
     <div class="card">
@@ -82,6 +171,11 @@
                     <p class="text-muted">Loading notifications...</p>
                 </div>
             </div>
+            <div class="loading-spinner">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -90,33 +184,45 @@
 {% block load_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        let currentPage = 1;
+        let isLoading = false;
+        let currentFilter = 'all';
+        const notificationsPerPage = 20;
+
         // Function to load notifications
-        async function loadNotifications() {
+        async function loadNotifications(page = 1, filter = 'all', append = false) {
+            if (isLoading) return;
+            isLoading = true;
+
             try {
-                const response = await fetch('/api/notifications?limit=50');
+                const response = await fetch(`/api/notifications?page=${page}&limit=${notificationsPerPage}&filter=${filter}`);
                 const result = await response.json();
-                console.log(response);
+
                 if (result.status === 'success') {
                     const notificationContainer = document.getElementById('notificationContainer');
                     const notifications = result.data.notifications;
 
                     if (!notifications || notifications.length === 0) {
-                        notificationContainer.innerHTML = `
-                            <div class="text-center p-4 notification-empty">
-                                <i class="bi bi-bell-slash fs-1 text-muted mb-3"></i>
-                                <p class="text-muted">No notifications</p>
-                            </div>
-                        `;
+                        if (!append) {
+                            notificationContainer.innerHTML = `
+                                <div class="text-center p-4 notification-empty">
+                                    <i class="bi bi-bell-slash fs-1 text-muted mb-3"></i>
+                                    <p class="text-muted">No notifications</p>
+                                </div>
+                            `;
+                        }
                         return;
                     }
 
-                    // Clear the loading message
-                    notificationContainer.innerHTML = '';
+                    if (!append) {
+                        notificationContainer.innerHTML = '';
+                    }
 
                     // Add each notification
                     notifications.forEach(notification => {
                         const notificationItem = document.createElement('div');
                         notificationItem.className = `notification-item p-3 border-bottom ${!notification.is_read ? 'unread' : ''}`;
+                        notificationItem.dataset.type = notification.type;
 
                         // Set notification icon based on type
                         let iconClass = 'info';
@@ -139,9 +245,12 @@
                                     <i class="bi bi-${iconName}"></i>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <strong>${notification.title}</strong>
-                                        <span class="notification-time">${formatTimeAgo(notification.created_at)}</span>
+                                    <div class="notification-header">
+                                        <div class="notification-title">${notification.title}</div>
+                                        <div class="notification-meta">
+                                            <span class="notification-time">${formatTimeAgo(notification.created_at)}</span>
+                                            <i class="bi bi-x-lg delete-notification" data-id="${notification.id}"></i>
+                                        </div>
                                     </div>
                                     <div class="notification-content">${notification.message}</div>
                                 </div>
@@ -152,7 +261,10 @@
                         if (!notification.is_read || notification.link) {
                             notificationItem.style.cursor = 'pointer';
 
-                            notificationItem.addEventListener('click', async function() {
+                            notificationItem.addEventListener('click', async function(e) {
+                                // Don't trigger if clicking delete button
+                                if (e.target.classList.contains('delete-notification')) return;
+
                                 // If notification is not read, mark it as read
                                 if (!notification.is_read) {
                                     await fetch(`/api/notifications/mark-read/${notification.id}`, {
@@ -173,13 +285,28 @@
                             });
                         }
 
+                        // Add delete handler
+                        const deleteBtn = notificationItem.querySelector('.delete-notification');
+                        deleteBtn.addEventListener('click', async function(e) {
+                            e.stopPropagation();
+                            if (confirm('Are you sure you want to delete this notification?')) {
+                                await deleteNotification(notification.id);
+                                notificationItem.remove();
+                            }
+                        });
+
                         notificationContainer.appendChild(notificationItem);
                     });
+
+                    currentPage = page;
                 } else {
                     console.error('Failed to load notifications:', result.message);
                 }
             } catch (error) {
                 console.error('Error loading notifications:', error);
+            } finally {
+                isLoading = false;
+                document.querySelector('.loading-spinner').style.display = 'none';
             }
         }
 
@@ -206,11 +333,55 @@
             }
         }
 
+        // Delete notification function
+        async function deleteNotification(id) {
+            try {
+                const response = await fetch(`/api/notifications/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                if (data.status !== 'success') {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Error deleting notification:', error);
+                alert('Failed to delete notification');
+            }
+        }
+
+        // Delete all notifications
+        async function deleteAllNotifications() {
+            if (!confirm('Are you sure you want to delete all notifications?')) return;
+
+            try {
+                const response = await fetch('/api/notifications/delete-all', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                if (data.status === 'success') {
+                    loadNotifications(1, currentFilter);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Error deleting all notifications:', error);
+                alert('Failed to delete all notifications');
+            }
+        }
+
+        // Mark all as read
         async function markAllAsRead(e) {
             if (e) e.preventDefault();
     
             try {
-                console.log('Marking all notifications as read');
                 const response = await fetch('/api/notifications/mark-all-read', {
                     method: 'POST',
                     headers: {
@@ -219,21 +390,48 @@
                 });
     
                 const data = await response.json();
-                console.log('Mark all read response:', data);
-    
                 if (data.status === 'success') {
-                    // Tải lại thông báo
-                    loadNotifications();
+                    loadNotifications(1, currentFilter);
                 }
             } catch (error) {
                 console.error('Error marking all notifications as read:', error);
             }
         }
 
-        const markAllReadBtn = document.getElementById('markAllRead-container');
-        markAllReadBtn.addEventListener('click', markAllAsRead);
+        // Infinite scroll handler
+        function handleScroll() {
+            if (isLoading) return;
 
-        // Load notifications
+            const container = document.querySelector('.card');
+            const scrollPosition = window.innerHeight + window.scrollY;
+            const threshold = document.documentElement.scrollHeight - 100;
+
+            if (scrollPosition >= threshold) {
+                document.querySelector('.loading-spinner').style.display = 'block';
+                loadNotifications(currentPage + 1, currentFilter, true);
+            }
+        }
+
+        // Filter buttons handler
+        document.querySelectorAll('.filter-buttons .btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.filter-buttons .btn').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                currentPage = 1;
+                loadNotifications(1, currentFilter);
+            });
+        });
+
+        // Event listeners
+        const markAllReadBtn = document.getElementById('markAllRead-container');
+        const deleteAllBtn = document.getElementById('deleteAll-container');
+        
+        markAllReadBtn.addEventListener('click', markAllAsRead);
+        deleteAllBtn.addEventListener('click', deleteAllNotifications);
+        window.addEventListener('scroll', handleScroll);
+
+        // Initial load
         loadNotifications();
     });
 </script>

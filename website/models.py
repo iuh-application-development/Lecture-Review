@@ -13,6 +13,7 @@ class User(db.Model, UserMixin):
     status        = db.Column(db.String(20), default='Active') # ['Active', 'Locked', 'Inactive']
     gender        = db.Column(db.String(10), nullable=False)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
+    avatar_url = db.Column(db.String(300), nullable=True, default='images/uploads/default-avatar.jpg')
 
     def __repr__(self):
         return f'<User {self.email!r}>'
@@ -62,7 +63,7 @@ class Comment (db.Model):
     content       = db.Column(db.Text, nullable=False)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
     
-    note          = db.relationship('Note', backref=db.backref('comments', lazy=True))
+    note          = db.relationship('Note', backref=db.backref('comments', lazy=True, cascade='all, delete'))
     user          = db.relationship('User', backref=db.backref('comments', lazy=True))
 
     def __repr__(self):
