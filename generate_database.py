@@ -61,6 +61,8 @@ with app.app_context():
         db.session.add(user)
     db.session.commit()
 
+    users = users[:5]
+
     # Tạo 200 ghi chú
     notes = []
     for i in range(200):
@@ -90,7 +92,7 @@ with app.app_context():
     for i in range(100):
         sharer = random.choice(users)
         # Chỉ chọn các ghi chú mà sharer là chủ sở hữu
-        sharer_notes = [note for note in notes if note.user_id == sharer.id]
+        sharer_notes = [note for note in notes if note.user_id == sharer.id and note.is_trashed == False]
         if not sharer_notes:  # Nếu người dùng không có ghi chú, bỏ qua
             continue
         note = random.choice(sharer_notes)
