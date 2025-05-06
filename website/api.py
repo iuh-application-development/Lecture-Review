@@ -428,12 +428,12 @@ def get_public_notes():
            
         notes = query.paginate(page=page, per_page=limit, error_out=False)
         
-        
+        valid_colors = ['note-yellow', 'note-green', 'note-purple', 'note-blue']
         result = [{
             'id': note.id,
             'title': note.title,
             'content': note.content,
-            'color': note.color,
+            'color':note.color if note.color in valid_colors else 'note-yellow',
             'user_id': note.user_id,
             'tags': note.tags,
             # 'user_name': f'{note.user.first_name} {note.user.last_name}',
