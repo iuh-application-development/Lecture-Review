@@ -335,4 +335,33 @@ document.addEventListener('DOMContentLoaded', () => {
         commentForm.addEventListener('submit', submitComment);
     }
     fetchComments();
+
+    // Event handling for move-to-trash button
+    const trashButton = document.querySelector('.move-to-trash');
+    if (trashButton) {
+        trashButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (confirm('Bạn có chắc chắn muốn đưa ghi chú này vào Trash không?')) {
+                fetch(`/api/notes/${noteId}/move-to-trash`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Đã chuyển ghi chú vào Trash!');
+                        window.location.href = '/dashboard'; // Redirect to dashboard or appropriate page
+                    } else {
+                        alert('Thao tác thất bại: ' + (data.message || 'Unknown error.'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error moving note to Trash:', error);
+                    alert('An error occurred.');
+                });
+            }
+        });
+    }
 });
