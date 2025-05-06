@@ -2,36 +2,54 @@ body {
     font-family: Arial, sans-serif;
 }
 
+.notes-carousel::-webkit-scrollbar {
+    display: none;
+}
+
 .note-card {
-    border-radius: 15px;
-    color: #fff;
-    padding: 15px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
     cursor: pointer;
-    transition: transform 0.1s, box-shadow 0.2s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    overflow: hidden;
 }
 
 .note-card:hover {
-    transform: scale(1.03);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.13);
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.note-header {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.note-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.note-content {
+    padding: 1rem;
+    color: #495057;
+    line-height: 1.6;
 }
 
 .note-yellow {
-    background-color: #f7d774;
-    color: #000;
-}
-
-.note-black {
-    background-color: #000;
-    color: #fff;
+    background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
 }
 
 .note-green {
-    background-color: #1fb67d;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
 }
 
 .note-purple {
-    background-color: #b86ccf;
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+}
+.note-blue {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
 }
 
 .header-section,
