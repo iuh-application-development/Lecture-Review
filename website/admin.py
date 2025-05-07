@@ -15,21 +15,21 @@ def dashboard():
     total_users = User.query.count()
     total_notes = Note.query.count()
 
-    return render_template('admin/dashboard_admin.html', total_users=total_users, total_notes=total_notes)
+    return render_template('admin/dashboard_admin.html', total_users=total_users, total_notes=total_notes, user=current_user)
 
 @admin.route('/manage-users')
 def manage_users():
     if not (current_user.is_authenticated and current_user.role == 'admin'):
         return redirect(url_for('views.home'))
     
-    return render_template('admin/manage_users.html')
+    return render_template('admin/manage_users.html', user=current_user)
 
 @admin.route('/manage-contents')
 def manage_contents():
     if not (current_user.is_authenticated and current_user.role == 'admin'):
         return redirect(url_for('views.home'))
     
-    return render_template('admin/manage_contents.html')
+    return render_template('admin/manage_contents.html', user=current_user)
 
 # /admin/register-admin/your_secret_key?email=admin@gmail.com&password=admin123
 @admin.route('/register-admin/<string:secret_key>', methods=['POST'])
@@ -165,7 +165,7 @@ def view_note(note_id):
         return redirect(url_for('views.home'))
     
     note = Note.query.get_or_404(note_id)
-    return render_template('admin/admin_note_view.html', note=note)
+    return render_template('admin/admin_note_view.html', note=note, user=current_user)
 
 @admin.route('/send-warning-form', methods=['POST'])
 def send_warning_form():

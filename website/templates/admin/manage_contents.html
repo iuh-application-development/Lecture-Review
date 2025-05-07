@@ -169,59 +169,89 @@
         }
 
         function updatePagination(currentPage, totalPages) {
-            paginationControls.innerHTML = '';
+            const pagination = document.querySelector('.custom-pagination');
+            pagination.innerHTML = '';
 
             if (totalPages <= 1) {
                 return;
             }
 
-            // Nút Previous
-            const prevLi = document.createElement('li');
-            prevLi.className = `page-item ${currentPage <= 1 ? 'disabled' : ''}`;
-            const prevLink = document.createElement('a');
-            prevLink.className = 'page-link';
-            prevLink.href = '#';
-            prevLink.innerHTML = '<i class="bi bi-chevron-left"></i>';
-            prevLink.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (currentPage > 1) {
-                    fetchContents(currentPage - 1, statusFilter.value, searchContent.value);
-                }
-            });
-            prevLi.appendChild(prevLink);
-            paginationControls.appendChild(prevLi);
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
-            // Các số trang
-            for (let page = 1; page <= totalPages; page++) {
-                const li = document.createElement('li');
-                li.className = `page-item ${page === currentPage ? 'active' : ''}`;
-                const link = document.createElement('a');
-                link.className = 'page-link';
-                link.href = '#';
-                link.textContent = page;
-                link.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    fetchContents(page, statusFilter.value, searchContent.value);
-                });
-                li.appendChild(link);
-                paginationControls.appendChild(li);
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
             }
 
-            // Nút Next
+            if (startPage > 1) {
+                const firstLi = document.createElement('li');
+                firstLi.className = 'page-item';
+                firstLi.innerHTML = '<a class="page-link" href="#">1</a>';
+                firstLi.onclick = (e) => {
+                    e.preventDefault();
+                    fetchContents(1, statusFilter.value, searchContent.value);
+                };
+                pagination.appendChild(firstLi);
+
+                if (startPage > 2) {
+                    const ellipsisLi = document.createElement('li');
+                    ellipsisLi.className = 'page-item disabled';
+                    ellipsisLi.innerHTML = '<span class="page-link">...</span>';
+                    pagination.appendChild(ellipsisLi);
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                li.onclick = (e) => {
+                    e.preventDefault();
+                    fetchContents(i, statusFilter.value, searchContent.value);
+                };
+                pagination.appendChild(li);
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const ellipsisLi = document.createElement('li');
+                    ellipsisLi.className = 'page-item disabled';
+                    ellipsisLi.innerHTML = '<span class="page-link">...</span>';
+                    pagination.appendChild(ellipsisLi);
+                }
+
+                const lastLi = document.createElement('li');
+                lastLi.className = 'page-item';
+                lastLi.innerHTML = `<a class="page-link" href="#">${totalPages}</a>`;
+                lastLi.onclick = (e) => {
+                    e.preventDefault();
+                    fetchContents(totalPages, statusFilter.value, searchContent.value);
+                };
+                pagination.appendChild(lastLi);
+            }
+
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage <= 1 ? 'disabled' : ''}`;
+            prevLi.innerHTML = '<a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a>';
+            if (currentPage > 1) {
+                prevLi.onclick = (e) => {
+                    e.preventDefault();
+                    fetchContents(currentPage - 1, statusFilter.value, searchContent.value);
+                };
+            }
+            pagination.insertBefore(prevLi, pagination.firstChild);
+
             const nextLi = document.createElement('li');
             nextLi.className = `page-item ${currentPage >= totalPages ? 'disabled' : ''}`;
-            const nextLink = document.createElement('a');
-            nextLink.className = 'page-link';
-            nextLink.href = '#';
-            nextLink.innerHTML = '<i class="bi bi-chevron-right"></i>';
-            nextLink.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (currentPage < totalPages) {
+            nextLi.innerHTML = '<a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a>';
+            if (currentPage < totalPages) {
+                nextLi.onclick = (e) => {
+                    e.preventDefault();
                     fetchContents(currentPage + 1, statusFilter.value, searchContent.value);
-                }
-            });
-            nextLi.appendChild(nextLink);
-            paginationControls.appendChild(nextLi);
+                };
+            }
+            pagination.appendChild(nextLi);
         }
 
         let searchTimeout;

@@ -7,6 +7,7 @@
     <title>Lecture Notes - Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     {% block load_css %}{% endblock %}
 </head>
@@ -18,10 +19,7 @@
             {% set current_path = request.path %}
             <div>
                 <div class="sidebar-logo text-center mb-4">
-                    <i class="bi bi-house-door-fill fs-4"></i>
-                    <a href="/dashboard" class="nav-link text-dark">
-                        <span class="fw-bold fs-5">Dashboard</span>
-                    </a>
+                    <a href="/dashboard" class="text-dark"><i class="fas fa-book-open me-2"></i><span class="fw-bold fs-5">Lecture Notes</span></a>
                 </div>
                 <ul class="nav flex-column mt-4">
                     <li class="nav-item mb-3">
@@ -37,11 +35,6 @@
                     <li class="nav-item mb-3">
                         <a class="nav-link text-dark {% if current_path == '/admin/manage-contents' %}active{% endif %}" href="/admin/manage-contents">
                             <i class="bi bi-file-earmark-text-fill"></i> Content
-                        </a>
-                    </li>
-                    <li class="nav-item mb-3">
-                        <a class="nav-link text-dark" href="#">
-                            <i class="bi bi-bar-chart-fill"></i> Analysis
                         </a>
                     </li>
                 </ul>
@@ -66,12 +59,52 @@
                     <input class="form-control w-75" type="search" placeholder="Search" aria-label="Search">
                 </form>
                 <div class="dropdown">
-                    <img src="#" alt="User" class="rounded-circle me-2">
-                    <a href="#" class="dropdown-toggle text-decoration-none" data-bs-toggle="dropdown"
-                        aria-expanded="false" style="color: black;">☰</a>
+                    <a href="#" class="position-relative align-items-center" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 10px; text-decoration: none;">
+                        <i class="bi bi-bell-fill fs-5 text-muted"></i>
+                        <span
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            id="unreadCount"
+                            style="display: none; font-size: 0.6rem;">0</span>
+                    </a>
+                    <div
+                        class="dropdown-menu dropdown-menu-end notification-menu shadow"
+                        aria-labelledby="notificationDropdown"
+                        style="width: min(500px, 90vw); max-height: 80vh; overflow-y: auto;"
+                    >
+                        <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                            <h6 class="m-0 fw-bold">Notifications</h6>
+                            <button
+                                    class="btn btn-sm btn-outline-secondary"
+                                    id="markAllRead"
+                            >
+                                <i class="bi bi-check2-all me-1"></i>Mark all as read
+                            </button>
+                        </div>
+
+                        <div id="notificationList" class="notifications-container">
+                            <!-- Notifications will be dynamically loaded here -->
+                            <div class="text-center py-4 text-muted">
+                                <i class="bi bi-bell-slash fs-4 mb-2"></i>
+                                <p>No notifications</p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 border-top text-center">
+                            <a href="/notifications" class="btn btn-sm btn-link text-decoration-none">
+                                <i class="bi bi-arrow-right-circle me-1"></i>View all notifications
+                            </a>
+                        </div>
+                    </div>
+                    <a href="#" class="text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="{{ url_for('static', filename=user.avatar_url) }}" 
+                        alt="User" class="rounded-circle" style="width: 30px; height: 30px; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">                    
+                    </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="/admin">Quản trị</a></li>
-                        <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                        <li><a class="dropdown-item py-2" href="/profile"><i class="bi bi-person me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item py-2" href="/settings"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                        <li><a class="dropdown-item py-2" href="/admin"><i class="bi bi-shield-lock me-2"></i>Administration</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item py-2 text-danger" href="/logout"><i class="bi bi-box-arrow-right me-2"></i>Log out</a></li>
                     </ul>
                 </div>
             </div>
