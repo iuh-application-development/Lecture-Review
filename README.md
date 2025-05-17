@@ -22,7 +22,7 @@ Hệ thống này là một ứng dụng web cho phép người dùng tạo, qu�
 
 ## 3. PHÂN TÍCH THIẾT KẾ
 
-> **Lưu ý**: Để xem thông tin chi tiết hơn về các use case và đặc tả chức năng của hệ thống, vui lòng tham khảo [tài liệu đặc tả yêu cầu phần mềm (SRS.pdf)](./SRS.pdf).
+> **Lưu ý**: Để xem thông tin chi tiết hơn về các use case và đặc tả chức năng của hệ thống, vui lòng tham khảo [tài liệu đặc tả yêu cầu phần mềm (SRS.pdf)](./docs/SRS.pdf).
 
 ### 3.1. Phân tích yêu cầu
 - Các yêu cầu chức năng:
