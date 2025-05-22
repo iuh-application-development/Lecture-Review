@@ -2,8 +2,8 @@ from flask import Blueprint, render_template, redirect, url_for, request, jsonif
 from werkzeug.security import generate_password_hash
 from flask_login import current_user
 from .models import User, Note, UserWarning, UserNotification, db
-import datetime
 import traceback
+from .utils.admin_chart import ChartDataGenerator
 
 admin = Blueprint('admin', __name__)
 
@@ -12,10 +12,16 @@ def dashboard():
     if not (current_user.is_authenticated and current_user.role == 'admin'):
         return redirect(url_for('views.home'))
     
-    total_users = User.query.count()
-    total_notes = Note.query.count()
+    dashboard_data = ChartDataGenerator.get_dashboard_data()
+    notes_chart_data = ChartDataGenerator.get_notes_data()
+    accounts_chart_data = ChartDataGenerator.get_accounts_data()
 
-    return render_template('admin/dashboard_admin.html', total_users=total_users, total_notes=total_notes, user=current_user)
+    return render_template('admin/dashboard_admin.html', 
+                          total_users=dashboard_data['total_users'], 
+                          total_notes=dashboard_data['total_notes'], 
+                          user=current_user,
+                          notes_chart_data=notes_chart_data,
+                          accounts_chart_data=accounts_chart_data)
 
 @admin.route('/manage-users')
 def manage_users():

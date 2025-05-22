@@ -1,4 +1,15 @@
-{% extends 'admin/base_admin.html' %} {% block content %}
+{% extends 'admin/base_admin.html' %} 
+
+{% block load_css %}
+<style>
+    .chart-container {
+        width: 100%;
+        height: 400px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
 <div class="content p-4 flex-grow-1">
     <!-- Hàng hiển thị 3 box thống kê -->
     <div class="row mb-4">
@@ -20,41 +31,37 @@
                 <div>50</div>
             </div>
         </div>
-    </div>
-
-    <!-- Hàng hiển thị Recent Activities và System Status -->
+    </div>    
+      <!-- Hàng hiển thị biểu đồ thống kê -->
     <div class="row">
-        <!-- Recent Activities -->
+        <!-- Notes Created Chart -->
         <div class="col-md-6 mb-4 text-center">
             <!-- Tiêu đề bên ngoài khối, căn giữa -->
-            <h5 class="fw-bold mb-3">Recent Activities</h5>
+            <h5 class="fw-bold mb-3">Total Notes Over Time</h5>
             <!-- Khối nội dung full-width cột -->
             <div class="border rounded p-3">
-                <ul class="list-unstyled text-start">
-                    <li class="mb-2 d-flex align-items-center">
-                        <i class="bi bi-person-plus-fill me-2"></i>
-                        New user registered
-                    </li>
-                    <li class="mb-2 d-flex align-items-center">
-                        <i class="bi bi-pencil-fill me-2"></i>
-                        Content update
-                    </li>
-                    <li class="d-flex align-items-center">
-                        <i class="bi bi-gear-fill me-2"></i>
-                        Setting change
-                    </li>
-                </ul>
+                <div id="notes-chart" class="chart-container"></div>
             </div>
         </div>
-        <!-- System Status -->
+        <!-- User Accounts Chart -->
         <div class="col-md-6 mb-4 text-center">
             <!-- Tiêu đề bên ngoài khối, căn giữa -->
-            <h5 class="fw-bold mb-3">System Status</h5>
+            <h5 class="fw-bold mb-3">Total User Accounts Over Time</h5>
             <!-- Khối nội dung full-width cột -->
-            <div class="border rounded p-3 text-start">
-                <p class="mb-0">All systems running normally.</p>
+            <div class="border rounded p-3">
+                <div id="accounts-chart" class="chart-container"></div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block load_js %}
+<!-- Plotly.js -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    const notesChartData = {{ notes_chart_data|safe }};
+    const accountsChartData = {{ accounts_chart_data|safe }};
+</script>
+<script src="{{ url_for('static', filename='js/admin_dashboard.js') }}"></script>
 {% endblock %}
