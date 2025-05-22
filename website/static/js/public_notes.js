@@ -72,8 +72,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     tagsHtml = keywords.map(k => `
                         <span class="badge bg-secondary me-1">${k.length > 10 ? k.slice(0, 7) + '...' : k}</span>
                     `).join("");
-                }
-
+                }                
+                
                 noteCard.innerHTML = `
                     <div class="note-content">
                         <div class="note-header d-flex justify-content-between align-items-start pb-1">
@@ -85,6 +85,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item share-note" href="#" data-bs-toggle="modal" data-bs-target="#shareNoteModal" data-note-id="${note.id}">
                                         <i class="bi bi-share"></i> Share</a></li>
+                                    <li><a class="dropdown-item clone-note" href="#" data-note-id="${note.id}">
+                                        <i class="bi bi-files"></i> Tạo bản sao</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -101,13 +103,25 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (!e.target.closest('.dropdown')) {
                         window.location.href = `/edit-note/${note.id}?view_only=true&from=public`; 
                     }
-                });
-
+                });                
+                
                 const shareButton = noteCard.querySelector('.share-note');
                 shareButton.addEventListener('click', function (e) {
                     e.preventDefault();
                     const noteId = this.getAttribute('data-note-id');
                     document.getElementById('noteIdToShare').value = noteId;
+                });
+                
+                // Thêm xử lý sự kiện cho nút clone
+                const cloneButton = noteCard.querySelector('.clone-note');
+                cloneButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const noteId = this.getAttribute('data-note-id');
+                    
+                    if (confirm('Bạn có muốn tạo bản sao của ghi chú này không?')) {
+                        cloneNote(noteId);
+                    }
                 });
 
                 notesContainer.appendChild(noteCard);
@@ -122,8 +136,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             `;
         }
-    }
-
+    }    
+    
     function updatePagination(currentPage, totalPages) {
         const pagination = document.querySelector('.custom-pagination');
         pagination.innerHTML = '';
@@ -143,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function () {
             };
         }
         pagination.appendChild(prevLi);
-
+        
         // Logic hiển thị số trang
         const maxVisiblePages = 5; // Số trang tối đa hiển thị
         let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
@@ -222,6 +236,31 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         pagination.appendChild(nextLi);
     }
+    
+    // Hàm để tạo bản sao của note
+    async function cloneNote(noteId) {
+        try {
+            const response = await fetch(`/api/notes/${noteId}/clone`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Đã tạo bản sao thành công!');
+                // Chuyển đến trang chỉnh sửa note mới
+                window.location.href = `/edit-note/${result.note_id}`;
+            } else {
+                alert('Không thể tạo bản sao: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error cloning note:', error);
+            alert('Đã xảy ra lỗi khi tạo bản sao ghi chú.');
+        }
+    }
 
     if (searchInput) {
         searchInput.value = initialSearch;
@@ -231,6 +270,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 500));
     }
 
+    // Gọi hàm fetchPublicNotes khi trang được tải
     fetchPublicNotes(currentPage, initialSearch);
 
     function debounce(func, wait) {

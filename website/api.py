@@ -8,6 +8,7 @@ from datetime import datetime
 from weasyprint import HTML
 from markupsafe import Markup
 import html
+import json
 from sqlalchemy.sql.expression import or_
 from werkzeug.utils import secure_filename
 import os
@@ -678,6 +679,47 @@ def api_response(data):
         'api_info': g.api_info,
         'data': data
     })
+
+@api.route('/notes/<int:note_id>/clone', methods=['POST'])
+@login_required
+def clone_note(note_id):
+    try:
+        note_to_clone = Note.query.get(note_id)
+        
+        is_public = note_to_clone.is_public
+        is_shared = ShareNote.query.filter_by(note_id=note_id, recipient_id=current_user.id).first() is not None
+        is_owner = note_to_clone.user_id == current_user.id
+        
+        if not (is_public or is_shared or is_owner):
+            return jsonify({
+                'success': False,
+                'message': 'You do not have permission to clone this note'
+            }), 403
+        
+        cloned_note = Note(
+            title=f"Copy of {note_to_clone.title}",
+            content=note_to_clone.content,
+            color=note_to_clone.color,
+            tags=note_to_clone.tags,
+            user_id=current_user.id
+        )
+        
+        db.session.add(cloned_note)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Note cloned successfully',
+            'note_id': cloned_note.id
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error cloning note: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Error cloning note: {str(e)}'
+        }), 500
 
 @api.errorhandler(404)
 def handle_404_error(e):

@@ -173,8 +173,8 @@ document.addEventListener('DOMContentLoaded', function () {
             tagsHtml = keywords.map(k => `
                 <span class="badge bg-secondary me-1">${k.length > 10 ? k.slice(0, 7) + '...' : k}</span>
             `).join("");
-        }
-
+        }        
+        
         noteCard.innerHTML = `
             <div class="note-content">
                 <div class="note-header d-flex justify-content-between align-items-start pb-1">
@@ -192,7 +192,17 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <li><a class="dropdown-item text-danger" href="#">
                                 <i class="bi bi-trash"></i> Delete</a></li>
                         </ul>
-                    </div>`:``
+                    </div>`:
+                    `<div class="dropdown">
+                        <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item clone-note" href="#" data-note-id="${share_note.note_id}">
+                            <i class="bi bi-files"></i> Tạo bản sao</a></li>
+                        </ul>
+                    </div>`
                     }
                 </div>
                 <div class="card-separator"></div>
@@ -226,9 +236,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const noteId = this.getAttribute('data-note-id');
                 document.getElementById('noteIdToShare').value = noteId;
             });
-        }
-
-        if (byMe) {
+        }        if (byMe) {
             const deleteButton = noteCard.querySelector('.dropdown-item.text-danger');
             deleteButton.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -254,11 +262,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                 }
             });
+        } else {
+            // Nếu là note được share cho mình, thêm xử lý nút clone
+            const cloneButton = noteCard.querySelector('.clone-note');
+            if (cloneButton) {
+                cloneButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const noteId = this.getAttribute('data-note-id');
+                    
+                    if (confirm('Bạn có muốn tạo bản sao của ghi chú này không?')) {
+                        cloneNote(noteId);
+                    }
+                });
+            }
         }
         return noteCard;
-    }
-
-    async function fetchSharedNotes() {
+    }    async function fetchSharedNotes() {
         try {
             const limit = sharedContainer.getAttribute('data-limit') ? parseInt(sharedContainer.getAttribute('data-limit')) : 9;
             const response = await fetch(`/api/shared-notes?limit=${limit}&byMe=${byMe}`);
@@ -295,6 +315,31 @@ document.addEventListener('DOMContentLoaded', function () {
                     <button class="btn btn-link" onclick="location.reload()">Retry</button>
                 </div>
             `;
+        }
+    }
+    
+    // Hàm để tạo bản sao của note
+    async function cloneNote(noteId) {
+        try {
+            const response = await fetch(`/api/notes/${noteId}/clone`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Đã tạo bản sao thành công!');
+                // Chuyển đến trang chỉnh sửa note mới
+                window.location.href = `/edit-note/${result.note_id}`;
+            } else {
+                alert('Không thể tạo bản sao: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error cloning note:', error);
+            alert('Đã xảy ra lỗi khi tạo bản sao ghi chú.');
         }
     }
 
