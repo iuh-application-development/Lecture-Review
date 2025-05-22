@@ -223,23 +223,27 @@ gcloud run deploy lecture-review --image gcr.io/YOUR_PROJECT_ID/lecture-review -
 - Kiểm thử hiệu năng (Performance Testing)
 
 ## 7. KẾT QUẢ
-[Viết các kết quả đạt được sau khi hoàn thành đề tài, có thể sử dụng hình ảnh hoặc bảng biểu để minh họa.]
-
 ### 7.1. Kết quả đạt được
-- [Kết quả 1]
-- [Kết quả 2]
+- Hệ thống được triển khai với giao diện rõ ràng, thuận tiện trong thao tác và sử dụng
+- Chức năng soạn thảo ghi chú hoạt động ổn định, hỗ trợ lưu trữ và chỉnh sửa nội dung linh hoạt
+- Người dùng có thể gửi nội dung cho nhau, tương tác qua bình luận bài viết
+- Thiết kế được giao diện điều hành riêng dành cho quản lý, hỗ trợ kiểm soát thông tin hiệu quả
+- Có cơ chế bảo mật để đảm bảo an toàn thông tin cá nhân
+- Xây dựng được tính năng luyện tập dưới dạng trắc nghiệm
+### 7.2. Link deploy
+https://www.projectsiuh.online/
 
-### 7.2. Kết quả chưa đạt được
+### 7.3. Kết quả chưa đạt được
 - [Kết quả chưa đạt được 1]
 - [Kết quả chưa đạt được 2]
 
-### 7.3. Hướng phát triển
+### 7.4. Hướng phát triển
 - Tích hợp trí tuệ nhân tạo để gợi ý và tóm tắt nội dung
 - Cải thiện hệ thống phân tích dữ liệu và báo cáo cho quản trị viên
 - Nâng cao thuật toán tạo trắc nghiệm với AI để sinh ra câu hỏi chất lượng cao hơn
 - Thêm tính năng chia sẻ bài trắc nghiệm và tổ chức thi đua giữa người dùng
-
-## 8. TÀI LIỆU THAM KHẢO
+## 8. LINK VIDEO BÁO CÁO
+## 9. TÀI LIỆU THAM KHẢO
 - Flask Documentation: https://flask.palletsprojects.com/
 - WeasyPrint: https://weasyprint.org/
 - MDN Web Docs (HTML, CSS, JavaScript): https://developer.mozilla.org/
