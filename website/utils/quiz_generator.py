@@ -34,7 +34,7 @@ def generate_quiz(note_id, question_count=5):
                 "answer": 0,
                 "explanation": "Giải thích tại sao đáp án đúng"
             }},
-            ... 4 câu hỏi khác
+            ... {question_count - 1} câu hỏi khác
         ]
     }}
 
