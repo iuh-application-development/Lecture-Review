@@ -665,21 +665,6 @@ def update_avatar():
     flash('Avatar updated successfully!', 'success')
     return redirect(url_for('views.profile'))
 
-### Standardize API responses and Handle Error ###
-@api.before_request
-def before_api_request():
-    g.api_info = {
-        'version': API_VERSION,
-        'endpoint': request.path,
-        'method': request.method
-    }
-
-def api_response(data):
-    return jsonify({
-        'api_info': g.api_info,
-        'data': data
-    })
-
 @api.route('/notes/<int:note_id>/clone', methods=['POST'])
 @login_required
 def clone_note(note_id):
@@ -720,6 +705,21 @@ def clone_note(note_id):
             'success': False,
             'message': f'Error cloning note: {str(e)}'
         }), 500
+
+### Standardize API responses and Handle Error ###
+@api.before_request
+def before_api_request():
+    g.api_info = {
+        'version': API_VERSION,
+        'endpoint': request.path,
+        'method': request.method
+    }
+
+def api_response(data):
+    return jsonify({
+        'api_info': g.api_info,
+        'data': data
+    })
 
 @api.errorhandler(404)
 def handle_404_error(e):
