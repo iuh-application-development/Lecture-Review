@@ -6,7 +6,7 @@
 {% endblock load_css %}
 
 {% block content %}
-{% include 'shared_modal.html' %}
+{% include 'shared_modal.html' %} {% include 'quiz_modal.html' %}
 <div class="content-wrapper">
     <div class="note-sidebar">
         <div class="sidebar-header">
@@ -89,6 +89,9 @@
                 <button class="btn btn-export" id="export-pdf-btn">
                     <i class="bi bi-download"></i> Export as PDF
                 </button>
+                <button id="generate-quiz-btn" class="btn btn-primary" data-note-id="{{ note.id }}">
+                    <i class="bi bi-card-checklist"></i> Generate Quiz
+                </button>
                 {% if note and note.user_id == current_user.id %}
                 <button class="btn btn-delete move-to-trash">
                     <i class="bi bi-trash"></i> Move to Trash
@@ -152,4 +155,5 @@
 <script src="https://cdn.jsdelivr.net/npm/editorjs-math/dist/bundle.min.js"></script>
 <script src="{{ url_for('static', filename='js/note_view.js') }}"></script>
 <script src="{{ url_for('static', filename='js/note_functions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/quiz_handler.js') }}"></script>
 {% endblock %}

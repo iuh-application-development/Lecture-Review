@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.note_id) {
                 window.location.href = `/edit-note/${data.note_id}`;
             } else {
-                window.location.reload();
+                // window.location.reload();
             }
             console.log('Saved successfully');
         } catch (err) {

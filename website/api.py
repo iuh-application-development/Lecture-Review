@@ -12,7 +12,7 @@ import json
 from sqlalchemy.sql.expression import or_
 from werkzeug.utils import secure_filename
 import os
-
+from .utils.quiz_generator import generate_quiz
 
 api = Blueprint('api', __name__)
 API_VERSION = 'api-v1'
@@ -705,6 +705,28 @@ def clone_note(note_id):
             'success': False,
             'message': f'Error cloning note: {str(e)}'
         }), 500
+
+@api.route('/generate-quiz/<int:note_id>', methods=['POST'])
+@login_required
+def create_quiz(note_id):
+    try:
+        data = request.get_json()
+        question_count = data.get('question_count', 5)  # Mặc định 5 câu hỏi
+        time_limit = data.get('time_limit', 0) # Mặc định không giới hạn thời gian
+
+        quiz_text = generate_quiz(note_id, question_count)
+        start_idx = quiz_text.find('{')
+        end_idx = quiz_text.rfind('}') + 1
+        
+        if start_idx >= 0 and end_idx > start_idx:
+            json_str = quiz_text[start_idx:end_idx]
+            quiz_json = json.loads(json_str)
+            return jsonify({"success": True, "quiz": quiz_json})
+        else:
+            print(f"Quiz generation error: {str(e)}")
+            return jsonify({"success": False, "error": "Invalid JSON response format"})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 ### Standardize API responses and Handle Error ###
 @api.before_request

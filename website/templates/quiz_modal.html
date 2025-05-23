@@ -1,0 +1,146 @@
+<div class="modal fade" id="quizModal" tabindex="-1" aria-labelledby="quizModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="quizModalLabel">Quiz from Note</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Quiz Timer (sẽ hiện khi bắt đầu quiz) -->
+        <div id="quiz-timer-container" class="position-absolute top-0 end-0 m-3 d-none">
+          <div class="quiz-timer">00:00</div>
+        </div>
+        
+        <!-- Quiz Settings Form -->
+        <div id="quiz-settings" class="mb-4">
+          <h5 class="mb-3">Quiz Settings</h5>
+          <form id="quiz-options-form">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="question-count" class="form-label">Number of Questions</label>
+                <select class="form-select" id="question-count">
+                  <option value="3">3 Questions</option>
+                  <option value="5" selected>5 Questions</option>
+                  <option value="7">7 Questions</option>
+                  <option value="10">10 Questions</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="time-limit" class="form-label">Time Limit</label>
+                <select class="form-select" id="time-limit">
+                  <option value="0">No time limit</option>
+                  <option value="5">5 minutes</option>
+                  <option value="10" selected>10 minutes</option>
+                  <option value="15">15 minutes</option>
+                  <option value="20">20 minutes</option>
+                </select>
+              </div>
+            </div>
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary" id="start-quiz-btn">Generate Quiz</button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Quiz Container -->
+        <div id="quiz-container" style="display:none;">
+          <div class="text-center">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Generating quiz questions...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Custom styles cho modal quiz */
+  #quizModal .modal-dialog {
+    max-height: 80vh;
+  }
+  
+  #quizModal .modal-content {
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,.2);
+    position: relative; /* Đảm bảo timer định vị chính xác */
+  }
+  
+  #quizModal .modal-body {
+    max-height: calc(80vh - 120px);
+    overflow-y: auto;
+    padding-top: 40px; /* Tạo không gian cho timer */
+  }
+  
+  /* Timer styles */
+  .quiz-timer {
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 0.3rem 0.7rem;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    z-index: 1050;
+  }
+  
+  #quiz-timer-container {
+    z-index: 1050;
+  }
+  
+  .quiz-timer.warning {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  
+  .quiz-timer.danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    animation: pulse 1s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+  }
+  
+  .quiz-progress-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #dee2e6;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-block;
+    margin: 0 3px;
+  }
+  
+  .quiz-progress-dot.active {
+    background-color: #0d6efd;
+    transform: scale(1.2);
+  }
+  
+  .quiz-progress-dot.answered {
+    background-color: #20c997;
+  }
+  
+  .quiz-progress-dot.answered.active {
+    background-color: #0dcaf0;
+  }
+
+  .quiz-progress-dot.temp-answered {
+    background-color: #a8d1ff;
+  }
+  
+  .selected-temp {
+    font-weight: 500;
+    color: #0d6efd;
+  }
+  
+  .form-check-input:checked + .form-check-label:not(.text-success):not(.text-danger) {
+    font-weight: 500;
+    color: #0d6efd;
+  }
+</style>
