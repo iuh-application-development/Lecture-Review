@@ -150,6 +150,7 @@ SECRET_KEY=your_secret_key
 JWT_SECRET_KEY=your_jwt_secret_key
 MAIL_USERNAME=your_email@gmail.com
 MAIL_PASSWORD=your_email_password
+GEMINI_API_KEY=your_api_key_gemini
 ```
 
 ### 5.4. Chạy và phát triển ứng dụng
