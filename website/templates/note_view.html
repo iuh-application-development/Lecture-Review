@@ -89,9 +89,11 @@
                 <button class="btn btn-export" id="export-pdf-btn">
                     <i class="bi bi-download"></i> Export as PDF
                 </button>
+                {% if note %}
                 <button id="generate-quiz-btn" class="btn btn-primary" data-note-id="{{ note.id }}">
                     <i class="bi bi-card-checklist"></i> Generate Quiz
                 </button>
+                {% endif %}
                 {% if note and note.user_id == current_user.id %}
                 <button class="btn btn-delete move-to-trash">
                     <i class="bi bi-trash"></i> Move to Trash
