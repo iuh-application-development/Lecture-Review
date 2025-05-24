@@ -18,6 +18,7 @@ api = Blueprint('api', __name__)
 API_VERSION = 'api-v1'
 
 @api.route('/notes', methods=['GET'])
+@login_required
 def get_notes():
     try:
         limit = request.args.get('limit', type=int)
@@ -52,6 +53,7 @@ def get_notes():
         }), 500
 
 @api.route('/notes-paginate', methods=['GET'])
+@login_required
 def get_notes_paginate():
     try:
         page = request.args.get('page', 1, type=int)
@@ -116,13 +118,14 @@ def get_notes_paginate():
         }), 500
 
 @api.route('/notes/create', methods=['POST'])
+@login_required
 def create_note():
     data = request.get_json()
     title = data.get('title')
     content = data.get('content')
     color = data.get('color', 'note-green')
     tags = data.get('tags', [])
-    user_id = data.get('user_id')
+    user_id = current_user.id
     is_public = data.get('is_public', False)
 
     new_note = Note(
@@ -170,6 +173,7 @@ def edit_note(note_id):
     })
 
 @api.route('/notes/<int:note_id>', methods=['GET'])
+@login_required
 def get_note_detail(note_id):
     note = Note.query.get_or_404(note_id)
     note_data = {
@@ -318,6 +322,7 @@ def delete_note(note_id):
     return jsonify({'success': True, 'message': 'Note permanently deleted.'})
 
 @api.route('/user-notes/<int:user_id>')
+@login_required
 def get_user_notes(user_id):
     notes = Note.query.filter_by(user_id=user_id).all()
     notes_data = [{
@@ -331,6 +336,7 @@ def get_user_notes(user_id):
     return jsonify({'success': True, 'notes': notes_data})
 
 @api.route('/shared-notes', methods=['GET'])
+@login_required
 def get_shared_notes():
     try:
         limit = request.args.get('limit', type=int)
@@ -371,6 +377,7 @@ def get_shared_notes():
         }), 500
 
 @api.route('/export-pdf', methods=['POST'])
+@login_required
 def export_pdf():
     payload = request.get_json()
     blocks = payload.get('blocks', [])
@@ -394,6 +401,7 @@ def export_pdf():
     return response
 
 @api.route('/send-otp', methods=['POST'])
+@login_required
 def send_otp():
     data = request.get_json()
     email = data.get('email')
@@ -411,7 +419,6 @@ def send_otp():
 
     send_email('Mã OTP của bạn', email, message)
     return message
-        
         
 @api.route('/public-notes', methods=['GET'])
 def get_public_notes():
@@ -459,6 +466,7 @@ def get_public_notes():
         }), 500
 
 @api.route('/comments/<int:note_id>', methods=['GET'])
+@login_required
 def get_comments(note_id):
     try: 
         note = Note.query.get_or_404(note_id)
