@@ -17,3 +17,8 @@ class Config:
 
     # Cấu hình API GEMINI
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+    
+class TestingConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'  # Dùng DB in-memory cho test 
+    WTF_CSRF_ENABLED = False  

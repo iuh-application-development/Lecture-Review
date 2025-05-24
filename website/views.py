@@ -22,12 +22,12 @@ def all_my_notes():
 @views.route('/share-with-me')
 @login_required
 def share_with_me():
-    return render_template('share_with_me.html', user=current_user, shared_by_me=0)
+    return render_template('share_with_me.html', user=current_user, shared_by_me=False)
 
 @views.route('/share-by-me')
 @login_required
 def share_by_me():
-    return render_template('share_with_me.html', user=current_user, shared_by_me=1)
+    return render_template('share_with_me.html', user=current_user, shared_by_me=True)
 
 @views.route('/trash')
 @login_required

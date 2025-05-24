@@ -334,9 +334,9 @@ def get_user_notes(user_id):
 def get_shared_notes():
     try:
         limit = request.args.get('limit', type=int)
-        by_me = request.args.get('byMe', type=int)
+        by_me = request.args.get('byMe', type=str)
 
-        if by_me:
+        if by_me == 'true':
             query = ShareNote.query.join(ShareNote.note).filter(ShareNote.sharer_id==current_user.id, Note.is_trashed==False).order_by(Note.updated_at.desc())
         else:
             query = ShareNote.query.join(ShareNote.note).filter(ShareNote.recipient_id==current_user.id, Note.is_trashed==False).order_by(Note.updated_at.desc())

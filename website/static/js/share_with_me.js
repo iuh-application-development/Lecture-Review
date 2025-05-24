@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('note_functions.js DOMContentLoaded');
 
     const sharedContainer = document.getElementById('sharedNotesContainer');
-    const byMe = sharedContainer.getAttribute('data-by-me') ? parseInt(sharedContainer.getAttribute('data-by-me')) : 0;
+    const byMe = sharedContainer.getAttribute('data-by-me');
 
     // Hàm shareNote cho modal chia sẻ
     async function shareNote(event) {
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="note-content">
                 <div class="note-header d-flex justify-content-between align-items-start pb-1">
                     <strong class="d-inline-block"><em>${truncatedTitle}</em></strong>
-                    ${byMe ?
+                    ${byMe === 'true' ?
                     `<div class="dropdown">
                         <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown">
                             <i class="bi bi-three-dots-vertical"></i>
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <small class="text-muted">Shared at: ${sharedStr}</small>
                 <br/>
                 <p class="fst-italic">
-                    ${byMe ? 
+                    ${byMe === 'true' ? 
                         `<small class="fst-italic">Shared to ${share_note.recipient}</small>` : 
                         `<small class="fst-italic">Shared by ${share_note.sharer}</small>`}
                 </p>
@@ -236,7 +236,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 const noteId = this.getAttribute('data-note-id');
                 document.getElementById('noteIdToShare').value = noteId;
             });
-        }        if (byMe) {
+        }        
+        
+        if (byMe === 'true') {
             const deleteButton = noteCard.querySelector('.dropdown-item.text-danger');
             deleteButton.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -261,7 +263,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         alert('Đã xảy ra lỗi.');
                     });
                 }
-            });
+            }
+        );
         } else {
             // Nếu là note được share cho mình, thêm xử lý nút clone
             const cloneButton = noteCard.querySelector('.clone-note');
@@ -278,7 +281,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
         return noteCard;
-    }    async function fetchSharedNotes() {
+    }    
+    
+    async function fetchSharedNotes() {
         try {
             const limit = sharedContainer.getAttribute('data-limit') ? parseInt(sharedContainer.getAttribute('data-limit')) : 9;
             const response = await fetch(`/api/shared-notes?limit=${limit}&byMe=${byMe}`);
