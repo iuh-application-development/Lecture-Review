@@ -36,9 +36,13 @@
 
     <!-- Cards -->
      <div style="min-height: 80%;">
-       <div id="sharedNotesContainer" class="all-notes-container d-flex flex-wrap gap-3 mb-5" data-limit="15" data-by-me="{{shared_by_me}}">
-           <!-- Notes sẽ được load ở đây -->
-       </div>
+       <div id="sharedNotesContainer" 
+          class="all-notes-container d-flex flex-wrap gap-3 mb-5" 
+          data-limit="15" 
+          data-by-me="{{ shared_by_me|string|lower }}">
+    <!-- Notes sẽ được load ở đây -->
+</div>
+
      </div>
   </div>
 </div>

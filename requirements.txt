@@ -10,3 +10,5 @@ weasyprint
 matplotlib
 pyotp
 gunicorn
+pytest
+locust

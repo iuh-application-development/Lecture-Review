@@ -7,9 +7,13 @@ import pytz
 
 db = SQLAlchemy()
 
-def create_app():
+def create_app(config_name=None):
     app = Flask(__name__)
-    app.config.from_object(Config)
+    if config_name == 'testing':
+        from .config import TestingConfig
+        app.config.from_object(TestingConfig)
+    else:
+        app.config.from_object(Config)
     app.jinja_env.filters['vn_datetime'] = vn_datetime
     db.init_app(app)
 
