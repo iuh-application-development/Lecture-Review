@@ -220,8 +220,8 @@ gcloud run deploy lecture-review --image gcr.io/YOUR_PROJECT_ID/lecture-review -
 - Cân nhắc sử dụng cơ sở dữ liệu có tính sao lưu tự động như Cloud SQL cho môi trường sản phẩm
 
 ## 6. KIỂM THỬ
-- Thực hiện kiểm thử chức năng (Functional Testing)
-- Kiểm thử hiệu năng (Performance Testing)
+- Thực hiện kiểm thử chức năng (Functional Testing): Kiểm thử chức năng đăng nhập, đăng kí, đăng xuất, truy cập các giao diện người dùng, tạo và chia sẻ note,...
+- Kiểm thử hiệu năng (Performance Testing): Mô phỏng nhiều người dùng và thực hiện các hành động cùng một lúc
 
 ## 7. KẾT QUẢ
 ### 7.1. Kết quả đạt được

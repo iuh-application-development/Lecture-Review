@@ -13,6 +13,8 @@ from sqlalchemy.sql.expression import or_
 from werkzeug.utils import secure_filename
 import os
 from .utils.quiz_generator import generate_quiz
+from .utils.jwt_processor import generate_password_reset_token, verify_password_reset_token
+from werkzeug.security import generate_password_hash
 
 api = Blueprint('api', __name__)
 API_VERSION = 'api-v1'
@@ -735,6 +737,185 @@ def create_quiz(note_id):
             return jsonify({"success": False, "error": "Invalid JSON response format"})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+
+@api.route('/request-password-reset', methods=['POST'])
+def request_password_reset():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        
+        if not email:
+            return jsonify({
+                'success': False,
+                'message': 'Email là bắt buộc'
+            }), 400
+            
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({
+                'success': False,
+                'message': 'Email không tồn tại trong hệ thống'
+            }), 404
+            
+        # Tạo JWT token cho đặt lại mật khẩu
+        reset_token = generate_password_reset_token(email)
+        
+        # Tạo URL đặt lại mật khẩu
+        reset_url = request.host_url.rstrip('/') + f'/reset-password?token={reset_token}'
+        
+        # Chuẩn bị nội dung email
+        message = f"""
+        <html>
+        <body>
+            <h2>Đặt lại mật khẩu</h2>
+            <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản của mình.</p>
+            <p>Vui lòng click vào liên kết sau để đặt lại mật khẩu:</p>
+            <p><a href="{reset_url}">Tại đây</a></p>
+            <p>Liên kết này có hiệu lực trong 30 phút.</p>
+            <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>
+        </body>
+        </html>
+        """
+        
+        # Gửi email chứa liên kết đặt lại mật khẩu
+        send_email('Yêu cầu đặt lại mật khẩu', email, message)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Email đặt lại mật khẩu đã được gửi'
+        })
+        
+    except Exception as e:
+        print(f'Lỗi khi gửi email đặt lại mật khẩu: {str(e)}')
+        return jsonify({
+            'success': False,
+            'message': 'Đã xảy ra lỗi khi gửi email đặt lại mật khẩu'
+        }), 500
+
+@api.route('/verify-reset-token', methods=['POST'])
+def verify_reset_token():
+    try:
+        data = request.get_json()
+        token = data.get('token')
+        
+        if not token:
+            return jsonify({
+                'success': False,
+                'message': 'Token là bắt buộc'
+            }), 400
+            
+        # Xác thực token
+        email = verify_password_reset_token(token)
+        
+        if not email:
+            return jsonify({
+                'success': False,
+                'message': 'Token không hợp lệ hoặc đã hết hạn'
+            }), 400
+            
+        # Kiểm tra xem email có tồn tại trong hệ thống không
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({
+                'success': False,
+                'message': 'Người dùng không tồn tại'
+            }), 404
+            
+        return jsonify({
+            'success': True,
+            'message': 'Token hợp lệ',
+            'email': email
+        })
+        
+    except Exception as e:
+        print(f'Lỗi khi xác thực token: {str(e)}')
+        return jsonify({
+            'success': False,
+            'message': 'Đã xảy ra lỗi khi xác thực token'
+        }), 500
+
+@api.route('/complete-password-reset', methods=['POST'])
+def complete_password_reset():
+    try:
+        data = request.get_json()
+        token = data.get('token')
+        new_password = data.get('new_password')
+        
+        if not token or not new_password:
+            return jsonify({
+                'success': False,
+                'message': 'Token và mật khẩu mới là bắt buộc'
+            }), 400
+            
+        # Kiểm tra độ dài mật khẩu
+        if len(new_password) < 6:
+            return jsonify({
+                'success': False,
+                'message': 'Mật khẩu phải có ít nhất 6 ký tự'
+            }), 400
+            
+        # Xác thực token
+        email = verify_password_reset_token(token)
+        
+        if not email:
+            return jsonify({
+                'success': False,
+                'message': 'Token không hợp lệ hoặc đã hết hạn'
+            }), 400
+            
+        # Tìm người dùng
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({
+                'success': False,
+                'message': 'Không tìm thấy người dùng'
+            }), 404
+        
+        try:
+            # Cập nhật mật khẩu
+            user.password_hash = generate_password_hash(new_password)
+            
+            # Tạo thông báo cho người dùng
+            notification = UserNotification(
+                user_id=user.id,
+                title="Mật khẩu đã được thay đổi",
+                message="Mật khẩu tài khoản của bạn đã được thay đổi thành công.",
+                type='info',
+                is_read=False
+            )
+            db.session.add(notification)
+            db.session.commit()
+            
+            # Gửi email thông báo đổi mật khẩu thành công
+            notify_message = f"""
+            <html>
+            <body>
+                <h2>Mật khẩu đã được thay đổi</h2>
+                <p>Mật khẩu tài khoản của bạn đã được thay đổi thành công.</p>
+                <p>Thời gian: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}</p>
+                <p>Nếu bạn không thực hiện thao tác này, vui lòng liên hệ với quản trị viên ngay lập tức.</p>
+            </body>
+            </html>
+            """
+            
+            send_email('Thông báo: Mật khẩu đã được thay đổi', email, notify_message)
+            
+            return jsonify({
+                'success': True,
+                'message': 'Mật khẩu đã được đặt lại thành công'
+            })
+            
+        except Exception as e:
+            db.session.rollback()
+            raise e
+            
+    except Exception as e:
+        db.session.rollback()
+        print(f'Lỗi khi đặt lại mật khẩu: {str(e)}')
+        return jsonify({
+            'success': False,
+            'message': 'Đã xảy ra lỗi khi đặt lại mật khẩu'
+        }), 500
 
 ### Standardize API responses and Handle Error ###
 @api.before_request

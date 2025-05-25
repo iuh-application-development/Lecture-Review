@@ -13,3 +13,4 @@ gunicorn
 google-genai
 pytest
 locust
+PyJWT
