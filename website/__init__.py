@@ -1,7 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from .config import Config
+from .utils.session_tracker import SessionTracker
 import os
 import pytz
 
@@ -17,7 +18,6 @@ def create_app(config_name=None):
     app.jinja_env.filters['vn_datetime'] = vn_datetime
     db.init_app(app)
 
-    
     from .views import views
     from .auth import auth
     from .api import api
@@ -37,6 +37,11 @@ def create_app(config_name=None):
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
+
+    @app.before_request
+    def track_user_activity():
+        if current_user.is_authenticated:
+            SessionTracker.update_session()
 
     create_database(app)
     return app

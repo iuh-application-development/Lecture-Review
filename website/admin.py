@@ -18,7 +18,8 @@ def dashboard():
 
     return render_template('admin/dashboard_admin.html', 
                           total_users=dashboard_data['total_users'], 
-                          total_notes=dashboard_data['total_notes'], 
+                          total_notes=dashboard_data['total_notes'],
+                          active_sessions=dashboard_data['active_sessions'], 
                           user=current_user,
                           notes_chart_data=notes_chart_data,
                           accounts_chart_data=accounts_chart_data)
