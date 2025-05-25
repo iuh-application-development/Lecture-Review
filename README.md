@@ -98,12 +98,32 @@ Các màn hình được thiết kế theo phong cách phẳng (flat design), s�
 
 ## 4. CÔNG CỤ VÀ CÔNG NGHỆ SỬ DỤNG
 
-- Ngôn ngữ lập trình: Python
-- Framework: Flask (framework web)
+### 4.1. Backend
+- Ngôn ngữ lập trình: Python 3.9+
+- Framework: Flask
 - Cơ sở dữ liệu: SQLite (lưu trong instance/database.db)
-- Frontend: HTML, CSS, JavaScript
+- API intergration: Google Gemini API (Quiz)
+
+### 4.2. Frontend
+- HTML/CSS: Cấu trúc và giao diện web
+- JavaScript: Xử lý tương tác người dùng
+- Bootstrap: Framework CSS cho thiết kế responsive
+- Thư viện JavaScript:
+   - Plotly.js: Tạo biểu đồ thống kê tương tác
+   - Editorjs: Editor định dạng cho ghi chú
+
+### 4.3. Security
+- Authentication: JWT (JSON Web Tokens)
+- Password Hashing: Bcrypt
+
+### 4.4. DevOps & Deployment
 - IDE: Visual Studio Code
-- Docker: Containerization
+- Version Control: Git
+- Containerization: Docker
+- Cloud Platform: Google Cloud Run (Deploy)
+- Testing Tools:
+   - Pytest (kiểm thử chức năng)
+   - Locust (kiểm thử hiệu năng)
 
 ## 5. TRIỂN KHAI
 
@@ -118,7 +138,7 @@ Các màn hình được thiết kế theo phong cách phẳng (flat design), s�
 
 #### 5.2.1. Clone repository từ GitHub
 ```bash
-git clone <repository_url>
+git clone https://github.com/iuh-application-development/Lecture-Review.git
 cd Lecture-Review
 ```
 
@@ -235,15 +255,13 @@ GEMINI_API_KEY=your_api_key_gemini"
 - Cân nhắc sử dụng cơ sở dữ liệu có tính sao lưu tự động như Cloud SQL cho môi trường sản phẩm
 
 ## 6. KIỂM THỬ
-- Thực hiện kiểm thử chức năng (Functional Testing): Kiểm thử chức năng đăng nhập, đăng kí, đăng xuất, truy cập các giao diện người dùng, tạo và chia sẻ note,...
-  
- ![Pytest](./docs/testing/pytest.png)
+- Thực hiện kiểm thử chức năng (Functional Testing): Kiểm thử chức năng đăng nhập, đăng kí, đăng xuất, truy cập các giao diện người dùng, tạo và chia sẻ note,... (Chạy lệnh: `pytest tests`)
+   ![Pytest](./docs/testing/pytest.png)
 
-- Kiểm thử hiệu năng (Performance Testing): Mô phỏng nhiều người dùng và thực hiện các hành động cùng một lúc
- 
-  ![Locust Statistic](./docs/testing/locust_stat.png)
+- Kiểm thử hiệu năng (Performance Testing): Mô phỏng nhiều người dùng và thực hiện các hành động cùng một lúc (Chạy lệnh: `locust --host=http://localhost:8080`)
+   ![Locust Statistic](./docs/testing/locust_stat.png)
   
-  ![Locust Charts](./docs/testing/locust_charts.png)
+   ![Locust Charts](./docs/testing/locust_charts.png)
 
 ## 7. KẾT QUẢ
 ### 7.1. Kết quả đạt được
@@ -254,7 +272,7 @@ GEMINI_API_KEY=your_api_key_gemini"
 - Có cơ chế bảo mật để đảm bảo an toàn thông tin cá nhân
 - Xây dựng được tính năng luyện tập dưới dạng trắc nghiệm
 ### 7.2. Link deploy
-https://www.projectsiuh.online/
+https://www.projectsiuh.online
 
 ### 7.3. Kết quả chưa đạt được
 - Chưa triển khai được dark mode 
@@ -267,9 +285,8 @@ https://www.projectsiuh.online/
 - Thêm tính năng chia sẻ bài trắc nghiệm và tổ chức thi đua giữa người dùng
 ## 8. LINK VIDEO BÁO CÁO
 ## 9. TÀI LIỆU THAM KHẢO
-- Flask Documentation: https://flask.palletsprojects.com/
-- WeasyPrint: https://weasyprint.org/
-- MDN Web Docs (HTML, CSS, JavaScript): https://developer.mozilla.org/
-- Bootstrap Documentation: https://getbootstrap.com/docs/
-- Python Documentation: https://docs.python.org/
-- W3Schools Online Web Tutorials: https://www.w3schools.com/
+- Flask Documentation: https://flask.palletsprojects.com
+- Google Gemini API Documentation: https://ai.google.dev/gemini-api/docs?hl=vi
+- Bootstrap Documentation: https://getbootstrap.com/docs
+- Editor.js Documentation: https://editorjs.io/getting-started
+- Google Cloud Run Documentation: https://cloud.google.com/run/docs/deploy-functions
