@@ -237,14 +237,13 @@ GEMINI_API_KEY=your_api_key_gemini"
 ## 6. KIỂM THỬ
 - Thực hiện kiểm thử chức năng (Functional Testing): Kiểm thử chức năng đăng nhập, đăng kí, đăng xuất, truy cập các giao diện người dùng, tạo và chia sẻ note,...
   
- <img width="581" alt="image" src="https://github.com/user-attachments/assets/54d02835-0d50-41bc-97f3-85510b7fd223" />
+ ![Pytest](./docs/testing/pytest.png)
 
-
-- Kiểm thử hiệu năng (Performance Testing):Mô phỏng nhiều người dùng và thực hiện các hành động cùng một lúc
+- Kiểm thử hiệu năng (Performance Testing): Mô phỏng nhiều người dùng và thực hiện các hành động cùng một lúc
  
-  <img width="624" alt="image" src="https://github.com/user-attachments/assets/1aa43218-508c-4b7d-948b-9d17c9264ff7" />
+  ![Locust Statistic](./docs/testing/locust_stat.png)
   
-  ![Screenshot 2025-05-25 170451](https://github.com/user-attachments/assets/35eefbb2-b7d4-466a-ae01-b8f8115d34e3)
+  ![Locust Charts](./docs/testing/locust_charts.png)
 
 ## 7. KẾT QUẢ
 ### 7.1. Kết quả đạt được
