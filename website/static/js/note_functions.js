@@ -357,9 +357,9 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const limit = sharedContainer.getAttribute('data-limit') ? parseInt(sharedContainer.getAttribute('data-limit')) : 10;
             const byMe = sharedContainer.getAttribute('data-by-me') ? parseInt(sharedContainer.getAttribute('data-by-me')) : 0;
-            const response = await fetch(`/api/shared-notes?limit=${limit}&byMe=${byMe}`);
+            const response = await fetch(`/api/shared-notes?page=${1}&limit=${limit}&byMe=${byMe}`);
             const result = await response.json();
-            const notes = result.data || [];
+            const notes = result.data.notes || [];
 
             console.log(result);
 

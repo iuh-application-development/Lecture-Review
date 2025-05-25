@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
         pagination.appendChild(prevLi);
         
         // Logic hiển thị số trang
-        const maxVisiblePages = 5; // Số trang tối đa hiển thị
+        const maxVisiblePages = 2; // Số trang tối đa hiển thị
         let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
         let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 

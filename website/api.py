@@ -341,19 +341,18 @@ def get_user_notes(user_id):
 @login_required
 def get_shared_notes():
     try:
-        limit = request.args.get('limit', type=int)
+        page = request.args.get('page', 1, type=int)
+        limit = request.args.get('limit', 15, type=int)
         by_me = request.args.get('byMe', type=str)
 
         if by_me == 'true':
             query = ShareNote.query.join(ShareNote.note).filter(ShareNote.sharer_id==current_user.id, Note.is_trashed==False).order_by(Note.updated_at.desc())
         else:
             query = ShareNote.query.join(ShareNote.note).filter(ShareNote.recipient_id==current_user.id, Note.is_trashed==False).order_by(Note.updated_at.desc())
-
-        if limit:
-            shared_notes = query.limit(limit).all()
-        else:
-            shared_notes = query.all()
-
+        
+        # Phân trang
+        pagination = query.paginate(page=page, per_page=limit, error_out=False)
+        
         shared_notes_data = [{
             'note_id': shared_note.note.id,
             'title': shared_note.note.title,
@@ -363,16 +362,24 @@ def get_shared_notes():
             'color': shared_note.note.color,
             'tags': shared_note.note.tags,
             'sharer': shared_note.sharer.first_name + ' ' + shared_note.sharer.last_name,
-            'recipient': shared_note.recipient.first_name + ' ' + shared_note.recipient.last_name
-        } for shared_note in shared_notes]
+            'recipient': shared_note.recipient.first_name + ' ' + shared_note.recipient.last_name,
+            'share_id': shared_note.id
+        } for shared_note in pagination.items]
 
         return jsonify({
             'status': 'success',
-            'data': shared_notes_data
+            'data': {
+                'notes': shared_notes_data,
+                'page': pagination.page,
+                'total_pages': pagination.pages,
+                'total_items': pagination.total,
+                'has_next': pagination.has_next,
+                'has_prev': pagination.has_prev
+            }
         })
 
     except Exception as e:
-        print('Error in get_notes:', str(e))  # Log lỗi để debug
+        print('Error in get_shared_notes:', str(e))  # Log lỗi để debug
         return jsonify({
             'status': 'error',
             'message': 'Error fetching notes'
