@@ -236,7 +236,15 @@ GEMINI_API_KEY=your_api_key_gemini"
 
 ## 6. KIỂM THỬ
 - Thực hiện kiểm thử chức năng (Functional Testing): Kiểm thử chức năng đăng nhập, đăng kí, đăng xuất, truy cập các giao diện người dùng, tạo và chia sẻ note,...
-- Kiểm thử hiệu năng (Performance Testing): Mô phỏng nhiều người dùng và thực hiện các hành động cùng một lúc
+  
+ <img width="581" alt="image" src="https://github.com/user-attachments/assets/54d02835-0d50-41bc-97f3-85510b7fd223" />
+
+
+- Kiểm thử hiệu năng (Performance Testing):Mô phỏng nhiều người dùng và thực hiện các hành động cùng một lúc
+ 
+  <img width="624" alt="image" src="https://github.com/user-attachments/assets/1aa43218-508c-4b7d-948b-9d17c9264ff7" />
+  
+  ![Screenshot 2025-05-25 170451](https://github.com/user-attachments/assets/35eefbb2-b7d4-466a-ae01-b8f8115d34e3)
 
 ## 7. KẾT QUẢ
 ### 7.1. Kết quả đạt được
@@ -250,8 +258,8 @@ GEMINI_API_KEY=your_api_key_gemini"
 https://www.projectsiuh.online/
 
 ### 7.3. Kết quả chưa đạt được
-- [Kết quả chưa đạt được 1]
-- [Kết quả chưa đạt được 2]
+- Chưa triển khai được dark mode 
+- Giao diện website hiện tại chỉ tối ưu cho máy tính, sử dụng trên mobile thì bố cục sẽ bị lệch, khó thao tác
 
 ### 7.4. Hướng phát triển
 - Tích hợp trí tuệ nhân tạo để gợi ý và tóm tắt nội dung
