@@ -137,6 +137,7 @@ source venv/bin/activate
 
 #### 5.2.3. Cài đặt các thư viện phụ thuộc
 ```bash
+python -m pip install --upgrade pip  # Nâng cấp phiên bản mới nhất của pip
 pip install -r requirements.txt
 ```
 
@@ -176,7 +177,13 @@ docker build -t lecture-review:latest .
 
 #### 5.5.2. Chạy container từ image đã tạo
 ```bash
-docker run -p 8080:8080 -e SECRET_KEY=your_secret_key -e JWT_SECRET_KEY=your_jwt_secret_key -e MAIL_USERNAME=your_email@gmail.com -e MAIL_PASSWORD=your_email_password -e GEMINI_API_KEY=your_api_key_gemini lecture-review:latest
+docker run -p 8080:8080 \
+  -e SECRET_KEY=your_secret_key \
+  -e JWT_SECRET_KEY=your_jwt_secret_key \
+  -e MAIL_USERNAME=your_email@gmail.com \
+  -e MAIL_PASSWORD=your_email_password \
+  -e GEMINI_API_KEY=your_api_key_gemini \
+  lecture-review:latest
 ```
 
 ### 5.6. Triển khai lên Google Cloud Run
@@ -198,7 +205,15 @@ gcloud builds submit --tag gcr.io/YOUR_PROJECT_ID/lecture-review
 
 #### 5.6.4. Triển khai lên Google Cloud Run
 ```bash
-gcloud run deploy lecture-review --image gcr.io/YOUR_PROJECT_ID/lecture-review --platform managed --region asia-southeast1 --allow-unauthenticated --set-env-vars="SECRET_KEY=your_secret_key,JWT_SECRET_KEY=your_jwt_secret_key,MAIL_USERNAME=your_email@gmail.com,MAIL_PASSWORD=your_email_password,GEMINI_API_KEY=your_api_key_gemini"
+gcloud run deploy lecture-review \
+  --source . \
+  --region asia-southeast1 \
+  --allow-unauthenticated \
+  --set-env-vars="SECRET_KEY=your_secret_key,\
+JWT_SECRET_KEY=your_jwt_secret_key,\
+MAIL_USERNAME=your_email@gmail.com,\
+MAIL_PASSWORD=your_email_password,\
+GEMINI_API_KEY=your_api_key_gemini"
 ```
 
 ### 5.7. Quản lý triển khai
