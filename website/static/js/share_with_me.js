@@ -4,7 +4,11 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('note_functions.js DOMContentLoaded');
 
     const sharedContainer = document.getElementById('sharedNotesContainer');
-    const byMe = sharedContainer.getAttribute('data-by-me') ? parseInt(sharedContainer.getAttribute('data-by-me')) : 0;
+    const byMe = sharedContainer.getAttribute('data-by-me');
+    const paginationContainer = document.querySelector('.pagination-container');
+    const currentPageInfo = document.getElementById('currentPageInfo');
+    const totalPagesInfo = document.getElementById('totalPagesInfo');
+    let currentPage = 1;
 
     // Hàm shareNote cho modal chia sẻ
     async function shareNote(event) {
@@ -179,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="note-content">
                 <div class="note-header d-flex justify-content-between align-items-start pb-1">
                     <strong class="d-inline-block"><em>${truncatedTitle}</em></strong>
-                    ${byMe ?
+                    ${byMe === 'true' ?
                     `<div class="dropdown">
                         <button class="btn btn-link p-0 border-0" type="button" data-bs-toggle="dropdown">
                             <i class="bi bi-three-dots-vertical"></i>
@@ -216,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <small class="text-muted">Shared at: ${sharedStr}</small>
                 <br/>
                 <p class="fst-italic">
-                    ${byMe ? 
+                    ${byMe === 'true' ? 
                         `<small class="fst-italic">Shared to ${share_note.recipient}</small>` : 
                         `<small class="fst-italic">Shared by ${share_note.sharer}</small>`}
                 </p>
@@ -236,7 +240,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 const noteId = this.getAttribute('data-note-id');
                 document.getElementById('noteIdToShare').value = noteId;
             });
-        }        if (byMe) {
+        }        
+        
+        if (byMe === 'true') {
             const deleteButton = noteCard.querySelector('.dropdown-item.text-danger');
             deleteButton.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -261,7 +267,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         alert('Đã xảy ra lỗi.');
                     });
                 }
-            });
+            }
+        );
         } else {
             // Nếu là note được share cho mình, thêm xử lý nút clone
             const cloneButton = noteCard.querySelector('.clone-note');
@@ -278,14 +285,16 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
         return noteCard;
-    }    async function fetchSharedNotes() {
+    }    
+    
+    async function fetchSharedNotes(page = 1) {
         try {
             const limit = sharedContainer.getAttribute('data-limit') ? parseInt(sharedContainer.getAttribute('data-limit')) : 9;
-            const response = await fetch(`/api/shared-notes?limit=${limit}&byMe=${byMe}`);
+            const response = await fetch(`/api/shared-notes?page=${page}&limit=${limit}&byMe=${byMe}`);
             const result = await response.json();
-            const notes = result.data || [];
-
-            console.log(result);
+            const notes = result.data?.notes || [];
+            const totalPages = result.data?.total_pages || 1;
+            const currentPageNum = result.data?.page || 1;
 
             sharedContainer.innerHTML = '';
 
@@ -300,6 +309,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         <p>No notes found. No body share note for you!</p>
                     </div>
                 `;
+                // Ẩn phân trang khi không có dữ liệu
+                paginationContainer.style.display = 'none';
                 return;
             }
 
@@ -307,6 +318,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 const noteCard = createSharedNoteCard(note);
                 sharedContainer.appendChild(noteCard);
             });
+
+            // Cập nhật thông tin phân trang
+            currentPage = currentPageNum;
+            if (totalPages > 1) {
+                updatePagination(currentPageNum, totalPages);
+                paginationContainer.style.display = 'block';
+                currentPageInfo.textContent = currentPageNum;
+                totalPagesInfo.textContent = totalPages;
+            } else {
+                paginationContainer.style.display = 'none';
+            }
         } catch (error) {
             console.error('Error fetching notes:', error);
             sharedContainer.innerHTML = `
@@ -315,9 +337,109 @@ document.addEventListener('DOMContentLoaded', function () {
                     <button class="btn btn-link" onclick="location.reload()">Retry</button>
                 </div>
             `;
+            paginationContainer.style.display = 'none';
         }
     }
     
+    function updatePagination(currentPage, totalPages) {
+        const pagination = document.querySelector('.custom-pagination');
+        pagination.innerHTML = '';
+
+        // Nút Previous
+        const prevLi = document.createElement('li');
+        prevLi.className = `page-item ${currentPage <= 1 ? 'disabled' : ''}`;
+        prevLi.innerHTML = `
+            <a class="page-link" href="#" ${currentPage <= 1 ? 'tabindex="-1"' : ''}>
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        `;
+        if (currentPage > 1) {
+            prevLi.onclick = (e) => {
+                e.preventDefault();
+                fetchSharedNotes(currentPage - 1);
+            };
+        }
+        pagination.appendChild(prevLi);
+
+        // Logic hiển thị số trang
+        const maxVisiblePages = 2; // Số trang tối đa hiển thị
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        // Điều chỉnh startPage nếu endPage đã đạt giới hạn
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // Thêm nút First Page nếu không ở trang đầu
+        if (startPage > 1) {
+            const firstLi = document.createElement('li');
+            firstLi.className = 'page-item';
+            firstLi.innerHTML = '<a class="page-link" href="#">1</a>';
+            firstLi.onclick = (e) => {
+                e.preventDefault();
+                fetchSharedNotes(1);
+            };
+            pagination.appendChild(firstLi);
+
+            // Thêm dấu ... nếu có khoảng cách
+            if (startPage > 2) {
+                const ellipsisLi = document.createElement('li');
+                ellipsisLi.className = 'page-item disabled';
+                ellipsisLi.innerHTML = '<span class="page-link">...</span>';
+                pagination.appendChild(ellipsisLi);
+            }
+        }
+
+        // Các số trang
+        for (let i = startPage; i <= endPage; i++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+            li.onclick = (e) => {
+                e.preventDefault();
+                fetchSharedNotes(i);
+            };
+            pagination.appendChild(li);
+        }
+
+        // Thêm nút Last Page nếu không ở trang cuối
+        if (endPage < totalPages) {
+            // Thêm dấu ... nếu có khoảng cách
+            if (endPage < totalPages - 1) {
+                const ellipsisLi = document.createElement('li');
+                ellipsisLi.className = 'page-item disabled';
+                ellipsisLi.innerHTML = '<span class="page-link">...</span>';
+                pagination.appendChild(ellipsisLi);
+            }
+
+            const lastLi = document.createElement('li');
+            lastLi.className = 'page-item';
+            lastLi.innerHTML = `<a class="page-link" href="#">${totalPages}</a>`;
+            lastLi.onclick = (e) => {
+                e.preventDefault();
+                fetchSharedNotes(totalPages);
+            };
+            pagination.appendChild(lastLi);
+        }
+
+        // Nút Next
+        const nextLi = document.createElement('li');
+        nextLi.className = `page-item ${currentPage >= totalPages ? 'disabled' : ''}`;
+        nextLi.innerHTML = `
+            <a class="page-link" href="#" ${currentPage >= totalPages ? 'tabindex="-1"' : ''}>
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        `;
+        if (currentPage < totalPages) {
+            nextLi.onclick = (e) => {
+                e.preventDefault();
+                fetchSharedNotes(currentPage + 1);
+            };
+        }
+        pagination.appendChild(nextLi);
+    }
+
     // Hàm để tạo bản sao của note
     async function cloneNote(noteId) {
         try {
@@ -382,8 +504,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     window.addEventListener('popstate', function (event) {
-        fetchSharedNotes(1);
+        fetchSharedNotes(currentPage);
     });
 
-    fetchSharedNotes();
+    fetchSharedNotes(1);
 });

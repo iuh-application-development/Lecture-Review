@@ -1,5 +1,6 @@
 from sqlalchemy import func
 from ..models import Note, User, ShareNote, db
+from .session_tracker import SessionTracker
 import json
 
 class ChartDataGenerator:
@@ -124,7 +125,10 @@ class ChartDataGenerator:
         total_users = User.query.count()
         total_notes = Note.query.count()
         
+        active_sessions = SessionTracker.get_active_count()
+
         return {
             'total_users': total_users,
-            'total_notes': total_notes
+            'total_notes': total_notes,
+            'active_sessions': active_sessions
         }

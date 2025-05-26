@@ -192,3 +192,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     fetchComments();
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteNoteBtn = document.querySelector('.btn-danger[data-note-id]');
+    
+    if (deleteNoteBtn) {
+        deleteNoteBtn.addEventListener('click', async function() {
+            const noteId = this.getAttribute('data-note-id');
+            
+            // Hiển thị hộp thoại xác nhận trước khi xóa
+            if (confirm('Bạn có chắc chắn muốn xóa ghi chú này không? Hành động này không thể hoàn tác.')) {
+                try {
+                    // Gửi yêu cầu xóa đến máy chủ
+                    const response = await fetch(`/api/notes/${noteId}/delete`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        alert('Ghi chú đã được xóa thành công');
+                        window.location.href = '/admin/manage-contents';
+                    } else {
+                        alert('Lỗi: ' + (result.message || 'Không thể xóa ghi chú'));
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi xóa ghi chú:', error);
+                    alert('Đã xảy ra lỗi khi xóa ghi chú. Vui lòng thử lại.');
+                }
+            }
+        });
+    }
+});

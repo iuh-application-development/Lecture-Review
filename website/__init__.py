@@ -1,19 +1,23 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from .config import Config
+from .utils.session_tracker import SessionTracker
 import os
 import pytz
 
 db = SQLAlchemy()
 
-def create_app():
+def create_app(config_name=None):
     app = Flask(__name__)
-    app.config.from_object(Config)
+    if config_name == 'testing':
+        from .config import TestingConfig
+        app.config.from_object(TestingConfig)
+    else:
+        app.config.from_object(Config)
     app.jinja_env.filters['vn_datetime'] = vn_datetime
     db.init_app(app)
 
-    
     from .views import views
     from .auth import auth
     from .api import api
@@ -33,6 +37,11 @@ def create_app():
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
+
+    @app.before_request
+    def track_user_activity():
+        if current_user.is_authenticated:
+            SessionTracker.update_session()
 
     create_database(app)
     return app

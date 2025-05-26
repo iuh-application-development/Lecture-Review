@@ -10,3 +10,7 @@ weasyprint
 matplotlib
 pyotp
 gunicorn
+google-genai
+pytest
+locust
+PyJWT

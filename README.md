@@ -98,12 +98,32 @@ Các màn hình được thiết kế theo phong cách phẳng (flat design), s�
 
 ## 4. CÔNG CỤ VÀ CÔNG NGHỆ SỬ DỤNG
 
-- Ngôn ngữ lập trình: Python
-- Framework: Flask (framework web)
+### 4.1. Backend
+- Ngôn ngữ lập trình: Python 3.9+
+- Framework: Flask
 - Cơ sở dữ liệu: SQLite (lưu trong instance/database.db)
-- Frontend: HTML, CSS, JavaScript
+- API intergration: Google Gemini API (Quiz)
+
+### 4.2. Frontend
+- HTML/CSS: Cấu trúc và giao diện web
+- JavaScript: Xử lý tương tác người dùng
+- Bootstrap: Framework CSS cho thiết kế responsive
+- Thư viện JavaScript:
+   - Plotly.js: Tạo biểu đồ thống kê tương tác
+   - Editorjs: Editor định dạng cho ghi chú
+
+### 4.3. Security
+- Authentication: JWT (JSON Web Tokens)
+- Password Hashing: Bcrypt
+
+### 4.4. DevOps & Deployment
 - IDE: Visual Studio Code
-- Docker: Containerization
+- Version Control: Git
+- Containerization: Docker
+- Cloud Platform: Google Cloud Run (Deploy)
+- Testing Tools:
+   - Pytest (kiểm thử chức năng)
+   - Locust (kiểm thử hiệu năng)
 
 ## 5. TRIỂN KHAI
 
@@ -118,7 +138,7 @@ Các màn hình được thiết kế theo phong cách phẳng (flat design), s�
 
 #### 5.2.1. Clone repository từ GitHub
 ```bash
-git clone <repository_url>
+git clone https://github.com/iuh-application-development/Lecture-Review.git
 cd Lecture-Review
 ```
 
@@ -137,6 +157,7 @@ source venv/bin/activate
 
 #### 5.2.3. Cài đặt các thư viện phụ thuộc
 ```bash
+python -m pip install --upgrade pip  # Nâng cấp phiên bản mới nhất của pip
 pip install -r requirements.txt
 ```
 
@@ -150,6 +171,7 @@ SECRET_KEY=your_secret_key
 JWT_SECRET_KEY=your_jwt_secret_key
 MAIL_USERNAME=your_email@gmail.com
 MAIL_PASSWORD=your_email_password
+GEMINI_API_KEY=your_api_key_gemini
 ```
 
 ### 5.4. Chạy và phát triển ứng dụng
@@ -175,7 +197,13 @@ docker build -t lecture-review:latest .
 
 #### 5.5.2. Chạy container từ image đã tạo
 ```bash
-docker run -p 8080:8080 -e SECRET_KEY=your_secret_key -e JWT_SECRET_KEY=your_jwt_secret_key -e MAIL_USERNAME=your_email@gmail.com -e MAIL_PASSWORD=your_email_password lecture-review:latest
+docker run -p 8080:8080 \
+  -e SECRET_KEY=your_secret_key \
+  -e JWT_SECRET_KEY=your_jwt_secret_key \
+  -e MAIL_USERNAME=your_email@gmail.com \
+  -e MAIL_PASSWORD=your_email_password \
+  -e GEMINI_API_KEY=your_api_key_gemini \
+  lecture-review:latest
 ```
 
 ### 5.6. Triển khai lên Google Cloud Run
@@ -197,7 +225,15 @@ gcloud builds submit --tag gcr.io/YOUR_PROJECT_ID/lecture-review
 
 #### 5.6.4. Triển khai lên Google Cloud Run
 ```bash
-gcloud run deploy lecture-review --image gcr.io/YOUR_PROJECT_ID/lecture-review --platform managed --region asia-southeast1 --allow-unauthenticated --set-env-vars="SECRET_KEY=your_secret_key,JWT_SECRET_KEY=your_jwt_secret_key,MAIL_USERNAME=your_email@gmail.com,MAIL_PASSWORD=your_email_password"
+gcloud run deploy lecture-review \
+  --source . \
+  --region asia-southeast1 \
+  --allow-unauthenticated \
+  --set-env-vars="SECRET_KEY=your_secret_key,\
+JWT_SECRET_KEY=your_jwt_secret_key,\
+MAIL_USERNAME=your_email@gmail.com,\
+MAIL_PASSWORD=your_email_password,\
+GEMINI_API_KEY=your_api_key_gemini"
 ```
 
 ### 5.7. Quản lý triển khai
@@ -219,8 +255,13 @@ gcloud run deploy lecture-review --image gcr.io/YOUR_PROJECT_ID/lecture-review -
 - Cân nhắc sử dụng cơ sở dữ liệu có tính sao lưu tự động như Cloud SQL cho môi trường sản phẩm
 
 ## 6. KIỂM THỬ
-- Thực hiện kiểm thử chức năng (Functional Testing)
-- Kiểm thử hiệu năng (Performance Testing)
+- Thực hiện kiểm thử chức năng (Functional Testing): Kiểm thử chức năng đăng nhập, đăng kí, đăng xuất, truy cập các giao diện người dùng, tạo và chia sẻ note,... (Chạy lệnh: `pytest tests`)
+   ![Pytest](./docs/testing/pytest.png)
+
+- Kiểm thử hiệu năng (Performance Testing): Mô phỏng nhiều người dùng và thực hiện các hành động cùng một lúc (Chạy lệnh: `locust --host=http://localhost:8080`)
+   ![Locust Statistic](./docs/testing/locust_stat.png)
+  
+   ![Locust Charts](./docs/testing/locust_charts.png)
 
 ## 7. KẾT QUẢ
 ### 7.1. Kết quả đạt được
@@ -231,22 +272,28 @@ gcloud run deploy lecture-review --image gcr.io/YOUR_PROJECT_ID/lecture-review -
 - Có cơ chế bảo mật để đảm bảo an toàn thông tin cá nhân
 - Xây dựng được tính năng luyện tập dưới dạng trắc nghiệm
 ### 7.2. Link deploy
-https://www.projectsiuh.online/
+https://www.projectsiuh.online
 
 ### 7.3. Kết quả chưa đạt được
-- [Kết quả chưa đạt được 1]
-- [Kết quả chưa đạt được 2]
+- Chưa triển khai được dark mode 
+- Giao diện website hiện tại chỉ tối ưu cho máy tính, sử dụng trên mobile thì bố cục sẽ bị lệch, khó thao tác
 
 ### 7.4. Hướng phát triển
 - Tích hợp trí tuệ nhân tạo để gợi ý và tóm tắt nội dung
 - Cải thiện hệ thống phân tích dữ liệu và báo cáo cho quản trị viên
 - Nâng cao thuật toán tạo trắc nghiệm với AI để sinh ra câu hỏi chất lượng cao hơn
 - Thêm tính năng chia sẻ bài trắc nghiệm và tổ chức thi đua giữa người dùng
-## 8. LINK VIDEO BÁO CÁO
+
+## 8. BÁO CÁO
+### 8.1. LINK VIDEO 
+Demo hệ thống ["All members in"](https://youtu.be/4Jz-p_o5K3o)
+
+### 8.2. KẾT QUẢ HOẠT ĐỘNG NHÓM
+Để xem thông tin chi tiết hơn về quá trình hoạt động nhóm, vui lòng tham khảo [Báo cáo hoạt động nhóm](./docs/Report.pdf).
+
 ## 9. TÀI LIỆU THAM KHẢO
-- Flask Documentation: https://flask.palletsprojects.com/
-- WeasyPrint: https://weasyprint.org/
-- MDN Web Docs (HTML, CSS, JavaScript): https://developer.mozilla.org/
-- Bootstrap Documentation: https://getbootstrap.com/docs/
-- Python Documentation: https://docs.python.org/
-- W3Schools Online Web Tutorials: https://www.w3schools.com/
+- Flask Documentation: https://flask.palletsprojects.com
+- Google Gemini API Documentation: https://ai.google.dev/gemini-api/docs?hl=vi
+- Bootstrap Documentation: https://getbootstrap.com/docs
+- Editor.js Documentation: https://editorjs.io/getting-started
+- Google Cloud Run Documentation: https://cloud.google.com/run/docs/deploy-functions

@@ -12,12 +12,15 @@ import json
 from sqlalchemy.sql.expression import or_
 from werkzeug.utils import secure_filename
 import os
-
+from .utils.quiz_generator import generate_quiz
+from .utils.jwt_processor import generate_password_reset_token, verify_password_reset_token
+from werkzeug.security import generate_password_hash
 
 api = Blueprint('api', __name__)
 API_VERSION = 'api-v1'
 
 @api.route('/notes', methods=['GET'])
+@login_required
 def get_notes():
     try:
         limit = request.args.get('limit', type=int)
@@ -52,6 +55,7 @@ def get_notes():
         }), 500
 
 @api.route('/notes-paginate', methods=['GET'])
+@login_required
 def get_notes_paginate():
     try:
         page = request.args.get('page', 1, type=int)
@@ -116,13 +120,14 @@ def get_notes_paginate():
         }), 500
 
 @api.route('/notes/create', methods=['POST'])
+@login_required
 def create_note():
     data = request.get_json()
     title = data.get('title')
     content = data.get('content')
     color = data.get('color', 'note-green')
     tags = data.get('tags', [])
-    user_id = data.get('user_id')
+    user_id = current_user.id
     is_public = data.get('is_public', False)
 
     new_note = Note(
@@ -170,6 +175,7 @@ def edit_note(note_id):
     })
 
 @api.route('/notes/<int:note_id>', methods=['GET'])
+@login_required
 def get_note_detail(note_id):
     note = Note.query.get_or_404(note_id)
     note_data = {
@@ -318,6 +324,7 @@ def delete_note(note_id):
     return jsonify({'success': True, 'message': 'Note permanently deleted.'})
 
 @api.route('/user-notes/<int:user_id>')
+@login_required
 def get_user_notes(user_id):
     notes = Note.query.filter_by(user_id=user_id).all()
     notes_data = [{
@@ -331,21 +338,21 @@ def get_user_notes(user_id):
     return jsonify({'success': True, 'notes': notes_data})
 
 @api.route('/shared-notes', methods=['GET'])
+@login_required
 def get_shared_notes():
     try:
-        limit = request.args.get('limit', type=int)
-        by_me = request.args.get('byMe', type=int)
+        page = request.args.get('page', 1, type=int)
+        limit = request.args.get('limit', 15, type=int)
+        by_me = request.args.get('byMe', type=str)
 
-        if by_me:
+        if by_me == 'true':
             query = ShareNote.query.join(ShareNote.note).filter(ShareNote.sharer_id==current_user.id, Note.is_trashed==False).order_by(Note.updated_at.desc())
         else:
             query = ShareNote.query.join(ShareNote.note).filter(ShareNote.recipient_id==current_user.id, Note.is_trashed==False).order_by(Note.updated_at.desc())
-
-        if limit:
-            shared_notes = query.limit(limit).all()
-        else:
-            shared_notes = query.all()
-
+        
+        # Phân trang
+        pagination = query.paginate(page=page, per_page=limit, error_out=False)
+        
         shared_notes_data = [{
             'note_id': shared_note.note.id,
             'title': shared_note.note.title,
@@ -355,22 +362,31 @@ def get_shared_notes():
             'color': shared_note.note.color,
             'tags': shared_note.note.tags,
             'sharer': shared_note.sharer.first_name + ' ' + shared_note.sharer.last_name,
-            'recipient': shared_note.recipient.first_name + ' ' + shared_note.recipient.last_name
-        } for shared_note in shared_notes]
+            'recipient': shared_note.recipient.first_name + ' ' + shared_note.recipient.last_name,
+            'share_id': shared_note.id
+        } for shared_note in pagination.items]
 
         return jsonify({
             'status': 'success',
-            'data': shared_notes_data
+            'data': {
+                'notes': shared_notes_data,
+                'page': pagination.page,
+                'total_pages': pagination.pages,
+                'total_items': pagination.total,
+                'has_next': pagination.has_next,
+                'has_prev': pagination.has_prev
+            }
         })
 
     except Exception as e:
-        print('Error in get_notes:', str(e))  # Log lỗi để debug
+        print('Error in get_shared_notes:', str(e))  # Log lỗi để debug
         return jsonify({
             'status': 'error',
             'message': 'Error fetching notes'
         }), 500
 
 @api.route('/export-pdf', methods=['POST'])
+@login_required
 def export_pdf():
     payload = request.get_json()
     blocks = payload.get('blocks', [])
@@ -394,6 +410,7 @@ def export_pdf():
     return response
 
 @api.route('/send-otp', methods=['POST'])
+@login_required
 def send_otp():
     data = request.get_json()
     email = data.get('email')
@@ -411,7 +428,6 @@ def send_otp():
 
     send_email('Mã OTP của bạn', email, message)
     return message
-        
         
 @api.route('/public-notes', methods=['GET'])
 def get_public_notes():
@@ -459,6 +475,7 @@ def get_public_notes():
         }), 500
 
 @api.route('/comments/<int:note_id>', methods=['GET'])
+@login_required
 def get_comments(note_id):
     try: 
         note = Note.query.get_or_404(note_id)
@@ -665,21 +682,6 @@ def update_avatar():
     flash('Avatar updated successfully!', 'success')
     return redirect(url_for('views.profile'))
 
-### Standardize API responses and Handle Error ###
-@api.before_request
-def before_api_request():
-    g.api_info = {
-        'version': API_VERSION,
-        'endpoint': request.path,
-        'method': request.method
-    }
-
-def api_response(data):
-    return jsonify({
-        'api_info': g.api_info,
-        'data': data
-    })
-
 @api.route('/notes/<int:note_id>/clone', methods=['POST'])
 @login_required
 def clone_note(note_id):
@@ -720,6 +722,222 @@ def clone_note(note_id):
             'success': False,
             'message': f'Error cloning note: {str(e)}'
         }), 500
+
+@api.route('/generate-quiz/<int:note_id>', methods=['POST'])
+@login_required
+def create_quiz(note_id):
+    try:
+        data = request.get_json()
+        question_count = data.get('question_count', 5)  # Mặc định 5 câu hỏi
+        time_limit = data.get('time_limit', 0) # Mặc định không giới hạn thời gian
+
+        quiz_text = generate_quiz(note_id, question_count)
+        start_idx = quiz_text.find('{')
+        end_idx = quiz_text.rfind('}') + 1
+        
+        if start_idx >= 0 and end_idx > start_idx:
+            json_str = quiz_text[start_idx:end_idx]
+            quiz_json = json.loads(json_str)
+            return jsonify({"success": True, "quiz": quiz_json})
+        else:
+            print(f"Quiz generation error: {str(e)}")
+            return jsonify({"success": False, "error": "Invalid JSON response format"})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@api.route('/request-password-reset', methods=['POST'])
+def request_password_reset():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        
+        if not email:
+            return jsonify({
+                'success': False,
+                'message': 'Email là bắt buộc'
+            }), 400
+            
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({
+                'success': False,
+                'message': 'Email không tồn tại trong hệ thống'
+            }), 404
+            
+        # Tạo JWT token cho đặt lại mật khẩu
+        reset_token = generate_password_reset_token(email)
+        
+        # Tạo URL đặt lại mật khẩu
+        reset_url = request.host_url.rstrip('/') + f'/reset-password?token={reset_token}'
+        
+        # Chuẩn bị nội dung email
+        message = f"""
+        <html>
+        <body>
+            <h2>Đặt lại mật khẩu</h2>
+            <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản của mình.</p>
+            <p>Vui lòng click vào liên kết sau để đặt lại mật khẩu:</p>
+            <p><a href="{reset_url}">Tại đây</a></p>
+            <p>Liên kết này có hiệu lực trong 30 phút.</p>
+            <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>
+        </body>
+        </html>
+        """
+        
+        # Gửi email chứa liên kết đặt lại mật khẩu
+        send_email('Yêu cầu đặt lại mật khẩu', email, message)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Email đặt lại mật khẩu đã được gửi'
+        })
+        
+    except Exception as e:
+        print(f'Lỗi khi gửi email đặt lại mật khẩu: {str(e)}')
+        return jsonify({
+            'success': False,
+            'message': 'Đã xảy ra lỗi khi gửi email đặt lại mật khẩu'
+        }), 500
+
+@api.route('/verify-reset-token', methods=['POST'])
+def verify_reset_token():
+    try:
+        data = request.get_json()
+        token = data.get('token')
+        
+        if not token:
+            return jsonify({
+                'success': False,
+                'message': 'Token là bắt buộc'
+            }), 400
+            
+        # Xác thực token
+        email = verify_password_reset_token(token)
+        
+        if not email:
+            return jsonify({
+                'success': False,
+                'message': 'Token không hợp lệ hoặc đã hết hạn'
+            }), 400
+            
+        # Kiểm tra xem email có tồn tại trong hệ thống không
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({
+                'success': False,
+                'message': 'Người dùng không tồn tại'
+            }), 404
+            
+        return jsonify({
+            'success': True,
+            'message': 'Token hợp lệ',
+            'email': email
+        })
+        
+    except Exception as e:
+        print(f'Lỗi khi xác thực token: {str(e)}')
+        return jsonify({
+            'success': False,
+            'message': 'Đã xảy ra lỗi khi xác thực token'
+        }), 500
+
+@api.route('/complete-password-reset', methods=['POST'])
+def complete_password_reset():
+    try:
+        data = request.get_json()
+        token = data.get('token')
+        new_password = data.get('new_password')
+        
+        if not token or not new_password:
+            return jsonify({
+                'success': False,
+                'message': 'Token và mật khẩu mới là bắt buộc'
+            }), 400
+            
+        # Kiểm tra độ dài mật khẩu
+        if len(new_password) < 6:
+            return jsonify({
+                'success': False,
+                'message': 'Mật khẩu phải có ít nhất 6 ký tự'
+            }), 400
+            
+        # Xác thực token
+        email = verify_password_reset_token(token)
+        
+        if not email:
+            return jsonify({
+                'success': False,
+                'message': 'Token không hợp lệ hoặc đã hết hạn'
+            }), 400
+            
+        # Tìm người dùng
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({
+                'success': False,
+                'message': 'Không tìm thấy người dùng'
+            }), 404
+        
+        try:
+            # Cập nhật mật khẩu
+            user.password_hash = generate_password_hash(new_password)
+            
+            # Tạo thông báo cho người dùng
+            notification = UserNotification(
+                user_id=user.id,
+                title="Mật khẩu đã được thay đổi",
+                message="Mật khẩu tài khoản của bạn đã được thay đổi thành công.",
+                type='info',
+                is_read=False
+            )
+            db.session.add(notification)
+            db.session.commit()
+            
+            # Gửi email thông báo đổi mật khẩu thành công
+            notify_message = f"""
+            <html>
+            <body>
+                <h2>Mật khẩu đã được thay đổi</h2>
+                <p>Mật khẩu tài khoản của bạn đã được thay đổi thành công.</p>
+                <p>Thời gian: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}</p>
+                <p>Nếu bạn không thực hiện thao tác này, vui lòng liên hệ với quản trị viên ngay lập tức.</p>
+            </body>
+            </html>
+            """
+            
+            send_email('Thông báo: Mật khẩu đã được thay đổi', email, notify_message)
+            
+            return jsonify({
+                'success': True,
+                'message': 'Mật khẩu đã được đặt lại thành công'
+            })
+            
+        except Exception as e:
+            db.session.rollback()
+            raise e
+            
+    except Exception as e:
+        db.session.rollback()
+        print(f'Lỗi khi đặt lại mật khẩu: {str(e)}')
+        return jsonify({
+            'success': False,
+            'message': 'Đã xảy ra lỗi khi đặt lại mật khẩu'
+        }), 500
+
+### Standardize API responses and Handle Error ###
+@api.before_request
+def before_api_request():
+    g.api_info = {
+        'version': API_VERSION,
+        'endpoint': request.path,
+        'method': request.method
+    }
+
+def api_response(data):
+    return jsonify({
+        'api_info': g.api_info,
+        'data': data
+    })
 
 @api.errorhandler(404)
 def handle_404_error(e):
