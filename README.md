@@ -283,7 +283,14 @@ https://www.projectsiuh.online
 - Cải thiện hệ thống phân tích dữ liệu và báo cáo cho quản trị viên
 - Nâng cao thuật toán tạo trắc nghiệm với AI để sinh ra câu hỏi chất lượng cao hơn
 - Thêm tính năng chia sẻ bài trắc nghiệm và tổ chức thi đua giữa người dùng
-## 8. LINK VIDEO BÁO CÁO
+
+## 8. BÁO CÁO
+### 8.1. LINK VIDEO 
+Demo hệ thống ["All members in"](https://youtu.be/4Jz-p_o5K3o)
+
+### 8.2. KẾT QUẢ HOẠT ĐỘNG NHÓM
+Để xem thông tin chi tiết hơn về quá trình hoạt động nhóm, vui lòng tham khảo [Báo cáo hoạt động nhóm](./docs/Report.pdf).
+
 ## 9. TÀI LIỆU THAM KHẢO
 - Flask Documentation: https://flask.palletsprojects.com
 - Google Gemini API Documentation: https://ai.google.dev/gemini-api/docs?hl=vi
